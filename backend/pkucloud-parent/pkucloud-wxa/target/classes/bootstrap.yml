@@ -1,5 +1,0 @@
-spring:
-  application:
-    name: pkucloud-wxa
-  profiles:
-    active: dev

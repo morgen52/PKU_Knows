@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: pkucloud-msg
+  cloud:
+    nacos:
+      config:
+        server-addr: 172.25.39.30:8848
+      discovery:
+        server-addr: 172.25.39.30:8848
+  jackson:
+    default-property-inclusion: non_null
+server:
+  port: 11082
+tencentcloud:
+  sms:
+    secretId: AKIDczY5Qo94KJ9xWo9ugMlt63xZvNZfv5a7
+    secretKey: PJ4ZCZfiV2JI2VpupWvUnbhW4LVP1Lm3
+    appid: 1400452579
+    sign: 未名云
+    templateID: 769779

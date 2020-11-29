@@ -1,0 +1,16 @@
+C:\Users\mryao\IdeaProjects\pkucloud-parent\pkucloud-auth\src\main\java\cn\pkucloud\auth\entity\wx\BaseResult.java
+C:\Users\mryao\IdeaProjects\pkucloud-parent\pkucloud-auth\src\main\java\cn\pkucloud\auth\controller\AuthController.java
+C:\Users\mryao\IdeaProjects\pkucloud-parent\pkucloud-auth\src\main\java\cn\pkucloud\auth\AuthApplication.java
+C:\Users\mryao\IdeaProjects\pkucloud-parent\pkucloud-auth\src\main\java\cn\pkucloud\auth\feign\WxSnsClient.java
+C:\Users\mryao\IdeaProjects\pkucloud-parent\pkucloud-auth\src\main\java\cn\pkucloud\auth\entity\wx\AccessToken.java
+C:\Users\mryao\IdeaProjects\pkucloud-parent\pkucloud-auth\src\main\java\cn\pkucloud\auth\entity\wx\UserInfo.java
+C:\Users\mryao\IdeaProjects\pkucloud-parent\pkucloud-auth\src\main\java\cn\pkucloud\auth\entity\Auth.java
+C:\Users\mryao\IdeaProjects\pkucloud-parent\pkucloud-auth\src\main\java\cn\pkucloud\auth\entity\wx\WxLoginType.java
+C:\Users\mryao\IdeaProjects\pkucloud-parent\pkucloud-auth\src\main\java\cn\pkucloud\auth\service\AuthService.java
+C:\Users\mryao\IdeaProjects\pkucloud-parent\pkucloud-auth\src\main\java\cn\pkucloud\auth\dto\LoginDto.java
+C:\Users\mryao\IdeaProjects\pkucloud-parent\pkucloud-auth\src\main\java\cn\pkucloud\auth\feign\MsgClient.java
+C:\Users\mryao\IdeaProjects\pkucloud-parent\pkucloud-auth\src\main\java\cn\pkucloud\auth\entity\CodeInfo.java
+C:\Users\mryao\IdeaProjects\pkucloud-parent\pkucloud-auth\src\main\java\cn\pkucloud\auth\feign\WxspClient.java
+C:\Users\mryao\IdeaProjects\pkucloud-parent\pkucloud-auth\src\main\java\cn\pkucloud\auth\mapper\AuthMapper.java
+C:\Users\mryao\IdeaProjects\pkucloud-parent\pkucloud-auth\src\main\java\cn\pkucloud\auth\service\impl\AuthServiceImpl.java
+C:\Users\mryao\IdeaProjects\pkucloud-parent\pkucloud-auth\src\main\java\cn\pkucloud\auth\entity\WxspResult.java

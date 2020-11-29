@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: pkucloud-auth
+  cloud:
+    nacos:
+      config:
+        server-addr: 172.25.39.30:8848
+      discovery:
+        server-addr: 172.25.39.30:8848
+  jackson:
+    default-property-inclusion: non_null
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://172.25.39.30:3306/pkucloud_auth
+    username: root
+    password: root
+  redis:
+    host: 172.25.39.30
+    port: 6379
+    database: 0
+server:
+  port: 12082
+feign:
+  hystrix:
+    enabled: true
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+sms:
+  ttl: 5
+wx:
+  app:
+    appid: wx123
+    secret: wx456
+  web:
+    appid: wx8104ed8be1bc5872
+    secret: d6a9350ea97879de66166633cd3a07aa
+  wxh5:
+    appid: wxd2bbe3e6ac56ab39
+    secret: fa492ba8f3bb6822cd97eec14a129eb0

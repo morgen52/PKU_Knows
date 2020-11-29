@@ -2,14 +2,17 @@ package cn.pkucloud.wxmp.service.impl;
 
 import cn.pkucloud.common.Result;
 import cn.pkucloud.wxmp.entity.wx.AccessToken;
+import cn.pkucloud.wxmp.entity.wx.Signature;
 import cn.pkucloud.wxmp.entity.wx.Ticket;
 import cn.pkucloud.wxmp.feign.WxmpClient;
 import cn.pkucloud.wxmp.service.WxmpService;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -29,8 +32,7 @@ public class WxmpServiceImpl implements WxmpService {
         this.wxmpClient = wxmpClient;
     }
 
-    @Override
-    public Result<String> getJsapiTicket() {
+    private String getJsapiTicket() {
         BoundValueOperations<String, String> ops = redisTemplate.boundValueOps("jsapi_ticket");
         String jsapi_ticket = ops.get();
         if (null == jsapi_ticket) {
@@ -44,7 +46,7 @@ public class WxmpServiceImpl implements WxmpService {
                 }
             }
         }
-        return new Result<>(jsapi_ticket);
+        return jsapi_ticket;
     }
 
     private String getAccessToken() {
@@ -61,5 +63,19 @@ public class WxmpServiceImpl implements WxmpService {
             }
         }
         return access_token;
+    }
+
+    @Override
+    public Result<Signature> getSignature() {
+        String jsapi_ticket = getJsapiTicket();
+        String nonceStr = UUID.randomUUID().toString().replace("-", "");
+        String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
+        String url = "https://sso.pkucloud.cn/index.html";
+        String strToSign = "jsapi_ticket=" + jsapi_ticket +
+                "&noncestr=" + nonceStr +
+                "&timestamp=" + timestamp +
+                "&url=" + url;
+        String signature = DigestUtils.sha1Hex(strToSign);
+        return new Result<>(new Signature(nonceStr, timestamp, signature));
     }
 }

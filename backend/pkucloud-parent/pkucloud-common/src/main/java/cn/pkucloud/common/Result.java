@@ -1,5 +1,6 @@
 package cn.pkucloud.common;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import static cn.pkucloud.common.ResultCode.OK;
@@ -8,6 +9,7 @@ import static cn.pkucloud.common.ResultCode.OK;
 public class Result<T> {
     private int code;
     private String msg;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
 
     public Result() {

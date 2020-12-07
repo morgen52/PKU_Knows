@@ -17,12 +17,12 @@ package cn.pkucloud.wxa.netty;
 
 import cn.pkucloud.wxa.service.WxaService;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -47,22 +47,30 @@ import org.springframework.stereotype.Component;
 @Component
 public class WebSocketServer {
 
-    static final int PORT = 14082;
-
+    static final int PORT = 12082;
+    private final EventLoopGroup bossGroup;
+    private final EventLoopGroup workerGroup;
     private final ServerBootstrap b;
 
     public WebSocketServer(WxaService wxaService) {
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        bossGroup = new NioEventLoopGroup();
+        workerGroup = new NioEventLoopGroup();
         b = new ServerBootstrap();
-        b.group(bossGroup, workerGroup)
+        b
+                .group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .handler(new LoggingHandler(LogLevel.INFO))
                 .childHandler(new WebSocketServerInitializer(wxaService));
     }
 
-    public void run() {
-        b.bind(PORT);
-        System.out.println("netty server started");
+    public void run() throws InterruptedException {
+        try {
+            Channel ch = b.bind(PORT).sync().channel();
+            System.out.println("netty server started");
+            ch.closeFuture().sync();
+        } finally {
+            bossGroup.shutdownGracefully();
+            workerGroup.shutdownGracefully();
+        }
     }
 }

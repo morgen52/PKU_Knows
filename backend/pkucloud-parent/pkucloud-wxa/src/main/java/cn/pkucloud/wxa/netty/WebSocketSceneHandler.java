@@ -23,6 +23,7 @@ public class WebSocketSceneHandler extends SimpleChannelInboundHandler<WebSocket
             String uri = request.uri();
             HttpHeaders headers = request.headers();
             String ip = headers.get("X-Real-IP");
+            ip = "192.168.0.100";
             String ipListStr = headers.get("X-Forwarded-For");
             String ua = headers.get("User-Agent");
             if (Pattern.matches("^/ws/[0-9a-f]{32}$", uri)) {

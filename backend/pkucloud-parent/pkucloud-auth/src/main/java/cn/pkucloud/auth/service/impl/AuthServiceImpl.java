@@ -1,34 +1,46 @@
 package cn.pkucloud.auth.service.impl;
 
-import cn.pkucloud.auth.entity.Auth;
-import cn.pkucloud.auth.entity.CodeInfo;
-import cn.pkucloud.auth.entity.WxspResult;
+import cn.pkucloud.auth.dto.PkuUserInfoDto;
+import cn.pkucloud.auth.dto.WxaUserInfoDto;
+import cn.pkucloud.auth.entity.*;
 import cn.pkucloud.auth.entity.wx.AccessToken;
 import cn.pkucloud.auth.feign.MsgClient;
 import cn.pkucloud.auth.feign.WxSnsClient;
 import cn.pkucloud.auth.feign.WxspClient;
 import cn.pkucloud.auth.mapper.AuthMapper;
+import cn.pkucloud.auth.mapper.PkuUserInfoMapper;
+import cn.pkucloud.auth.mapper.WxUserInfoMapper;
 import cn.pkucloud.auth.service.AuthService;
 import cn.pkucloud.common.Result;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.core.incrementer.DefaultIdentifierGenerator;
+import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
+import java.security.Key;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import static cn.pkucloud.auth.entity.wx.WxLoginType.*;
-import static cn.pkucloud.common.ResultCode.BAD_REQUEST;
-import static cn.pkucloud.common.ResultCode.NOT_FOUND;
+import static cn.pkucloud.common.ResultCode.*;
 
 @Service
-public class AuthServiceImpl extends ServiceImpl<AuthMapper, Auth> implements AuthService {
+public class AuthServiceImpl implements AuthService {
+    private final AuthMapper authMapper;
+
+    private final WxUserInfoMapper wxUserInfoMapper;
+
+    private final PkuUserInfoMapper pkuUserInfoMapper;
+
     private final StringRedisTemplate redisTemplate;
 
     private final ObjectMapper objectMapper;
@@ -60,12 +72,15 @@ public class AuthServiceImpl extends ServiceImpl<AuthMapper, Auth> implements Au
     @Value("${wx.wxh5.secret}")
     private String wxh5Secret;
 
-    public AuthServiceImpl(StringRedisTemplate redisTemplate, ObjectMapper objectMapper, WxspClient wxspClient, MsgClient msgClient, WxSnsClient wxSnsClient) {
+    public AuthServiceImpl(StringRedisTemplate redisTemplate, ObjectMapper objectMapper, WxspClient wxspClient, MsgClient msgClient, WxSnsClient wxSnsClient, AuthMapper authMapper, WxUserInfoMapper wxUserInfoMapper, PkuUserInfoMapper pkuUserInfoMapper) {
         this.redisTemplate = redisTemplate;
         this.objectMapper = objectMapper;
         this.wxspClient = wxspClient;
         this.msgClient = msgClient;
         this.wxSnsClient = wxSnsClient;
+        this.authMapper = authMapper;
+        this.wxUserInfoMapper = wxUserInfoMapper;
+        this.pkuUserInfoMapper = pkuUserInfoMapper;
     }
 
     @Override
@@ -113,41 +128,99 @@ public class AuthServiceImpl extends ServiceImpl<AuthMapper, Auth> implements Au
         if (null != unionid) {
             Auth auth = getByWxUnionId(unionid);
             if (null != auth) {
-
+                // 登录
+                String jws = signJwt(auth.getId());
+                return new Result<>(jws);
             } else {
-
+                // 要求注册
+                return new Result<>(AUTHORIZATION_REQUIRED, "please register first");
             }
-            return new Result<>();
         }
         return new Result<>(BAD_REQUEST, "bad request");
+    }
+
+    @Override
+    public Result<String> wxaLogin(String wxaUserInfoStr, String pkuUserInfoStr) throws JsonProcessingException {
+        IdentifierGenerator identifierGenerator = new DefaultIdentifierGenerator();
+        WxaUserInfoDto wxaUserInfoDto = objectMapper.readValue(wxaUserInfoStr, WxaUserInfoDto.class);
+        PkuUserInfoDto pkuUserInfoDto = objectMapper.readValue(pkuUserInfoStr, PkuUserInfoDto.class);
+        String wxUnionId = wxaUserInfoDto.getUnionId();
+        String pkuId = pkuUserInfoDto.getPkuId();
+        Auth wxAuth = getByWxUnionId(wxUnionId);
+        Auth pkuAuth = getByPkuId(pkuId);
+        long id = 0;
+        int timestamp = (int) (System.currentTimeMillis() / 1000);
+        WxUserInfo wxUserInfo = new WxUserInfo(wxaUserInfoDto, timestamp, timestamp);
+        if (null == wxAuth) {
+            wxUserInfoMapper.insert(wxUserInfo);
+        } else {
+            wxUserInfo.setCreateTime(0);
+            wxUserInfoMapper.updateById(wxUserInfo);
+        }
+        PkuUserInfo pkuUserInfo = new PkuUserInfo(pkuUserInfoDto, timestamp, timestamp);
+        if (null == pkuAuth) {
+            id = (long) identifierGenerator.nextId(null);
+            Auth auth = Auth.builder()
+                    .id(id)
+                    .status(0)
+                    .risk(0)
+                    .createTime(timestamp)
+                    .accessTime(timestamp)
+                    .pkuId(pkuId)
+                    .wxUnionId(wxUnionId)
+                    .build();
+            authMapper.insert(auth);
+
+            pkuUserInfoMapper.insert(pkuUserInfo);
+        } else {
+            id = pkuAuth.getId();
+            Auth auth = Auth.builder()
+                    .id(id)
+                    .accessTime(timestamp)
+                    .build();
+            authMapper.updateById(auth);
+
+            pkuUserInfo.setCreateTime(0);
+            pkuUserInfoMapper.updateById(pkuUserInfo);
+        }
+        String jws = signJwt(id);
+        return new Result<>(jws);
+    }
+
+    @Override
+    public Result<Auth> getAuthByWxUnionId(String wxUnionId) {
+        Auth auth = getByWxUnionId(wxUnionId);
+        if (null == auth) {
+            return new Result<>(NOT_FOUND, "not found");
+        }
+        return new Result<>(auth);
     }
 
     private Auth getByWxUnionId(String wxUnionId) {
         QueryWrapper<Auth> wrapper = new QueryWrapper<>();
         wrapper.eq("wx_union_id", wxUnionId);
-        return getOne(wrapper);
-    }
-
-    private Auth getByPhone(String phone) {
-        QueryWrapper<Auth> wrapper = new QueryWrapper<>();
-        wrapper.eq("phone", phone);
-        return getOne(wrapper);
+        return authMapper.selectOne(wrapper);
     }
 
     private Auth getByPkuId(String pkuId) {
         QueryWrapper<Auth> wrapper = new QueryWrapper<>();
         wrapper.eq("pku_id", pkuId);
-        return getOne(wrapper);
+        return authMapper.selectOne(wrapper);
     }
 
     private Auth getByUserName(String userName) {
         QueryWrapper<Auth> wrapper = new QueryWrapper<>();
         wrapper.eq("user_name", userName);
-        return getOne(wrapper);
+        return authMapper.selectOne(wrapper);
     }
 
-    private String signJwt(String id) {
+    private String signJwt(long id) {
         SignatureAlgorithm algorithm = SignatureAlgorithm.HS256;
-        return null;
+        Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+
+        return Jwts.builder()
+                .setSubject(String.valueOf(id))
+                .signWith(key)
+                .compact();
     }
 }

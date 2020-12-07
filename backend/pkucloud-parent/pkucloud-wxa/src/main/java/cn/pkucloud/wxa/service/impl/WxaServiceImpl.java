@@ -4,10 +4,12 @@ import cn.pkucloud.common.Result;
 import cn.pkucloud.wxa.entity.SceneInfo;
 import cn.pkucloud.wxa.entity.wx.AccessToken;
 import cn.pkucloud.wxa.entity.wx.WxaCodeRequest;
+import cn.pkucloud.wxa.feign.AuthClient;
 import cn.pkucloud.wxa.feign.WxaClient;
 import cn.pkucloud.wxa.service.WxaService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -28,19 +30,28 @@ public class WxaServiceImpl implements WxaService {
 
     private final WxaClient wxaClient;
 
+    private final AuthClient authClient;
+
     @Value("${wx.wxa.appid}")
     private String APPID;
 
     @Value("${wx.wxa.secret}")
     private String SECRET;
 
+    @Value("${wx.wxa.cloudbase.appid}")
+    private String CLOUDBASE_APPID;
+
+    @Value("${wx.wxa.cloudbase.secret}")
+    private String CLOUDBASE_SECRET;
+
     @Value("${scene.ttl}")
     private int ttl;
 
-    public WxaServiceImpl(StringRedisTemplate redisTemplate, ObjectMapper objectMapper, WxaClient wxaClient) {
+    public WxaServiceImpl(StringRedisTemplate redisTemplate, ObjectMapper objectMapper, WxaClient wxaClient, AuthClient authClient) {
         this.redisTemplate = redisTemplate;
         this.objectMapper = objectMapper;
         this.wxaClient = wxaClient;
+        this.authClient = authClient;
     }
 
     @Override
@@ -76,7 +87,7 @@ public class WxaServiceImpl implements WxaService {
             SceneInfo sceneInfo = objectMapper.readValue(s, SceneInfo.class);
             if (sceneInfo.getIp().equals(ip) && sceneInfo.getUa().equals(ua) && CONNECTED >= sceneInfo.getState()) {
                 String access_token = getAccessToken();
-                WxaCodeRequest request = new WxaCodeRequest(scene, "pages/auth/scan");
+                WxaCodeRequest request = new WxaCodeRequest(scene, "pages/auth/index");
                 return wxaClient.getWxaCode(access_token, request);
             }
         }
@@ -100,7 +111,23 @@ public class WxaServiceImpl implements WxaService {
     }
 
     @Override
-    public Result<?> loginByWxa(String data) {
+    public Result<?> loginByWxa(String appid, String wxaUserInfo, String pkuUserInfo, String scene, String nonceStr, int timestamp, String sign) {
+        if (CLOUDBASE_APPID.equals(appid)) {
+            String strToSign =
+                    "appid=" + appid +
+                    "&nonceStr=" + nonceStr +
+                    "&pkuUserInfo=" + pkuUserInfo +
+                    "&scene=" + scene +
+                    "&timestamp=" + timestamp +
+                    "&wxaUserInfo=" + wxaUserInfo +
+                    "&secret=" + CLOUDBASE_SECRET;
+            System.out.println("strToSign = " + strToSign);
+            String sha1 = DigestUtils.sha1Hex(strToSign);
+            if (sha1.equals(sign)) {
+                Result<?> result = authClient.loginByWxa(wxaUserInfo, pkuUserInfo);
+                return new Result<>();
+            }
+        }
         return new Result<>(AUTHORIZATION_REQUIRED, "authorization required");
     }
 

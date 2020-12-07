@@ -13,5 +13,5 @@ public interface WxaService {
 
     Result<SceneInfo> getSceneInfo(String scene) throws JsonProcessingException;
 
-    Result<?> loginByWxa(String data);
+    Result<?> loginByWxa(String appid, String wxaUserInfo, String pkuUserInfo, String scene, String nonceStr, int timestamp, String sign);
 }

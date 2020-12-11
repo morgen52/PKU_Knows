@@ -1,43 +1,26 @@
 package cn.pkucloud.wxmp.service.impl;
 
-import cn.pkucloud.wxmp.dto.wx.xml.XmlEntity;
-import cn.pkucloud.wxmp.dto.wx.xml.XmlRequest;
-import cn.pkucloud.wxmp.dto.wx.xml.XmlResponse;
-import cn.pkucloud.wxmp.exception.AesException;
+import cn.pkucloud.wxmp.crypto.CryptoException;
+import cn.pkucloud.wxmp.crypto.CryptoUtil;
+import cn.pkucloud.wxmp.crypto.SHA1;
+import cn.pkucloud.wxmp.dto.wx.common.*;
+import cn.pkucloud.wxmp.dto.wx.custom.MiniProgramPageRequestEntity;
+import cn.pkucloud.wxmp.dto.wx.xml.*;
 import cn.pkucloud.wxmp.feign.AuthClient;
 import cn.pkucloud.wxmp.feign.MpClient;
-import cn.pkucloud.wxmp.service.MpMsgService;
 import cn.pkucloud.wxmp.service.AccessTokenService;
 import cn.pkucloud.wxmp.service.MpService;
-import cn.pkucloud.wxmp.util.ByteGroup;
-import cn.pkucloud.wxmp.util.PKCS7Encoder;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Random;
-import java.util.UUID;
 
 @Service
 public class MpServiceImpl implements MpService {
     private final AccessTokenService accessTokenService;
 
-    private final MpMsgService mpMsgService;
-
     private final MpClient mpClient;
 
     private final AuthClient authClient;
-
-    private final XmlMapper xmlMapper;
 
     @Value("${wx.mp.appid}")
     private String APPID;
@@ -51,17 +34,15 @@ public class MpServiceImpl implements MpService {
     @Value("${wx.mp.encoding_aes_key}")
     private String ENCODING_AES_KEY;
 
-    public MpServiceImpl(AccessTokenService accessTokenService, MpMsgService mpMsgService, MpClient mpClient, AuthClient authClient) {
+    public MpServiceImpl(AccessTokenService accessTokenService, MpClient mpClient, AuthClient authClient) {
         this.accessTokenService = accessTokenService;
-        this.mpMsgService = mpMsgService;
-        this.xmlMapper = new XmlMapper();
         this.mpClient = mpClient;
         this.authClient = authClient;
     }
 
     @Override
     public String echo(String signature, String echostr, int timestamp, String nonce) {
-        String sign = calcSignature(TOKEN, timestamp, nonce, "");
+        String sign = SHA1.calcSHA1(TOKEN, timestamp, nonce, "");
         if (sign.equals(signature)) {
             return echostr;
         }
@@ -69,9 +50,10 @@ public class MpServiceImpl implements MpService {
     }
 
     @Override
-    public XmlResponse msgHandler(String signature, int timestamp, String nonce, String openid, String encrypt_type, String msg_signature, XmlRequest request) throws AesException, JsonProcessingException {
+    public XmlResponse msgHandler(String signature, int timestamp, String nonce, String openid, String encrypt_type, String msg_signature, XmlRequest request) throws JsonProcessingException, CryptoException {
+        CryptoUtil cryptoUtil = new CryptoUtil(TOKEN, ENCODING_AES_KEY, APPID);
         String encrypt = request.getEncrypt();
-        XmlEntity entity = decryptMsg(msg_signature, timestamp, nonce, encrypt);
+        XmlRequestEntity entity = cryptoUtil.decryptMsg(timestamp, nonce, msg_signature, encrypt);
         System.out.println("entity = " + entity);
         String toUserName = entity.getToUserName();
         String fromUserName = entity.getFromUserName();
@@ -81,50 +63,50 @@ public class MpServiceImpl implements MpService {
         switch (msgType) {
             case "text":
                 String content = entity.getContent();
-                return mpMsgService.textMsgHandler(fromUserName, content);
+                return textMsgHandler(fromUserName, content);
 
             case "image":
                 String picUrl = entity.getPicUrl();
                 String imageMediaId = entity.getMediaId();
-                return mpMsgService.imageMsgHandler(fromUserName, picUrl, imageMediaId);
+                return imageMsgHandler(fromUserName, picUrl, imageMediaId);
 
             case "voice":
                 String voiceMediaId = entity.getMediaId();
                 String format = entity.getFormat();
                 String recognition = entity.getRecognition();
-                return mpMsgService.voiceMsgHandler(fromUserName, voiceMediaId, format, recognition);
+                return voiceMsgHandler(fromUserName, voiceMediaId, format, recognition);
 
             case "video":
                 String videoMediaId = entity.getMediaId();
                 String videoThumbMediaId = entity.getThumbMediaId();
-                return mpMsgService.videoMsgHandler(fromUserName, videoMediaId, videoThumbMediaId);
+                return videoMsgHandler(fromUserName, videoMediaId, videoThumbMediaId);
 
             case "shortvideo":
                 String shortVideoMediaId = entity.getMediaId();
                 String shortVideoThumbMediaId = entity.getThumbMediaId();
-                return mpMsgService.shortVideoMsgHandler(fromUserName, shortVideoMediaId, shortVideoThumbMediaId);
+                return shortVideoMsgHandler(fromUserName, shortVideoMediaId, shortVideoThumbMediaId);
 
             case "location":
                 double location_x = entity.getLocation_X();
                 double location_y = entity.getLocation_Y();
                 int scale = entity.getScale();
                 String label = entity.getLabel();
-                return mpMsgService.locationMsgHandler(fromUserName, location_x, location_y, scale, label);
+                return locationMsgHandler(fromUserName, location_x, location_y, scale, label);
 
             case "link":
                 String title = entity.getTitle();
                 String description = entity.getDescription();
                 String url = entity.getUrl();
-                return mpMsgService.linkMsgHandler(fromUserName, title, description, url);
+                return linkMsgHandler(fromUserName, title, description, url);
 
             case "event":
                 String event = entity.getEvent();
                 switch (event) {
                     case "subscribe":
-                        return mpMsgService.subscribeEventHandler(fromUserName);
+                        return subscribeEventHandler(fromUserName);
 
                     case "unsubscribe":
-                        return mpMsgService.unsubscribeEventHandler(fromUserName);
+                        return unsubscribeEventHandler(fromUserName);
 
                     default:
                         System.out.println(msgType);
@@ -138,159 +120,173 @@ public class MpServiceImpl implements MpService {
         return null;
     }
 
-    String decrypt(String text) throws AesException {
-        byte[] aesKey = Base64.decodeBase64(ENCODING_AES_KEY + "=");
+    // 接收普通消息
+    // https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Receiving_standard_messages.html
 
-        byte[] original;
-        try {
-            // 设置解密模式为AES的CBC模式
-            Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-            SecretKeySpec key_spec = new SecretKeySpec(aesKey, "AES");
-            IvParameterSpec iv = new IvParameterSpec(Arrays.copyOfRange(aesKey, 0, 16));
-            cipher.init(Cipher.DECRYPT_MODE, key_spec, iv);
-
-            // 使用BASE64对密文进行解码
-            byte[] encrypted = Base64.decodeBase64(text);
-
-            // 解密
-            original = cipher.doFinal(encrypted);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new AesException(AesException.DecryptAESError);
-        }
-
-        String xmlContent, from_appid;
-        try {
-            // 去除补位字符
-            byte[] bytes = PKCS7Encoder.decode(original);
-
-            // 分离16位随机字符串,网络字节序和AppId
-            byte[] networkOrder = Arrays.copyOfRange(bytes, 16, 20);
-
-            int xmlLength = recoverNetworkBytesOrder(networkOrder);
-
-            xmlContent = new String(Arrays.copyOfRange(bytes, 20, 20 + xmlLength), StandardCharsets.UTF_8);
-            from_appid = new String(Arrays.copyOfRange(bytes, 20 + xmlLength, bytes.length),
-                    StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new AesException(AesException.IllegalBuffer);
-        }
-
-        // appid不相同的情况
-        if (!from_appid.equals(APPID)) {
-            throw new AesException(AesException.ValidateAppidError);
-        }
-        return xmlContent;
+    /**
+     * 接收文本消息
+     * @param fromUserName 发送方帐号（一个OpenID）
+     * @param content
+     * @return
+     * @throws CryptoException
+     * @throws JsonProcessingException
+     */
+    private XmlResponse textMsgHandler(String fromUserName, String content) throws CryptoException, JsonProcessingException {
+        return replyTextMsg(fromUserName, content);
     }
 
-    XmlEntity decryptMsg(String msgSignature, int timeStamp, String nonce, String encrypt) throws AesException, JsonProcessingException {
-        String sign = calcSignature(TOKEN, timeStamp, nonce, encrypt);
-        if (!sign.equals(msgSignature)) {
-            throw new AesException(AesException.ValidateSignatureError);
-        }
-        String xmlEntityStr = decrypt(encrypt);
-        return xmlMapper.readValue(xmlEntityStr, XmlEntity.class);
+    /**
+     * 接收图片消息
+     * @param fromUserName 发送方帐号（一个OpenID）
+     * @param picUrl
+     * @param imageMediaId
+     * @return
+     * @throws CryptoException
+     * @throws JsonProcessingException
+     */
+    private XmlResponse imageMsgHandler(String fromUserName, String picUrl, String imageMediaId) throws CryptoException, JsonProcessingException {
+        return replyImageMsg(fromUserName, new Image(imageMediaId));
     }
 
-    String encrypt(String randomStr, String text) throws AesException {
-        byte[] aesKey = Base64.decodeBase64(ENCODING_AES_KEY + "=");
-
-        ByteGroup byteCollector = new ByteGroup();
-        byte[] randomStrBytes = randomStr.getBytes(StandardCharsets.UTF_8);
-        byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
-        byte[] networkBytesOrder = getNetworkBytesOrder(textBytes.length);
-        byte[] appidBytes = APPID.getBytes(StandardCharsets.UTF_8);
-
-        // randomStr + networkBytesOrder + text + appid
-        byteCollector.addBytes(randomStrBytes)
-                .addBytes(networkBytesOrder)
-                .addBytes(textBytes)
-                .addBytes(appidBytes);
-
-        // ... + pad: 使用自定义的填充方式对明文进行补位填充
-        byte[] padBytes = PKCS7Encoder.encode(byteCollector.size());
-        byteCollector.addBytes(padBytes);
-
-        // 获得最终的字节流, 未加密
-        byte[] unencrypted = byteCollector.toBytes();
-
-        try {
-            // 设置加密模式为AES的CBC模式
-            Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-            SecretKeySpec keySpec = new SecretKeySpec(aesKey, "AES");
-            IvParameterSpec iv = new IvParameterSpec(aesKey, 0, 16);
-            cipher.init(Cipher.ENCRYPT_MODE, keySpec, iv);
-
-            // 加密
-            byte[] encrypted = cipher.doFinal(unencrypted);
-
-            // 使用BASE64对加密后的字符串进行编码
-
-            return Base64.encodeBase64String(encrypted);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new AesException(AesException.EncryptAESError);
-        }
+    /**
+     * 接收语音消息
+     * @param fromUserName
+     * @param voiceMediaId
+     * @param format
+     * @param recognition
+     * @return
+     * @throws CryptoException
+     * @throws JsonProcessingException
+     */
+    private XmlResponse voiceMsgHandler(String fromUserName, String voiceMediaId, String format, String recognition) throws CryptoException, JsonProcessingException {
+        return replyVoiceMsg(fromUserName, new Voice(voiceMediaId));
     }
 
-    XmlResponse encryptMsg(XmlEntity xmlEntity, int timeStamp, String nonce) throws AesException, JsonProcessingException {
-        String xmlEntityStr = xmlMapper.writeValueAsString(xmlEntity);
-        String encrypt = encrypt(getRandomStr(), xmlEntityStr);
-        String signature = calcSignature(TOKEN, timeStamp, nonce, encrypt);
-        return new XmlResponse(encrypt, signature, timeStamp, nonce);
+    private XmlResponse videoMsgHandler(String fromUserName, String videoMediaId, String videoThumbMediaId) {
+        return null;
     }
 
-    // 生成4个字节的网络字节序
-    byte[] getNetworkBytesOrder(int sourceNumber) {
-        byte[] orderBytes = new byte[4];
-        orderBytes[3] = (byte) (sourceNumber & 0xFF);
-        orderBytes[2] = (byte) (sourceNumber >> 8 & 0xFF);
-        orderBytes[1] = (byte) (sourceNumber >> 16 & 0xFF);
-        orderBytes[0] = (byte) (sourceNumber >> 24 & 0xFF);
-        return orderBytes;
+    private XmlResponse shortVideoMsgHandler(String fromUserName, String shortVideoMediaId, String shortVideoThumbMediaId) {
+        return null;
     }
 
-    // 还原4个字节的网络字节序
-    int recoverNetworkBytesOrder(byte[] orderBytes) {
-        int sourceNumber = 0;
-        for (int i = 0; i < 4; i++) {
-            sourceNumber <<= 8;
-            sourceNumber |= orderBytes[i] & 0xff;
-        }
-        return sourceNumber;
+    private XmlResponse locationMsgHandler(String fromUserName, double location_x, double location_y, int scale, String label) {
+        return null;
     }
 
-    // 随机生成16位字符串
-    String getRandomStr() {
-        String base = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        Random random = new Random();
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 16; i++) {
-            int number = random.nextInt(base.length());
-            sb.append(base.charAt(number));
-        }
-        return sb.toString();
+    private XmlResponse linkMsgHandler(String fromUserName, String title, String description, String url) {
+        return null;
     }
 
-    String calcSignature(String token, int timestamp, String nonce, String data) {
-        String[] array = { token, String.valueOf(timestamp), nonce, data };
-        Arrays.sort(array);
-        String strToSign = StringUtils.join(array);
-        return DigestUtils.sha1Hex(strToSign);
+    // 接收事件推送
+    // https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Receiving_event_pushes.html
+
+    /**
+     * 关注事件
+     * @param fromUserName 发送方帐号（一个OpenID）
+     * @return xml响应体
+     */
+    private XmlResponse subscribeEventHandler(String fromUserName) {
+        String access_token = accessTokenService.getAccessToken();
+        MiniProgramPage miniProgramPage = new MiniProgramPage("测试小程序", "wx4e9dcf33a0d1f74a", "pages/auth/index", "DfYb6hy12M4EHKjosI_11ZxHfNW1HDayliGrOjDW-rijycQV5KR8N94hr5pwmF2C");
+        String s = mpClient.sendCustomMessage(access_token, new MiniProgramPageRequestEntity(fromUserName, miniProgramPage));
+        System.out.println("s = " + s);
+        return null;
     }
 
-    XmlResponse replyTextMsg(String toUserName, String content) throws JsonProcessingException, AesException {
-        String fromUserName = WXID;
-        int createTime = (int) (System.currentTimeMillis() / 1000);
-        String nonce = UUID.randomUUID().toString().replace("-", "");
-        XmlEntity xmlEntity = XmlEntity.builder()
-                .toUserName(toUserName)
-                .fromUserName(fromUserName)
-                .createTime(createTime)
-                .msgType("text")
-                .content(content)
-                .build();
-        return encryptMsg(xmlEntity, createTime, nonce);
+    /**
+     * 取消关注事件
+     * @param fromUserName 发送方帐号（一个OpenID）
+     * @return xml响应体
+     */
+    private XmlResponse unsubscribeEventHandler(String fromUserName) {
+        return null;
+    }
+
+    // 被动回复用户消息
+    // https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Passive_user_reply_message.html
+
+    /**
+     * 回复文本消息
+     * @param toUserName 接收方帐号（收到的OpenID）
+     * @param content 回复的消息内容（换行：在content中能够换行，微信客户端就支持换行显示）
+     * @return xml响应体
+     * @throws CryptoException
+     * @throws JsonProcessingException
+     */
+    private XmlResponse replyTextMsg(String toUserName, String content) throws CryptoException, JsonProcessingException {
+        TextResponseEntity entity = new TextResponseEntity(toUserName, content);
+        CryptoUtil cryptoUtil = new CryptoUtil(TOKEN, ENCODING_AES_KEY, APPID);
+        return cryptoUtil.encryptMsg(entity);
+    }
+
+    /**
+     * 回复图片消息
+     * @param toUserName 接收方帐号（收到的OpenID）
+     * @param image 图片对象
+     * @return xml响应体
+     * @throws CryptoException
+     * @throws JsonProcessingException
+     */
+    private XmlResponse replyImageMsg(String toUserName, Image image) throws CryptoException, JsonProcessingException {
+        ImageResponseEntity entity = new ImageResponseEntity(toUserName, image);
+        CryptoUtil cryptoUtil = new CryptoUtil(TOKEN, ENCODING_AES_KEY, APPID);
+        return cryptoUtil.encryptMsg(entity);
+    }
+
+    /**
+     * 回复语音消息
+     * @param toUserName 接收方帐号（收到的OpenID）
+     * @param voice 语音对象
+     * @return xml响应体
+     * @throws CryptoException
+     * @throws JsonProcessingException
+     */
+    private XmlResponse replyVoiceMsg(String toUserName, Voice voice) throws CryptoException, JsonProcessingException {
+        VoiceResponseEntity entity = new VoiceResponseEntity(toUserName, voice);
+        CryptoUtil cryptoUtil = new CryptoUtil(TOKEN, ENCODING_AES_KEY, APPID);
+        return cryptoUtil.encryptMsg(entity);
+    }
+
+    /**
+     * 回复视频消息
+     * @param toUserName 接收方帐号（收到的OpenID）
+     * @param video 视频对象
+     * @return xml响应体
+     * @throws CryptoException
+     * @throws JsonProcessingException
+     */
+    private XmlResponse replyVideoMsg(String toUserName, Video video) throws CryptoException, JsonProcessingException {
+        VideoResponseEntity entity = new VideoResponseEntity(toUserName, video);
+        CryptoUtil cryptoUtil = new CryptoUtil(TOKEN, ENCODING_AES_KEY, APPID);
+        return cryptoUtil.encryptMsg(entity);
+    }
+
+    /**
+     * 回复音乐消息
+     * @param toUserName 接收方帐号（收到的OpenID）
+     * @param music 音乐对象
+     * @return xml响应体
+     * @throws CryptoException
+     * @throws JsonProcessingException
+     */
+    private XmlResponse replyMusicMsg(String toUserName, Music music) throws CryptoException, JsonProcessingException {
+        MusicResponseEntity entity = new MusicResponseEntity(toUserName, music);
+        CryptoUtil cryptoUtil = new CryptoUtil(TOKEN, ENCODING_AES_KEY, APPID);
+        return cryptoUtil.encryptMsg(entity);
+    }
+
+    /**
+     * 回复图文消息
+     * @param toUserName 接收方帐号（收到的OpenID）
+     * @param articles 图文消息信息，注意，如果图文数超过限制，则将只发限制内的条数
+     * @return xml响应体
+     * @throws CryptoException
+     * @throws JsonProcessingException
+     */
+    private XmlResponse replyNewsMsg(String toUserName, Article[] articles) throws CryptoException, JsonProcessingException {
+        NewsResponseEntity entity = new NewsResponseEntity(toUserName, articles);
+        CryptoUtil cryptoUtil = new CryptoUtil(TOKEN, ENCODING_AES_KEY, APPID);
+        return cryptoUtil.encryptMsg(entity);
     }
 }

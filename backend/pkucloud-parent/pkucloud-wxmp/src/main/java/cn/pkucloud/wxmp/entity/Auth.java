@@ -1,13 +1,10 @@
 package cn.pkucloud.wxmp.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Auth {
@@ -22,9 +19,6 @@ public class Auth {
     private int accessTime;
 
     private String userName;
-
-    @JsonIgnore
-    private String password;
 
     private String pkuId;
 

@@ -7,7 +7,6 @@ import cn.pkucloud.wxmp.feign.MpClient;
 import cn.pkucloud.wxmp.service.AccessTokenService;
 import cn.pkucloud.wxmp.service.PublicService;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;

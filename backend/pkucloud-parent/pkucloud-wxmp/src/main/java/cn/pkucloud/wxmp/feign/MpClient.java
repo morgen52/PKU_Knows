@@ -1,7 +1,7 @@
 package cn.pkucloud.wxmp.feign;
 
 import cn.pkucloud.wxmp.dto.wx.AccessToken;
-import cn.pkucloud.wxmp.dto.wx.custom.CustomMessage;
+import cn.pkucloud.wxmp.dto.wx.custom.BaseRequestEntity;
 import cn.pkucloud.wxmp.dto.wx.template.TemplateMessageResult;
 import cn.pkucloud.wxmp.dto.wx.Ticket;
 import cn.pkucloud.wxmp.dto.wx.WxmpUserInfoDto;
@@ -25,7 +25,7 @@ public interface MpClient {
 
     @PostMapping("message/custom/send")
     String sendCustomMessage(@RequestParam String access_token,
-                             @RequestBody CustomMessage customMessage);
+                             @RequestBody BaseRequestEntity customMessage);
 
     @PostMapping("message/template/send")
     TemplateMessageResult sendTemplateMessage(@RequestParam String access_token,

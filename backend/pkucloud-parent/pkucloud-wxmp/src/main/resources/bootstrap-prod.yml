@@ -1,0 +1,13 @@
+spring:
+  cloud:
+    nacos:
+      config:
+        server-addr: 127.0.0.1:8848
+        group: WXMP_GROUP
+        file-extension: yml
+      discovery:
+        server-addr: 127.0.0.1:8848
+  jackson:
+    default-property-inclusion: non_null
+server:
+  port: 13082

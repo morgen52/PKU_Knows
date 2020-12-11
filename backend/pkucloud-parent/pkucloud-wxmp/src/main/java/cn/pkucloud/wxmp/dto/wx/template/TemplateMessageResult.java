@@ -7,5 +7,5 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class TemplateMessageResult extends BaseResult {
-    private int msgid;
+    private long msgid;
 }

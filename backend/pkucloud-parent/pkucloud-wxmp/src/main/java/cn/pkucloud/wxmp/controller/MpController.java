@@ -1,8 +1,8 @@
 package cn.pkucloud.wxmp.controller;
 
+import cn.pkucloud.wxmp.crypto.CryptoException;
 import cn.pkucloud.wxmp.dto.wx.xml.XmlRequest;
 import cn.pkucloud.wxmp.dto.wx.xml.XmlResponse;
-import cn.pkucloud.wxmp.exception.AesException;
 import cn.pkucloud.wxmp.service.MpService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.validation.annotation.Validated;
@@ -37,7 +37,7 @@ public class MpController {
                                   @NotBlank @RequestParam String openid,
                                   @NotBlank @RequestParam String encrypt_type,
                                   @NotBlank @RequestParam String msg_signature,
-                                  @NotNull @RequestBody XmlRequest xmlRequest) throws AesException, JsonProcessingException {
+                                  @NotNull @RequestBody XmlRequest xmlRequest) throws JsonProcessingException, CryptoException {
         return mpService.msgHandler(signature, timestamp, nonce, openid, encrypt_type, msg_signature, xmlRequest);
     }
 }

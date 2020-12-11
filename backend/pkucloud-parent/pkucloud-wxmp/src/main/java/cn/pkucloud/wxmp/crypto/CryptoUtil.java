@@ -1,19 +1,7 @@
-/**
- * 对公众平台发送给公众账号的消息加解密示例代码.
- * 
- * @copyright Copyright (c) 1998-2014 Tencent Inc.
- */
-
-// ------------------------------------------------------------------------
-
-/**
- * 针对org.apache.commons.codec.binary.Base64，
- * 需要导入架包commons-codec-1.9（或commons-codec-1.8等其他版本）
- * 官方下载地址：http://commons.apache.org/proper/commons-codec/download_codec.cgi
- */
 package cn.pkucloud.wxmp.crypto;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -21,6 +9,11 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import cn.pkucloud.wxmp.dto.wx.xml.BaseResponseEntity;
+import cn.pkucloud.wxmp.dto.wx.xml.XmlRequestEntity;
+import cn.pkucloud.wxmp.dto.wx.xml.XmlResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.apache.commons.codec.binary.Base64;
 
 /**
@@ -39,8 +32,7 @@ import org.apache.commons.codec.binary.Base64;
  * </ol>
  */
 public class CryptoUtil {
-	static Charset CHARSET = Charset.forName("utf-8");
-	Base64 base64 = new Base64();
+	static Charset CHARSET = StandardCharsets.UTF_8;
 	byte[] aesKey;
 	String token;
 	String appId;
@@ -51,13 +43,9 @@ public class CryptoUtil {
 	 * @param encodingAesKey 公众平台上，开发者设置的EncodingAESKey
 	 * @param appId 公众平台appid
 	 * 
-	 * @throws AesException 执行失败，请查看该异常的错误码和具体的错误信息
+	 * @throws CryptoException 执行失败，请查看该异常的错误码和具体的错误信息
 	 */
-	public CryptoUtil(String token, String encodingAesKey, String appId) throws AesException {
-		if (encodingAesKey.length() != 43) {
-			throw new AesException(AesException.IllegalAesKey);
-		}
-
+	public CryptoUtil(String token, String encodingAesKey, String appId) {
 		this.token = token;
 		this.appId = appId;
 		aesKey = Base64.decodeBase64(encodingAesKey + "=");
@@ -100,9 +88,9 @@ public class CryptoUtil {
 	 * 
 	 * @param text 需要加密的明文
 	 * @return 加密后base64编码的字符串
-	 * @throws AesException aes加密失败
+	 * @throws CryptoException aes加密失败
 	 */
-	String encrypt(String randomStr, String text) throws AesException {
+	String encrypt(String randomStr, String text) throws CryptoException {
 		ByteGroup byteCollector = new ByteGroup();
 		byte[] randomStrBytes = randomStr.getBytes(CHARSET);
 		byte[] textBytes = text.getBytes(CHARSET);
@@ -133,12 +121,12 @@ public class CryptoUtil {
 			byte[] encrypted = cipher.doFinal(unencrypted);
 
 			// 使用BASE64对加密后的字符串进行编码
-			String base64Encrypted = base64.encodeToString(encrypted);
+			String base64Encrypted = Base64.encodeBase64String(encrypted);
 
 			return base64Encrypted;
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new AesException(AesException.EncryptAESError);
+			throw new CryptoException(CryptoException.EncryptAESError);
 		}
 	}
 
@@ -147,9 +135,9 @@ public class CryptoUtil {
 	 * 
 	 * @param text 需要解密的密文
 	 * @return 解密得到的明文
-	 * @throws AesException aes解密失败
+	 * @throws CryptoException aes解密失败
 	 */
-	String decrypt(String text) throws AesException {
+	String decrypt(String text) throws CryptoException {
 		byte[] original;
 		try {
 			// 设置解密模式为AES的CBC模式
@@ -165,7 +153,7 @@ public class CryptoUtil {
 			original = cipher.doFinal(encrypted);
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new AesException(AesException.DecryptAESError);
+			throw new CryptoException(CryptoException.DecryptAESError);
 		}
 
 		String xmlContent, from_appid;
@@ -183,107 +171,40 @@ public class CryptoUtil {
 					CHARSET);
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new AesException(AesException.IllegalBuffer);
+			throw new CryptoException(CryptoException.IllegalBuffer);
 		}
 
 		// appid不相同的情况
 		if (!from_appid.equals(appId)) {
-			throw new AesException(AesException.ValidateAppidError);
+			throw new CryptoException(CryptoException.ValidateAppidError);
 		}
 		return xmlContent;
 
 	}
 
-	/**
-	 * 将公众平台回复用户的消息加密打包.
-	 * <ol>
-	 * 	<li>对要发送的消息进行AES-CBC加密</li>
-	 * 	<li>生成安全签名</li>
-	 * 	<li>将消息密文和安全签名打包成xml格式</li>
-	 * </ol>
-	 * 
-	 * @param replyMsg 公众平台待回复用户的消息，xml格式的字符串
-	 * @param timeStamp 时间戳，可以自己生成，也可以用URL参数的timestamp
-	 * @param nonce 随机串，可以自己生成，也可以用URL参数的nonce
-	 * 
-	 * @return 加密后的可以直接回复用户的密文，包括msg_signature, timestamp, nonce, encrypt的xml格式的字符串
-	 * @throws AesException 执行失败，请查看该异常的错误码和具体的错误信息
-	 */
-	public String encryptMsg(String replyMsg, String timeStamp, String nonce) throws AesException {
-		// 加密
-		String encrypt = encrypt(getRandomStr(), replyMsg);
+	public XmlResponse encryptMsg(BaseResponseEntity entity) throws CryptoException, JsonProcessingException {
+		XmlMapper xmlMapper = new XmlMapper();
+		String strToEncrypt = xmlMapper.writeValueAsString(entity);
+		String encrypt = encrypt(getRandomStr(), strToEncrypt);
 
-		// 生成安全签名
-		if (timeStamp == "") {
-			timeStamp = Long.toString(System.currentTimeMillis());
-		}
+		int	timeStamp = (int) (System.currentTimeMillis() / 1000);
+		String nonce = getRandomStr();
 
-		String signature = SHA1.getSHA1(token, timeStamp, nonce, encrypt);
-
-		// System.out.println("发送给平台的签名是: " + signature[1].toString());
-		// 生成发送的xml
-		String result = XMLParse.generate(encrypt, signature, timeStamp, nonce);
-		return result;
+		String signature = SHA1.calcSHA1(token, timeStamp, nonce, encrypt);
+		return new XmlResponse(encrypt, signature, timeStamp, nonce);
 	}
 
-	/**
-	 * 检验消息的真实性，并且获取解密后的明文.
-	 * <ol>
-	 * 	<li>利用收到的密文生成安全签名，进行签名验证</li>
-	 * 	<li>若验证通过，则提取xml中的加密消息</li>
-	 * 	<li>对消息进行解密</li>
-	 * </ol>
-	 * 
-	 * @param msgSignature 签名串，对应URL参数的msg_signature
-	 * @param timeStamp 时间戳，对应URL参数的timestamp
-	 * @param nonce 随机串，对应URL参数的nonce
-	 * @param postData 密文，对应POST请求的数据
-	 * 
-	 * @return 解密后的原文
-	 * @throws AesException 执行失败，请查看该异常的错误码和具体的错误信息
-	 */
-	public String decryptMsg(String msgSignature, String timeStamp, String nonce, String postData)
-			throws AesException {
+	public XmlRequestEntity decryptMsg(int timeStamp, String nonce, String msgSignature, String encrypt)
+			throws CryptoException, JsonProcessingException {
 
-		// 密钥，公众账号的app secret
-		// 提取密文
-		Object[] encrypt = XMLParse.extract(postData);
-
-		// 验证安全签名
-		String signature = SHA1.getSHA1(token, timeStamp, nonce, encrypt[1].toString());
-
-		// 和URL中的签名比较是否相等
-		// System.out.println("第三方收到URL中的签名：" + msg_sign);
-		// System.out.println("第三方校验签名：" + signature);
-		if (!signature.equals(msgSignature)) {
-			throw new AesException(AesException.ValidateSignatureError);
-		}
-
-		// 解密
-		String result = decrypt(encrypt[1].toString());
-		return result;
-	}
-
-	/**
-	 * 验证URL
-	 * @param msgSignature 签名串，对应URL参数的msg_signature
-	 * @param timeStamp 时间戳，对应URL参数的timestamp
-	 * @param nonce 随机串，对应URL参数的nonce
-	 * @param echoStr 随机串，对应URL参数的echostr
-	 * 
-	 * @return 解密之后的echostr
-	 * @throws AesException 执行失败，请查看该异常的错误码和具体的错误信息
-	 */
-	public String verifyUrl(String msgSignature, String timeStamp, String nonce, String echoStr)
-			throws AesException {
-		String signature = SHA1.getSHA1(token, timeStamp, nonce, echoStr);
+		String signature = SHA1.calcSHA1(token, timeStamp, nonce, encrypt);
 
 		if (!signature.equals(msgSignature)) {
-			throw new AesException(AesException.ValidateSignatureError);
+			throw new CryptoException(CryptoException.ValidateSignatureError);
 		}
 
-		String result = decrypt(echoStr);
-		return result;
+		String result = decrypt(encrypt);
+		XmlMapper xmlMapper = new XmlMapper();
+		return xmlMapper.readValue(result, XmlRequestEntity.class);
 	}
-
 }

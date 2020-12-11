@@ -11,6 +11,7 @@
         <module name="pkucloud-pay" />
         <module name="pkucloud-wxmp" />
         <module name="pkucloud-qa" />
+        <module name="pkucloud-gateway" />
         <module name="pkucloud-msg" />
         <module name="pkucloud-wxa" />
         <module name="pkucloud-auth" />
@@ -22,6 +23,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="pkucloud-auth" options="-parameters" />
       <module name="pkucloud-common" options="-parameters" />
+      <module name="pkucloud-gateway" options="-parameters" />
       <module name="pkucloud-msg" options="-parameters" />
       <module name="pkucloud-parent" options="-parameters" />
       <module name="pkucloud-pay" options="-parameters" />

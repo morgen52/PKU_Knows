@@ -17,12 +17,13 @@
         <module>pkucloud-pay</module>
         <module>pkucloud-qa</module>
         <module>pkucloud-tl</module>
+        <module>pkucloud-gateway</module>
     </modules>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.6.RELEASE</version>
+        <version>2.3.7.RELEASE</version>
         <relativePath/>
     </parent>
 

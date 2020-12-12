@@ -1,11 +1,15 @@
 package cn.pkucloud.wxmp.dto.wx.template;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@Builder
+@AllArgsConstructor
 public class Keyword {
     private String value;
     private String color;
+
+    public Keyword(String value) {
+        this.value = value;
+    }
 }

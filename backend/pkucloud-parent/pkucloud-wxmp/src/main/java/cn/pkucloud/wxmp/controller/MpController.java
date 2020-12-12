@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -34,7 +35,7 @@ public class MpController {
     public XmlResponse msgHandler(@NotBlank @RequestParam String signature,
                                   @Positive @RequestParam int timestamp,
                                   @NotBlank @RequestParam String nonce,
-                                  @NotBlank @RequestParam String openid,
+                                  @RequestParam(required = false) String openid,
                                   @NotBlank @RequestParam String encrypt_type,
                                   @NotBlank @RequestParam String msg_signature,
                                   @NotNull @RequestBody XmlRequest xmlRequest) throws JsonProcessingException, CryptoException {

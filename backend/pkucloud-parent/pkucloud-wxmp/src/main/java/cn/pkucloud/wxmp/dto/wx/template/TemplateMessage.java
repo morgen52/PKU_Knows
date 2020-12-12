@@ -1,9 +1,11 @@
 package cn.pkucloud.wxmp.dto.wx.template;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 @Builder
 public class TemplateMessage {
     private String touser;

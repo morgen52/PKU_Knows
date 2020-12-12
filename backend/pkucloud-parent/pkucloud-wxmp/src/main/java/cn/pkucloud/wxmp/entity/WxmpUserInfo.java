@@ -9,6 +9,7 @@ import lombok.Data;
 @TableName("tb_wxmp_user_info")
 public class WxmpUserInfo {
     private int subscribe;
+    @TableId
     private String openid;
     private String nickname;
     private int sex;
@@ -18,9 +19,9 @@ public class WxmpUserInfo {
     private String country;
     private String headimgurl;
     private int subscribe_time;
-    @TableId
     private String unionid;
     private String subscribe_scene;
+    private int update;
 
     public WxmpUserInfo(WxmpUserInfoDto wxmpUserInfoDto) {
         this.subscribe = wxmpUserInfoDto.getSubscribe();
@@ -35,5 +36,6 @@ public class WxmpUserInfo {
         this.subscribe_time = wxmpUserInfoDto.getSubscribe_time();
         this.unionid = wxmpUserInfoDto.getUnionid();
         this.subscribe_scene = wxmpUserInfoDto.getSubscribe_scene();
+        this.update = (int) (System.currentTimeMillis() / 1000);
     }
 }

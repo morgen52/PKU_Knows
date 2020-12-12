@@ -1,17 +1,9 @@
 package cn.pkucloud.wxmp.dto.wx.xml;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@JacksonXmlRootElement(localName = "xml")
 public class XmlRequestEntity {
     @JacksonXmlProperty(localName = "ToUserName")
     private String toUserName;
@@ -82,6 +74,12 @@ public class XmlRequestEntity {
     @JacksonXmlProperty(localName = "Precision")
     private double precision;
 
+    @JacksonXmlProperty(localName = "bizmsgmenuid")
+    private int bizmsgmenuid;
+
     @JacksonXmlProperty(localName = "MsgId")
     private long msgId;
+
+    @JacksonXmlProperty(localName = "Status")
+    private String status;
 }

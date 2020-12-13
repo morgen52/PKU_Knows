@@ -2,12 +2,10 @@ spring:
   cloud:
     nacos:
       config:
-        server-addr: 81.70.105.156:8848
+        server-addr: nacos.mryao.ac.cn:8848
         group: WXMP_GROUP
         file-extension: yml
       discovery:
-        server-addr: 81.70.105.156:8848
-  jackson:
-    default-property-inclusion: non_null
+        server-addr: nacos.mryao.ac.cn:8848
 server:
   port: 13082

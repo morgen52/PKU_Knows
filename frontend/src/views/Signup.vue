@@ -12,8 +12,7 @@
 			<v-toolbar-side-icon>
 				<v-btn icon to="/"><v-icon large>mdi-chevron-left</v-icon></v-btn>
 			</v-toolbar-side-icon>
-			<v-spacer></v-spacer>
-			<v-toolbar-title align="center" justify="center" class="texts">
+			<v-toolbar-title class="texts">
 				注册
 			</v-toolbar-title>
 			<v-spacer></v-spacer>
@@ -85,7 +84,7 @@
 				</v-form>
 			</v-card>
 			<v-form ref="form" v-model="valid2" lazy-validation>
-				<v-checkbox
+				<v-checkbox style="marginLeft:20px"
 				:rules="[v => !!v || '请阅读北大知道用户协议']"
 				color="blue"
 				required

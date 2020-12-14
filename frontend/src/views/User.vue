@@ -24,15 +24,17 @@
 					solo
 					v-bind:readonly="unchange"
 					v-bind:clearable="!unchange"
+                    v-bind:hide-details="unchange"
 					flat
+                    counter=14
 					class="title"
 					></v-text-field>
 				</v-list-item-content>
 				
 				<v-list-item-icon :style="info" v-if="unchange">
 						<v-btn 
-						elevation="2" 
-						right
+						elevation="1" 
+                        text
 						@click="unchange=false"
 						>编辑资料</v-btn>	
 				</v-list-item-icon>
@@ -132,19 +134,21 @@
 						
 					</v-row>
 					<v-row cols="12" sm="6" :style="marginBetween" justify="center" align='center'>
-						<v-col cols="4" sm="2" >
-							<v-header>一句话简介:</v-header>
+						<v-col cols="3" sm="2" >
+							<v-header>简介:</v-header>
 						</v-col>
-						<v-col cols="6" sm="6">
+						<v-col cols="8" sm="6">
 							<v-textarea
 							v-model="motto"
-							rows="2"
+							rows=1
 							v-bind:readonly="unchange"
 							v-bind:clearable="!unchange"
-							v-bind:outlined="!unchange"
-							dense
+                            v-bind:hide-details="unchange"
+                            dense
+                            no-resize=True
+                            auto-grow=True
 							class="myright"
-							counter="114"
+							counter="50"
 							></v-textarea>
 						</v-col>
 						
@@ -157,6 +161,8 @@
 				justify="space-around">
 				<v-btn 
 				depressed
+                text
+                elevation=1
 				v-if="!unchange"
 				@click="unchange=!unchange">
 					保存
@@ -178,7 +184,7 @@
 				gender:"男",
 				grade:"2018级本科生",
 				email:"111111111@qq.com",
-				motto:"啊啊啊啊啊",
+				motto:"啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊",
 				unchange:true,
 				gender_items:[
 					{state:'不展示'},
@@ -203,20 +209,20 @@
 					marginRight:"0px",
 				},
 				ava:{
-					marginLeft:"31px",
+					marginLeft:"10px",
 					marginRight:"0px",
 				},
 				user_style:{
-					marginLeft:"15px",
+					marginLeft:"0px",
 					width:"140px",
 					flex:"none",
 					marginTop:"15px",
 				},
 				info:{
 					marginTop:"33px",
-					width:"81px",
+                    marginRight:"2px",
 					height:"26px",
-					fontSize:"14px",
+					fontSize:"14px"
 				},
 				focus:"10",
 				collects:"5",

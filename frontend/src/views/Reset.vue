@@ -12,8 +12,7 @@
 			<v-toolbar-side-icon>
 				<v-btn icon to="/"><v-icon large>mdi-chevron-left</v-icon></v-btn>
 			</v-toolbar-side-icon>
-			<v-spacer></v-spacer>
-			<v-toolbar-title align="center" justify="center" class="texts">
+			<v-toolbar-title class="texts">
 				重置密码
 			</v-toolbar-title>
 			<v-spacer></v-spacer>

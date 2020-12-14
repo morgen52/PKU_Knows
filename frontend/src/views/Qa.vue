@@ -24,7 +24,7 @@
         </v-container>
     </v-app-bar>
 
-    <v-main class="grey lighten-5">
+    <v-main class="grey lighten-5" style="padding: 0px;">
         <v-list>
             <v-list-item>
                 <v-card 
@@ -64,7 +64,7 @@
                             <v-list-item-content>
                                 <v-list-item-title class="headline mb-2">{{ques}}</v-list-item-title>
                                 <v-text>{{disc}}</v-text>
-                                <v-list-item-subtitle>{{imfo}}</v-list-item-subtitle>
+                                <v-list-item-subtitle style="margin-top:10px">{{imfo}}</v-list-item-subtitle>
                             </v-list-item-content>
                         </v-list-item>
                     </v-list>
@@ -118,9 +118,9 @@
                                         background-color="white"
                                         flat
                                         filled
-                                        auto-grow
+                                        height="360px"
+                                        no-resize=True
                                         auto-force
-                                        counter
                                         text
                                     >
                                     </v-textarea>
@@ -184,7 +184,6 @@
                                     <v-dialog
                                         v-model="dialog1"
                                         hide-overlay
-                                        transition="dialog-bottom-transition"
                                     >
                                         <template v-slot:activator="{ on, attrs }">
                                             <v-btn
@@ -234,13 +233,13 @@
                                 </v-list-item>
                                 <v-list-item>
                                     <v-container>
-                                        <v-btn icon>
+                                        <v-btn icon >
                                             <v-icon>
                                                 mdi-thumb-up-outline
                                             </v-icon>
                                             {{item.like}}
                                         </v-btn>
-                                        <v-btn icon>
+                                        <v-btn icon style="margin-left:10px">
                                             <v-icon>
                                                 mdi-thumb-down-outline
                                             </v-icon>
@@ -256,6 +255,7 @@
                                                     v-on="on"
                                                     text
                                                     icon
+                                                    style="margin-left:16px"
                                                 >       
                                                 <v-icon>
                                                     mdi-comment-text-outline
@@ -397,11 +397,11 @@
             dialog1: false,
             dialog2: false,
             id:'label1',
-            topic:'话题',
+            topic:'课程',
             label:'标签',
-            ques:'如何进行原型设计',
-            disc:'如题：如何进行原型设计',
-            imfo:'X回答，Y浏览，Z关注',
+            ques:'如何进行软件开发？',
+            disc:'如题：如何进行软件开发',
+            imfo:'3回答 10关注 20浏览 20-12-14 10:10:00',
             label1:[
                 {
                     label:'软件工程'
@@ -413,10 +413,10 @@
             answer:[
                 { 
                     head:'../assets/images/logo.png',
-                    message:'姓名·信科·18本科生',
-                    time:'2020-12-13 11:34',
-                    anstext:'软件系统不断迅速变化。稍加规划，然后再做原型，以渐增、迭代的方式展开工作，这样能适应不断变化的环境。规划阶段所做的工作越多，越能更好地启动工作。当然，回报会递减，一定要用常识来判断需要做多少规划工作。',
-                    like:'2',
+                    message:'路人甲·男·信科·18本',
+                    time:'20-12-14 12:23:20',
+                    anstext:'学习计算机编程语言。想要进行软件开发，学习计算机编程语言是必不可少的。例如java、php、python、html、css、js等等。',
+                    like:'4',
                     dislike:'0',
                 },
                 { 

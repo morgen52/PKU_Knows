@@ -99,37 +99,23 @@
                                     </v-textarea>
                                 </v-list-item-content>
                             </v-list-item>
-                            <v-list-item>
-                                <v-card
-                                    width="200"
-                                    text
-                                    flat
-                                >
-                                    <template>
-                                      <v-container>
-                                        <v-overflow-btn
-                                          :items="items0"
-                                          label="话题"
-                                          background-color="white"
-                                          color="black"
-                                          
-                                        ></v-overflow-btn>
-                                      </v-container>
-                                    </template>
-                                </v-card>
-                            </v-list-item>
+                                        <v-select
+                                          style="margin-top:20px; width:80px; margin-left:20px"
+                                          :items="itemsx"
+                                          label="话题"      
+                                        ></v-select>
                             <v-list-item flat text>
                                 <v-list-item-content>
                                     <v-textarea
-                                        label="添加标签,以逗号空格或者分号隔开"
+                                        label="添加标签,以空格隔开"
                                         hide-details
+                                        rows=1
                                         background-color="white"
-                                        color="grey lighten-3"
+                                        
                                         flat
                                         filled
                                         auto-grow
                                         auto-force
-                                        counter
                                         text
                                     >
                                     </v-textarea>
@@ -141,7 +127,7 @@
         </v-container>
     </v-app-bar>
 
-    <v-main>
+    <v-main style="padding: 0px;">
         <v-card color="grey lighten-5" flat>
             <v-tabs
                 show-arrows
@@ -162,7 +148,7 @@
                             centered
                             width="137"
                             color="grey"
-                            height="40"
+                            height="47"
                             activator
                             auto
                             text
@@ -198,7 +184,7 @@
                         centered
                         width="137"
                         color="grey"
-                        height="40"
+                        height="47"
                         activator
                         auto
                         text
@@ -238,14 +224,14 @@
                             >
                                 <v-card
                                     auto
-                                    height="158"
+                                    height="172"
                                 >
                                     <template>
                                         <v-row>
                                             <v-btn
                                                 to="/qa"
                                                 class="auto"
-                                                height="158"
+                                                height="174"
                                                 text
                                                 block
                                             >
@@ -282,7 +268,7 @@
                                                         <v-list-item-content>
                                                             <v-list-item-title>{{item.ques}}</v-list-item-title>
                                                             <v-list-item-subtitle>{{item.imfo}}</v-list-item-subtitle>
-                                                            <v-text>{{item.ans0bar}}</v-text>
+                                                            <v-text style="margin-top:10px">{{item.ans0bar}}</v-text>
                                                             <v-text>{{item.ans0text}}</v-text>
                                                         </v-list-item-content>
                                                     </v-list-item>
@@ -315,7 +301,7 @@
                                         <v-btn
                                             to="/qa"
                                             class="auto"
-                                            height="158"
+                                            height="160"
                                             text
                                             block
                                         >
@@ -351,8 +337,8 @@
                                                 <v-list-item>
                                                     <v-list-item-content>
                                                         <v-list-item-title>{{item.ques}}</v-list-item-title>
+                                                        <v-text style="margin-top:10px">{{item.ansbar}}:{{item.anstext}}</v-text>
                                                         <v-list-item-subtitle>{{item.imfo}}</v-list-item-subtitle>
-                                                        <v-text>{{item.ansbar}}:{{item.anstext}}</v-text>
                                                     </v-list-item-content>
                                                 </v-list-item>
                                             </v-list>
@@ -377,13 +363,13 @@
                             >
                                 <v-card
                                     class="auto"
-                                    height="158"
+                                    height="172"
                                 >
                                     <v-row>
                                         <v-btn
                                             to="/qa"
                                             class="auto"
-                                            height="158"
+                                            height="174"
                                             text
                                             block
                                         >
@@ -420,7 +406,7 @@
                                                     <v-list-item-content>
                                                         <v-list-item-title>{{item.ques}}</v-list-item-title>
                                                         <v-list-item-subtitle>{{item.imfo}}</v-list-item-subtitle>
-                                                        <v-text>{{item.ans0bar}}</v-text>
+                                                        <v-text style="margin-top:10px">{{item.ans0bar}}</v-text>
                                                         <v-text>{{item.ans0text}}</v-text>
                                                     </v-list-item-content>
                                                 </v-list-item>
@@ -451,6 +437,7 @@
             dialog: false,
             label:['标签'],
             items0: ['全部', '课程', '学术', '生活','情感','娱乐'],
+            itemsx: ['课程', '学术', '生活','情感','娱乐'],
             items:[
                 { title: '全部'},
                 { title: '课程'},
@@ -466,51 +453,51 @@
             items2:[
                 { 
                     id:'label1',
-                    topic:'话题',
-                    ques:'题目...',
-                    imfo:'X回答，Y关注，Z收藏',
-                    ans0bar:'最新回答 用户 时间',
-                    ans0text:'回答...'
+                    topic:'课程',
+                    ques:'如何进行软件开发？',
+                    imfo:'3回答 10关注 20浏览 20-12-14 10:10:00',
+                    ans0bar:'最新回答：路人甲 20-12-14 12:23:20',
+                    ans0text:'学习计算机编程语言。想要进行软件开发……'
                 },
                 { 
                     id:'label1',
-                    topic:'话题',
-                    ques:'题目...',
-                    imfo:'X回答，Y关注，Z收藏',
-                    ans0bar:'最新回答 用户 时间',
-                    ans0text:'回答...'
+                    topic:'课程',
+                    ques:'如何进行UI设计？',
+                    imfo:'3回答 4关注 10浏览 20-12-14 10:09:00',
+                    ans0bar:'最新回答：路人乙 20-12-14 12:25:20',
+                    ans0text:'这个问题很简单很简单，所以我不想回答……'
                 },
                 { 
                     id:'label1',
-                    topic:'话题',
-                    ques:'题目...',
-                    imfo:'X回答，Y关注，Z收藏',
-                    ans0bar:'最新回答 用户 时间',
-                    ans0text:'回答...'
+                    topic:'课程',
+                    ques:'如何进行软件测试？',
+                    imfo:'4回答 10关注 12浏览 20-12-14 10:08:00',
+                    ans0bar:'最新回答：路人丙 20-12-14 12:26:20',
+                    ans0text:'这个问题很简单很简单，所以我不想回答……'
                 },
                 { 
                     id:'label1',
-                    topic:'话题',
-                    ques:'题目...',
-                    imfo:'X回答，Y关注，Z收藏',
-                    ans0bar:'最新回答 用户 时间',
-                    ans0text:'回答...'
+                    topic:'课程',
+                    ques:'如何进行软件重构？',
+                    imfo:'2回答 12关注 15浏览 20-12-14 10:07:00',
+                    ans0bar:'最新回答：路人丁 20-12-14 12:28:20',
+                    ans0text:'这个问题很简单很简单，所以我不想回答……'
                 },
             ],            
             items3:[
                 { 
-                    topic:'话题',
-                    ques:'题目...',
-                    ansbar:'用户',
-                    anstext:'回答...',
-                    imfo:'X赞同，Y评论，发表时间',
+                    topic:'课程',
+                    ques:'如何进行软件重构？',
+                    ansbar:'卷王',
+                    anstext:'软件重构是指在不改变软件的功能和外部……',
+                    imfo:'10赞同 20评论 20-12-14 10:15:00',
                 },
                 { 
-                    topic:'话题',
-                    ques:'题目...',
-                    ansbar:'用户',
-                    anstext:'回答...',
-                    imfo:'X赞同，Y评论，发表时间',
+                    topic:'课程',
+                    ques:'如何进行软件重构？',
+                    ansbar:'超级卷王',
+                    anstext:'为了改善软件的结构，提高软件的清晰……',
+                    imfo:'20赞同 20评论 20-12-14 10:14:00',
                 },
             ],
             label1:[

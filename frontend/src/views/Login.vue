@@ -17,14 +17,14 @@
 						</v-img>
 						<!--标语-->
 						<h2 class="slogans">
-							连接园子里的已知与未知
+							连接园子里的未知与已知
 						</h2>
 						<!--手机号、密码的输入-->
-						<v-text-field v-model="title" :rules="[rules1.required,rules1.counter]" counter="11" name="user" filled label=" 请输入手机号"
+						<v-text-field v-model="title" :rules="[rules1.required,rules1.counter]" counter="11" name="user" label=" 请输入手机号"
 						prepend-icon="mdi-account" clearable dark></v-text-field>
 
 						<v-text-field :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'" :rules="[rules2.required,rules2.min]" :type="show ? 'text': 'password'"
-						v-model="passward" name="passward" filled label="请输入密码" prepend-icon="mdi-key" counter @click:append="show = !show"
+						v-model="passward" name="passward" label="请输入密码" prepend-icon="mdi-key" counter @click:append="show = !show"
 						dark></v-text-field>
 						<!--没有账号、注册的显示和路由-->
 						<p class="white--text" style="margin-bottom: 40px;">
@@ -43,7 +43,7 @@
 						</v-btn>
 						<!--目前没有加入微信跳转功能-->
 						<p class="white--text" style="margin-top: 20px;">
-							————其他登录方式————
+							其它登录方式
 						</p>
 							<v-btn icon><v-icon color="green">mdi-wechat</v-icon></v-btn>
 					</v-col>

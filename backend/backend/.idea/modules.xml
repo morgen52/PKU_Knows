@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/backend.iml" filepath="$PROJECT_DIR$/.idea/backend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-auth/pkucloud-auth.iml" filepath="$PROJECT_DIR$/pkucloud-parent/pkucloud-auth/pkucloud-auth.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-common/pkucloud-common.iml" filepath="$PROJECT_DIR$/pkucloud-parent/pkucloud-common/pkucloud-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-gateway/pkucloud-gateway.iml" filepath="$PROJECT_DIR$/pkucloud-parent/pkucloud-gateway/pkucloud-gateway.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-msg/pkucloud-msg.iml" filepath="$PROJECT_DIR$/pkucloud-parent/pkucloud-msg/pkucloud-msg.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-parent.iml" filepath="$PROJECT_DIR$/pkucloud-parent/pkucloud-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-pay/pkucloud-pay.iml" filepath="$PROJECT_DIR$/pkucloud-parent/pkucloud-pay/pkucloud-pay.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-qa/pkucloud-qa.iml" filepath="$PROJECT_DIR$/pkucloud-parent/pkucloud-qa/pkucloud-qa.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-tl/pkucloud-tl.iml" filepath="$PROJECT_DIR$/pkucloud-parent/pkucloud-tl/pkucloud-tl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-wxa/pkucloud-wxa.iml" filepath="$PROJECT_DIR$/pkucloud-parent/pkucloud-wxa/pkucloud-wxa.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-wxmp/pkucloud-wxmp.iml" filepath="$PROJECT_DIR$/pkucloud-parent/pkucloud-wxmp/pkucloud-wxmp.iml" />
+    </modules>
+  </component>
+</project>

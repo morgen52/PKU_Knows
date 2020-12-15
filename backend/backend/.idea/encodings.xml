@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-auth/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-auth/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-gateway/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-msg/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-msg/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-pay/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-qa/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-qa/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-tl/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-tl/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-wxa/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-wxa/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-wxmp/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pkucloud-parent/pkucloud-wxmp/src/main/resources" charset="UTF-8" />
+  </component>
+</project>

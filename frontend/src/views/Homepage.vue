@@ -223,7 +223,7 @@
                                 md="12"
                             >
                                 <v-card
-                                    auto
+                                    class="mx-auto"
                                     height="172"
                                 >
                                     <template>
@@ -294,7 +294,7 @@
                                 md="12"
                             >
                                 <v-card
-                                    class="auto"
+                                    class="mx-auto"
                                     height="158"
                                 >
                                     <v-row>
@@ -362,7 +362,7 @@
                                 md="12"
                             >
                                 <v-card
-                                    class="auto"
+                                    class="mx-auto"
                                     height="172"
                                 >
                                     <v-row>

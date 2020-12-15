@@ -3,25 +3,12 @@
     <v-app-bar
       app
       color="white"
-      flat
+      elevate-on-scroll
     >
-        <v-container>
-            <v-btn
-                to="/homepage"
-                fab
-                small
-                text
-            >       
-                <v-img
-                     alt="fa-left Logo"
-                     class="shrink mr-2"
-                     contain
-                     src="../assets/icons/fas fa-chevron-left Copy.svg"
-                     transition="scale-transition"
-                     width="24"
-                />
-            </v-btn>
-        </v-container>
+        <v-btn icon color="blue-grey darken-4" x-large to="/homepage">
+            <v-icon>mdi-chevron-left</v-icon>
+        </v-btn>
+         <v-toolbar-title style="padding: 0px;">{{ques.substring(0,10)+(ques.length>10? "...":"")}}</v-toolbar-title>
     </v-app-bar>
 
     <v-main class="grey lighten-5" style="padding: 0px;">
@@ -399,7 +386,7 @@
             id:'label1',
             topic:'课程',
             label:'标签',
-            ques:'如何进行软件开发？',
+            ques:'如何进行软件开发怎么进行软件开发？',
             disc:'如题：如何进行软件开发',
             imfo:'3回答 10关注 20浏览 20-12-14 10:10:00',
             label1:[

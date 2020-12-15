@@ -3,128 +3,101 @@
     <v-app-bar
       app
       color="white"
-      flat
-      text
+      elevate-on-scroll
     >
-        <v-container class="py-0 fill-height">
-            <v-btn
-                to="/user"
-                fab
-                small
-                class="auto"
-                text
-            >       
-                <v-img
-                     alt="fa-user Logo"
-                     class="shrink mr-2"
-                     contain
-                     src="../assets/icons/far fa-user.svg"
-                     transition="scale-transition"
-                     width="24"
-                />
-            </v-btn>
-            <v-responsive>
-                <v-text-field
-                    dense
-                    flat
-                    hide-details
-                    color="black"
-                    background-color="grey lighten-5"
-                    rounded
-                    solo
-                    class="auto"
-                    label="请输入文字..."
+        <v-btn icon to="/user">
+            <v-icon color="blue-grey darken-4" size="34px">mdi-account-outline</v-icon>
+        </v-btn>
+        <v-text-field
+            dense
+            flat
+            hide-details
+            color="black"
+            background-color="grey lighten-5"
+            rounded
+            solo
+            clearable
+            label="请输入搜索内容"
+        >
+        </v-text-field>
+        <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+            <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                icon
+                v-bind="attrs"
+                v-on="on"
                 >
-                </v-text-field>
-            </v-responsive>
-            <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
-                <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                        fab
-                        small
-                        class="auto"
-                        v-bind="attrs"
-                        v-on="on"
-                        text
-                    >       
-                        <v-img
-                             alt="antOutline-edit Logo"
-                             class="shrink mr-2"
-                             contain
-                             src="../assets/icons/antOutline-edit.svg"
-                             transition="scale-transition"
-                             width="24"
-                        />
-                     </v-btn>
-                </template>
-                    <v-card text flat>
-                        <v-toolbar dark color="white" elevation="1">
-                            <v-btn color="black" icon dark @click="dialog = false">
-                                取消
+                    <v-icon color="blue-grey darken-4" size="28px">mdi-text-box-plus-outline</v-icon>
+                </v-btn>
+                
+            </template>
+                <v-card text flat>
+                    <v-toolbar dark color="white" elevation="1">
+                        <v-btn color="black" icon dark @click="dialog = false">
+                            取消
+                        </v-btn>
+                        <v-spacer></v-spacer>
+                        <v-toolbar-items>
+                            <v-btn color="primary" dark text @click="dialog = false">
+                                发布问题
                             </v-btn>
-                            <v-spacer></v-spacer>
-                            <v-toolbar-items>
-                                <v-btn color="primary" dark text @click="dialog = false">
-                                    发布问题
-                                </v-btn>
-                            </v-toolbar-items>
-                        </v-toolbar>
-                        <v-list four-line flat text>
-                            <v-list-item flat text>
-                                <v-list-item-content>
-                                    <v-text-field
-                                        label="问题：尽量简洁明晰(必填)"
-                                        :rules="rules"
-                                        hide-details
-                                        background-color="white"
-                                        flat
-                                        text
-                                    >
-                                    </v-text-field>
-                                </v-list-item-content>
-                            </v-list-item>
-                            <v-list-item flat text>
-                                <v-list-item-content>
-                                    <v-textarea
-                                        label="补充：说明(选填)"
-                                        hide-details
-                                        background-color="white"
-                                        flat
-                                        filled
-                                        auto-grow
-                                        auto-force
-                                        counter
-                                        text
-                                    >
-                                    </v-textarea>
-                                </v-list-item-content>
-                            </v-list-item>
-                                        <v-select
-                                          style="margin-top:20px; width:80px; margin-left:20px"
-                                          :items="itemsx"
-                                          label="话题"      
-                                        ></v-select>
-                            <v-list-item flat text>
-                                <v-list-item-content>
-                                    <v-textarea
-                                        label="添加标签,以空格隔开"
-                                        hide-details
-                                        rows=1
-                                        background-color="white"
-                                        
-                                        flat
-                                        filled
-                                        auto-grow
-                                        auto-force
-                                        text
-                                    >
-                                    </v-textarea>
-                                </v-list-item-content>
-                            </v-list-item>
-                        </v-list>
-                      </v-card>
-            </v-dialog>
-        </v-container>
+                        </v-toolbar-items>
+                    </v-toolbar>
+                    <v-list four-line flat text>
+                        <v-list-item flat text>
+                            <v-list-item-content>
+                                <v-text-field
+                                    label="问题：尽量简洁明晰(必填)"
+                                    :rules="rules"
+                                    hide-details
+                                    background-color="white"
+                                    flat
+                                    text
+                                >
+                                </v-text-field>
+                            </v-list-item-content>
+                        </v-list-item>
+                        <v-list-item flat text>
+                            <v-list-item-content>
+                                <v-textarea
+                                    label="补充：说明(选填)"
+                                    hide-details
+                                    background-color="white"
+                                    flat
+                                    filled
+                                    auto-grow
+                                    auto-force
+                                    counter
+                                    text
+                                >
+                                </v-textarea>
+                            </v-list-item-content>
+                        </v-list-item>
+                                    <v-select
+                                      style="margin-top:20px; width:80px; margin-left:20px"
+                                      :items="itemsx"
+                                      label="话题"      
+                                    ></v-select>
+                        <v-list-item flat text>
+                            <v-list-item-content>
+                                <v-textarea
+                                    label="添加标签,以空格隔开"
+                                    hide-details
+                                    rows=1
+                                    background-color="white"
+                                    
+                                    flat
+                                    filled
+                                    auto-grow
+                                    auto-force
+                                    text
+                                >
+                                </v-textarea>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list>
+                  </v-card>
+        </v-dialog>
     </v-app-bar>
 
     <v-main style="padding: 0px;">

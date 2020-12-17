@@ -13,14 +13,14 @@
 
     <v-main class="grey lighten-5" style="padding: 0px;">
         <v-btn
-        fab
-        fixed
-        bottom
-        right
-        elevation=1
-        @click="btrefresh"
+            fab
+            fixed
+            bottom
+            right
+            elevation=1
+            @click="btrefresh"
         >
-        <v-icon>mdi-refresh</v-icon>
+            <v-icon>mdi-refresh</v-icon>
         </v-btn>
         <v-list>
             <v-list-item>
@@ -59,7 +59,7 @@
                         </v-list-item>
                         <v-list-item>
                             <v-list-item-content>
-                                <v-list-item-title class="headline mb-2">{{ques}}</v-list-item-title>
+                                <v-text class="headline mb-2" v-html="ques"></v-text>
                                 <v-text>{{disc}}</v-text>
                                 <v-list-item-subtitle style="margin-top:10px">{{imfo}}</v-list-item-subtitle>
                             </v-list-item-content>
@@ -363,7 +363,7 @@
             topic:'课程',
             label:'标签',
             ques:'如何进行软件开发怎么进行软件开发？',
-            disc:'如题：如何进行软件开发',
+            disc:'如题：如何进行软件开发,如何进行软件开发,如何进行软件开发,如何进行软件开发,如何进行软件开发,如何进行软件开发,',
             imfo:'3回答 10关注 20浏览 20-12-14 10:10:00',
             label1:[
                 {

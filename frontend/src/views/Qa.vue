@@ -178,52 +178,16 @@
                                         <v-list-item-title>{{item.message}}</v-list-item-title>
                                         <v-list-item-subtitle>{{item.time}}</v-list-item-subtitle>
                                     </v-list-item-content>
-                                    <v-dialog
-                                        v-model="dialog1"
-                                        hide-overlay
+                                    <v-btn
+                                        fab
+                                        small
+                                        class="mx-auto"
+                                        text
+                                        icon
+                                        @click="dialog1 = true"
                                     >
-                                        <template v-slot:activator="{ on, attrs }">
-                                            <v-btn
-                                                fab
-                                                small
-                                                class="mx-auto"
-                                                v-bind="attrs"
-                                                v-on="on"
-                                                text
-                                                icon
-                                            >
-                                                <v-icon class="mr-1">mdi-dots-horizontal</v-icon>
-                                            </v-btn>
-                                        </template>
-                                        <v-container class="py-0 fill-width">
-                                            <v-card>
-                                                <v-row>
-                                                    <v-btn
-                                                        class="mx-auto"
-                                                        background-color="white"
-                                                        color="white"
-                                                        center
-                                                        @click="dialog1 = false"
-                                                        grow
-                                                        width="325"
-                                                    >
-                                                        举报
-                                                    </v-btn>
-                                                    <v-btn
-                                                        class="mx-auto"
-                                                        background-color="white"
-                                                        color="white"
-                                                        center
-                                                        @click="dialog1 = false"
-                                                        grow
-                                                        width="325"
-                                                    >
-                                                        取消
-                                                    </v-btn>
-                                                </v-row>
-                                            </v-card>
-                                        </v-container>
-                                    </v-dialog>
+                                        <v-icon class="mr-1">mdi-dots-horizontal</v-icon>
+                                    </v-btn>
                                 </v-list-item>
                                 <v-list-item>
                                     <v-text center>{{item.anstext}}</v-text>
@@ -242,132 +206,18 @@
                                             </v-icon>
                                             {{item.dislike}}
                                         </v-btn>
-                                        <v-dialog v-model="dialog0" fullscreen hide-overlay transition="dialog-bottom-transition">
-                                            <template v-slot:activator="{ on, attrs }">
-                                                <v-btn
-                                                    fab
-                                                    small
-                                                    class="mx-auto"
-                                                    v-bind="attrs"
-                                                    v-on="on"
-                                                    text
-                                                    icon
-                                                    style="margin-left:16px"
-                                                >       
-                                                <v-icon>
-                                                    mdi-comment-text-outline
-                                                </v-icon>
-                                                </v-btn>
-                                            </template>
-                                            <v-card text flat>
-                                                <v-toolbar color="white" elevation="1">
-                                                    评论
-                                                    <v-spacer></v-spacer>
-                                                    <v-btn color="black" icon dark @click="dialog0 = false">
-                                                        收起
-                                                    </v-btn>
-                                                </v-toolbar>
-                                                <v-container class="py-0 fill-height">
-                                                    <v-responsive grow>
-                                                        <v-text-field
-                                                            flat
-                                                            text
-                                                            dense
-                                                            hide-details
-                                                            background-color="grey lighten-5"
-                                                            solo
-                                                            label="请输入文字..."
-                                                            style="padding: 10px;"
-                                                        >
-                                                        </v-text-field>
-                                                    </v-responsive>
-                                                    <v-btn color="primary" dark text>
-                                                        发布
-                                                    </v-btn>
-                                                </v-container>
-                                                <v-row background-color="grey">
-                                                    <v-col
-                                                        v-for="(item, index) in comments"
-                                                        :key="index"
-                                                        @click="item"
-                                                        cols=12
-                                                        fluid
-                                                        md="12"
-                                                    >
-                                                        <v-card
-                                                            class="mx-auto"
-                                                        >
-                                                            <v-list>
-                                                            <v-list-item>
-                                                                <v-list-item-avatar color="white">
-                                                                  <v-img
-                                                                    src="../assets/images/logo.png"
-                                                                  ></v-img>
-                                                                </v-list-item-avatar>
-                                                                <v-list-item-content>
-                                                                    <v-list-item-title>{{item.message}}</v-list-item-title>
-                                                                    <v-list-item-subtitle>{{item.time}}</v-list-item-subtitle>
-                                                                </v-list-item-content>
-                                                                <v-dialog v-model="dialog2" hide-overlay transition="dialog-bottom-transition">
-                                                                    <template v-slot:activator="{ on, attrs }">
-                                                                        <v-btn
-                                                                            fab
-                                                                            small
-                                                                            class="mx-auto"
-                                                                            v-bind="attrs"
-                                                                            v-on="on"
-                                                                            text
-                                                                            icon
-                                                                        >
-                                                                            <v-icon class="mr-1">mdi-dots-horizontal</v-icon>
-                                                                        </v-btn>
-                                                                    </template>
-                                                                    <v-container class="py-0 fill-width">
-                                                                            <v-row>
-                                                                                <v-btn
-                                                                                    class="mx-auto"
-                                                                                    background-color="white"
-                                                                                    color="white"
-                                                                                    center
-                                                                                    @click="dialog2 = false"
-                                                                                    grow
-                                                                                    width="325"
-                                                                                >
-                                                                                    举报
-                                                                                </v-btn>
-                                                                                <v-btn
-                                                                                    class="mx-auto"
-                                                                                    background-color="white"
-                                                                                    color="white"
-                                                                                    center
-                                                                                    @click="dialog2 = false"
-                                                                                    grow
-                                                                                    width="325"
-                                                                                >
-                                                                                    取消
-                                                                                </v-btn>
-                                                                            </v-row>
-                                                                    </v-container>
-                                                                </v-dialog>
-                                                            </v-list-item>
-                                                            <v-list-item>
-                                                                <v-text center>{{item.text}}</v-text>
-                                                            </v-list-item>
-                                                            <v-list-item>
-                                                                <v-spacer></v-spacer>
-                                                                <v-btn
-                                                                    icon
-                                                                >
-                                                                    回复
-                                                                    <v-icon>mdi-reply-outline</v-icon>
-                                                                </v-btn>
-                                                            </v-list-item>
-                                                            </v-list>
-                                                        </v-card>
-                                                    </v-col>
-                                                </v-row>
-                                            </v-card>
-                                        </v-dialog>
+                                        <v-btn
+                                                fab
+                                                small
+                                                class="mx-auto"
+                                                text
+                                                icon
+                                                @click="dialog0 = true"
+                                            >       
+                                            <v-icon>
+                                                mdi-comment-text-outline
+                                            </v-icon>
+                                        </v-btn>
                                         <v-btn icon>
                                             <v-icon>mdi-star-outline</v-icon>
                                         </v-btn>
@@ -377,6 +227,115 @@
                         </v-col>
                     </v-row>
                 </v-container>
+                <v-dialog v-model="dialog0" fullscreen hide-overlay transition="dialog-bottom-transition">
+                    <v-card text flat>
+                        <v-toolbar color="white" elevation="1">
+                            评论
+                            <v-spacer></v-spacer>
+                            <v-btn color="black" icon dark @click="dialog0 = !dialog0">
+                                收起
+                            </v-btn>
+                        </v-toolbar>
+                        <v-container class="py-0 fill-height">
+                            <v-responsive grow>
+                                <v-text-field
+                                    flat
+                                    text
+                                    dense
+                                    hide-details
+                                    background-color="grey lighten-5"
+                                    solo
+                                    label="请输入文字..."
+                                    style="padding: 10px;"
+                                >
+                                </v-text-field>
+                            </v-responsive>
+                            <v-btn color="primary" dark text>
+                                发布
+                            </v-btn>
+                        </v-container>
+                        <v-row background-color="grey">
+                            <v-col
+                                v-for="(item, index) in comments"
+                                :key="index"
+                                @click="item"
+                                cols=12
+                                fluid
+                                md="12"
+                            >
+                                <v-card
+                                    class="mx-auto"
+                                >
+                                    <v-list>
+                                    <v-list-item>
+                                        <v-list-item-avatar color="white">
+                                          <v-img
+                                            src="../assets/images/logo.png"
+                                          ></v-img>
+                                        </v-list-item-avatar>
+                                        <v-list-item-content>
+                                            <v-list-item-title>{{item.message}}</v-list-item-title>
+                                            <v-list-item-subtitle>{{item.time}}</v-list-item-subtitle>
+                                        </v-list-item-content>
+                                            <v-btn
+                                                fab
+                                                small
+                                                class="mx-auto"
+                                                text
+                                                icon
+                                                @click="dialog1 = true"
+                                            >
+                                                <v-icon class="mr-1">mdi-dots-horizontal</v-icon>
+                                            </v-btn>
+                                    </v-list-item>
+                                    <v-list-item>
+                                        <v-text center>{{item.text}}</v-text>
+                                    </v-list-item>
+                                    <v-list-item>
+                                        <v-spacer></v-spacer>
+                                        <v-btn
+                                            icon
+                                        >
+                                            回复
+                                            <v-icon>mdi-reply-outline</v-icon>
+                                        </v-btn>
+                                    </v-list-item>
+                                    </v-list>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                    </v-card>
+                </v-dialog>
+                <v-dialog
+                    v-model="dialog1"
+                    hide-overlay
+                    transition="dialog-bottom-transition"
+                >
+                    <v-list>
+                        <v-list-item>
+                            <v-btn
+                                @click="dialog1 = !dialog1"
+                                color="white"
+                                width="295"
+                                auto-grow
+                                class="mx-auto"
+                            >
+                                举报
+                            </v-btn>
+                        </v-list-item>
+                        <v-list-item>
+                            <v-btn
+                                @click="dialog1 = !dialog1"
+                                color="white"
+                                width="295"
+                                auto-grow
+                                class="mx-auto"
+                            >
+                                取消
+                            </v-btn>
+                        </v-list-item>
+                    </v-list>
+                </v-dialog>
             </v-list-item>
         </v-list>
     </v-main>

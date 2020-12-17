@@ -121,7 +121,7 @@
                 <v-tab>关注</v-tab>
                 <v-tab>收藏</v-tab>
                 <v-tab>实时</v-tab>
-                    <v-menu
+<!--                    <v-menu
                       :close-on-click="closeOnClick"
                     >
                       <template v-slot:activator="{ on, attrs }">
@@ -190,8 +190,27 @@
                         <v-list-item-title>{{ item.title }}</v-list-item-title>
                         </v-list-item>
                     </v-list>
-                </v-menu>
-                    
+                </v-menu>-->
+                <v-card flat text width="137">
+                    <v-select
+                        :items="items0"
+                        label="标签"
+                        solo
+                        text
+                        flat
+                    >
+                    </v-select>
+                </v-card>
+                <v-card flat text width="137">
+                    <v-select
+                        :items="items1"
+                        label="排序方式"
+                        solo
+                        single-line
+                        text
+                        flat
+                    ></v-select>
+                </v-card>                    
                 <v-tab-item>
                     <v-container>
                         <v-row background-color="grey">
@@ -434,10 +453,11 @@
                 { title: '情感'},
                 { title: '娱乐'},
             ],
-            items1:[
+            items1:['最新提问','最新回答'],
+/*            items1:[
                 { title: '最新提问'},
                 { title: '最新回答'},
-            ],
+            ],*/
             items2:[
                 { 
                     id:'label1',

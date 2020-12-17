@@ -194,14 +194,14 @@
                                 </v-list-item>
                                 <v-list-item>
                                     <v-container>
-                                        <v-btn icon >
+                                        <v-btn icon @click="item.like++">
                                             <v-icon>
                                                 mdi-thumb-up-outline
                                             </v-icon>
                                             {{item.like}}
                                         </v-btn>
                                         <v-btn icon style="margin-left:10px">
-                                            <v-icon>
+                                            <v-icon @click="item.dislike++">
                                                 mdi-thumb-down-outline
                                             </v-icon>
                                             {{item.dislike}}

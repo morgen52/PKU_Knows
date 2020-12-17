@@ -12,6 +12,16 @@
     </v-app-bar>
 
     <v-main class="grey lighten-5" style="padding: 0px;">
+        <v-btn
+        fab
+        fixed
+        bottom
+        right
+        elevation=1
+        @click="btrefresh"
+        >
+        <v-icon>mdi-refresh</v-icon>
+        </v-btn>
         <v-list>
             <v-list-item>
                 <v-card 
@@ -377,6 +387,13 @@
     export default 
     {
 		name:"Qa",
+        methods: {
+            btrefresh() {
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+                this.$forceUpdate();
+            }
+        },
         data: () =>
         ({
             dialog: false,

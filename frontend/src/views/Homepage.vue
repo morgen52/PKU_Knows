@@ -101,6 +101,16 @@
     </v-app-bar>
 
     <v-main style="padding: 0px;">
+        <v-btn
+        fab
+        fixed
+        bottom
+        right
+        elevation=1
+        @click="btrefresh"
+        >
+        <v-icon>mdi-refresh</v-icon>
+        </v-btn>
         <v-card color="grey lighten-5" flat>
             <v-tabs
                 show-arrows
@@ -125,7 +135,6 @@
                             activator
                             auto
                             text
-                            flat
                         > 话题
                           <v-img
                                alt="antOutline-caret-down Logo"
@@ -161,7 +170,6 @@
                         activator
                         auto
                         text
-                        flat
                     > 排序方式
                       <v-img
                            alt="antOutline-caret-down Logo"
@@ -400,7 +408,14 @@
 <script>
     export default 
     {
-		name:"Homepage",
+        name:"Homepage",
+        methods: {
+            btrefresh() {
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+                this.$forceUpdate();
+            }
+        },
         data: () =>
         ({
             rules: [

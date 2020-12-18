@@ -410,6 +410,7 @@
                     label:'设计'
                 }
             ],
+            //增加了用户对回答的状态信息
             answer:[
                 { 
                     head:'../assets/images/logo.png',

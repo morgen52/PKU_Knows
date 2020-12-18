@@ -190,8 +190,9 @@
 		height:60px;
 	}
 	.header{
+        padding-top: 20px;
 		width: 42px;
-		height: 20px;
+		height: 30px;
 		font-size:14px;
 		color: rgba(16, 16, 16, 100);
 		font-family: PingFangSC-regular;

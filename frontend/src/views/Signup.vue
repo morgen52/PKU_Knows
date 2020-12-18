@@ -147,7 +147,25 @@
 						this.disable=true;
 						this.getC=this.count-- + '秒';
 					}
-				},1000);	
+				},1000);
+				var params = new URLSearchParams();
+				params.append('phone',this.phone);
+				var _self = this;
+				this.$ajax.post('https://auth.pkucs.cn/api/sms/code',params,{
+					headers:{
+						'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8',
+					},
+				}).then(function (response) {
+					console.log(response);
+					if(response.data.code == 404){
+						_self.count = 0;
+						alert("该手机号尚未绑定北大学号！");
+					}
+					// console.log(response)
+				}).catch(function(err){
+					_self.count = 0;
+					console.log(err);
+				})
 			},
 			validate(){
 				this.$refs.form.validate()

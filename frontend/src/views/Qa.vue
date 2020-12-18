@@ -8,7 +8,20 @@
         <v-btn icon color="blue-grey darken-4" x-large to="/homepage">
             <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
-         <v-toolbar-title style="padding: 0px;">{{ques.substring(0,10)+(ques.length>10? "...":"")}}</v-toolbar-title>
+<!--        <v-toolbar-title style="padding: 0px;">{{ques.substring(0,10)+(ques.length>10? "...":"")}}</v-toolbar-title>-->
+         
+        <v-toolbar-title style="padding: 0px;">{{ques}}</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn
+            fab
+            small
+            class="mx-auto"
+            text
+            icon
+            @click="dialog1 = true"
+        >
+            <v-icon class="mr-1">mdi-dots-horizontal</v-icon>
+        </v-btn>
     </v-app-bar>
 
     <v-main class="grey lighten-5" style="padding: 0px;">

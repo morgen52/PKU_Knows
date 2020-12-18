@@ -371,6 +371,7 @@
                 document.documentElement.scrollTop = 0;
                 this.$forceUpdate();
             },
+            //用于处理赞和踩
             dislike(item){
                 if(item.liked)return;
                 item.disliked=!item.disliked;

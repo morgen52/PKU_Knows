@@ -139,17 +139,36 @@
                         width="140"
                         center
                         text
+                        v-if="!isFocus"
+                        @click="isFocus=!isFocus"
                     >       
-                        <v-img
+                        <v-icon
                             alt="md-bookmark_border Logo"
                             class="shrink mr-2"
                             contain
-                            src="../assets/icons/md-bookmark_border.svg"
-                            transition="scale-transition"
                             width="24"
                             center
-                        />
+                        >mdi-bookmark-outline</v-icon>
                         关注问题
+                    </v-btn>
+                    <v-btn
+                        v-bind="attrs"
+                        v-on="on"
+                        width="140"
+                        center
+                        text
+                        v-if="isFocus"
+                        @click="isFocus=!isFocus"
+                    >       
+                        <v-icon
+                            alt="md-bookmark_border Logo"
+                            class="shrink mr-2"
+                            contain
+                            width="24"
+                            center
+                            color="blue"
+                        >mdi-bookmark</v-icon>
+                        已经关注
                     </v-btn>
                 </v-card>
             </v-list-item>
@@ -194,15 +213,15 @@
                                 </v-list-item>
                                 <v-list-item>
                                     <v-container>
-                                        <v-btn icon @click="item.like++">
-                                            <v-icon>
-                                                mdi-thumb-up-outline
+                                        <v-btn icon @click="like(item)">
+                                            <v-icon :color="item.liked?'blue':'none'">
+                                                mdi-thumb-up
                                             </v-icon>
                                             {{item.like}}
                                         </v-btn>
-                                        <v-btn icon style="margin-left:10px">
-                                            <v-icon @click="item.dislike++">
-                                                mdi-thumb-down-outline
+                                        <v-btn icon style="margin-left:10px" @click="dislike(item)">
+                                            <v-icon :color="item.disliked?'blue':'none'">
+                                                mdi-thumb-down
                                             </v-icon>
                                             {{item.dislike}}
                                         </v-btn>
@@ -218,8 +237,8 @@
                                                 mdi-comment-text-outline
                                             </v-icon>
                                         </v-btn>
-                                        <v-btn icon>
-                                            <v-icon>mdi-star-outline</v-icon>
+                                        <v-btn icon @click="item.collected=!item.collected">
+                                            <v-icon :color="item.collected?'yellow':'none'">mdi-star</v-icon>
                                         </v-btn>
                                     </v-container>
                                 </v-list-item>
@@ -351,7 +370,23 @@
                 document.body.scrollTop = 0;
                 document.documentElement.scrollTop = 0;
                 this.$forceUpdate();
-            }
+            },
+            dislike(item){
+                if(item.liked)return;
+                item.disliked=!item.disliked;
+                if(item.disliked){
+                    item.dislike++;
+                }
+                else item.dislike--;
+            },
+            like(item){
+                if(item.disliked)return;
+                item.liked=!item.liked;
+                if(item.liked){
+                    item.like++;
+                }
+                else item.like--;
+            },
         },
         data: () =>
         ({
@@ -365,6 +400,7 @@
             ques:'如何进行软件开发怎么进行软件开发？',
             disc:'如题：如何进行软件开发,如何进行软件开发,如何进行软件开发,如何进行软件开发,如何进行软件开发,如何进行软件开发,',
             imfo:'3回答 10关注 20浏览 20-12-14 10:10:00',
+            isFocus:false,
             label1:[
                 {
                     label:'软件工程'
@@ -381,6 +417,9 @@
                     anstext:'学习计算机编程语言。想要进行软件开发，学习计算机编程语言是必不可少的。例如java、php、python、html、css、js等等。',
                     like:'4',
                     dislike:'0',
+                    liked:false,
+                    disliked:false,
+                    collected:false,
                 },
                 { 
                     head:'../assets/images/logo.png',
@@ -389,6 +428,9 @@
                     anstext:'回答...',
                     like:'2',
                     dislike:'0',
+                    liked:false,
+                    disliked:false,
+                    collected:false,
                 },
                 { 
                     head:'../assets/images/logo.png',
@@ -397,6 +439,9 @@
                     anstext:'回答...',
                     like:'2',
                     dislike:'0',
+                    liked:false,
+                    disliked:false,
+                    collected:false,
                 },
                 { 
                     head:'../assets/images/logo.png',
@@ -405,6 +450,9 @@
                     anstext:'回答...',
                     like:'2',
                     dislike:'0',
+                    liked:false,
+                    disliked:false,
+                    collected:false,
                 },
             ],
             comments:[
@@ -428,5 +476,12 @@
                 },
             ],
         }),
+        
    }
 </script>
+<style>
+    .bookmark{
+        fill:black;
+        color:black;
+    }
+</style>

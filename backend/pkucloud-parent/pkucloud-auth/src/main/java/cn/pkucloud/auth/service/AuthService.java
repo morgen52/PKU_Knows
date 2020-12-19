@@ -1,16 +1,23 @@
 package cn.pkucloud.auth.service;
 
-import cn.pkucloud.auth.entity.Auth;
-import cn.pkucloud.auth.entity.WxUserInfo;
+import cn.pkucloud.auth.entity.WxaScene;
 import cn.pkucloud.common.Result;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 public interface AuthService {
-    Result<?> sendSmsCode(String ip, String ua, String phone) throws JsonProcessingException;
+    Result<String> getScene(String ip, String ua);
 
-    Result<?> wxLogin(int type, String code, String state) throws JsonProcessingException;
+    byte[] getWxaCode(String ip, String ua, String scene);
 
-    Result<String> wxaLogin(String wxaUserInfoStr, String pkuUserInfoStr) throws JsonProcessingException;
+    Result<WxaScene> getSceneInfo(String scene);
 
-    Result<Auth> getAuthByWxUnionId(String wxUnionId);
+    Result<?> wxaLogin(String ip, String ua, String encrypt, String iv, String signature, int timestamp, String nonce) throws Exception;
+
+    Result<String> wxLogin(int wxh5, String ip, String ua, String code, String state) throws JsonProcessingException;
+
+    Result<?> sendSmsCode(String ip, String ua, String phone);
+
+    Result<String> smsLogin(String ip, String ua, String phone, String smsCode);
+
+    Result<String> passwordLogin(String userName, String password);
 }

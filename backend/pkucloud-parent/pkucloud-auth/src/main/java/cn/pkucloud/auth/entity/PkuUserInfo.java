@@ -29,10 +29,10 @@ public class PkuUserInfo {
     private String politics;
     private String major;
     private String addr;
-    private int createTime;
-    private int accessTime;
+    private Integer register;
+    private Integer access;
 
-    public PkuUserInfo(PkuUserInfoDto pkuUserInfoDto, int create, int access) {
+    public PkuUserInfo(PkuUserInfoDto pkuUserInfoDto) {
         this.pkuId = pkuUserInfoDto.getPkuId();
         this.name = pkuUserInfoDto.getName();
         this.usrT = pkuUserInfoDto.getUsrT();
@@ -47,9 +47,5 @@ public class PkuUserInfo {
         this.politics = pkuUserInfoDto.getPolitics();
         this.major = pkuUserInfoDto.getMajor();
         this.addr = pkuUserInfoDto.getAddr();
-        if (0 != create) {
-            this.createTime = create;
-        }
-        this.accessTime = access;
     }
 }

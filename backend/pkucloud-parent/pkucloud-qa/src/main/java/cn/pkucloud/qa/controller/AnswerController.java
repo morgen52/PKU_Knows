@@ -5,11 +5,14 @@ import cn.pkucloud.common.Result;
 import cn.pkucloud.qa.entity.Answer;
 import cn.pkucloud.qa.entity.Comment;
 import cn.pkucloud.qa.entity.Report;
+import cn.pkucloud.qa.service.QaService;
+import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("answer")
+@RequestMapping("api/answer")
 @CrossOrigin
+@Api(tags = {"答案 API"})
 public class AnswerController {
     private final QaService qaService;
 
@@ -20,11 +23,6 @@ public class AnswerController {
     @GetMapping("{id}")
     public Result<Answer> getAnswerById(@PathVariable String id) {
         return qaService.getAnswerById(id);
-    }
-
-    @GetMapping("page/{page}")
-    public PageResult<Answer> getAnswerByPage(@PathVariable String page) {
-        return qaService.getAnswerByPage(page);
     }
 
     @GetMapping("{id}/comment")

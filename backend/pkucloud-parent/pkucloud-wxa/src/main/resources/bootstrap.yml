@@ -2,4 +2,4 @@ spring:
   application:
     name: pkucloud-wxa
   profiles:
-    active: dev
+    active: prod

@@ -15,16 +15,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @TableName("tb_auth")
 public class Auth {
-    @TableId(value = "id", type = IdType.INPUT)
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
-    private int status;
+    private Integer status;
 
-    private int risk;
+    private Integer risk;
 
-    private int createTime;
+    private Integer register;
 
-    private int accessTime;
+    private Integer access;
 
     private String userName;
 

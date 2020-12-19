@@ -11,15 +11,15 @@ import com.tencentcloudapi.sms.v20190711.models.SendStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import static cn.pkucloud.common.ResultCode.INTERNAL_SERVER_ERROR;
+import static cn.pkucloud.common.ResultCode.BAD_REQUEST;
 import static com.tencentcloudapi.common.profile.Region.Beijing;
 
 @Service
 public class SmsServiceImpl implements SmsService {
-    @Value("${tencentcloud.sms.secretId}")
+    @Value("${tencentcloud.sms.secretid}")
     private String secretId;
 
-    @Value("${tencentcloud.sms.secretKey}")
+    @Value("${tencentcloud.sms.secretkey}")
     private String secretKey;
 
     @Value("${tencentcloud.sms.appid}")
@@ -28,7 +28,7 @@ public class SmsServiceImpl implements SmsService {
     @Value("${tencentcloud.sms.sign}")
     private String sign;
 
-    @Value("${tencentcloud.sms.templateID}")
+    @Value("${tencentcloud.sms.templateid}")
     private String templateID;
 
     @Override
@@ -49,6 +49,6 @@ public class SmsServiceImpl implements SmsService {
         if ("Ok".equals(status.getCode())) {
             return new Result<>();
         }
-        return new Result<>(INTERNAL_SERVER_ERROR, status.getMessage());
+        return new Result<>(BAD_REQUEST, status.getMessage());
     }
 }

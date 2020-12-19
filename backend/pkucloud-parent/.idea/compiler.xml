@@ -8,12 +8,15 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="pkucloud-common" />
+        <module name="pkucloud-auth-wxa" />
         <module name="pkucloud-pay" />
         <module name="pkucloud-wxmp" />
         <module name="pkucloud-qa" />
         <module name="pkucloud-gateway" />
         <module name="pkucloud-msg" />
         <module name="pkucloud-wxa" />
+        <module name="pkucloud-obs" />
+        <module name="pkucloud-auth-sms" />
         <module name="pkucloud-auth" />
         <module name="pkucloud-tl" />
       </profile>
@@ -22,9 +25,12 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="pkucloud-auth" options="-parameters" />
+      <module name="pkucloud-auth-sms" options="-parameters" />
+      <module name="pkucloud-auth-wxa" options="-parameters" />
       <module name="pkucloud-common" options="-parameters" />
       <module name="pkucloud-gateway" options="-parameters" />
       <module name="pkucloud-msg" options="-parameters" />
+      <module name="pkucloud-obs" options="-parameters" />
       <module name="pkucloud-parent" options="-parameters" />
       <module name="pkucloud-pay" options="-parameters" />
       <module name="pkucloud-qa" options="-parameters" />

@@ -1,6 +1,5 @@
 package cn.pkucloud.auth.dto;
 
-import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 @Data

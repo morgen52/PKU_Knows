@@ -1,6 +1,6 @@
 package cn.pkucloud.wxa.feign;
 
-import cn.pkucloud.wxa.entity.wx.*;
+import cn.pkucloud.wxa.dto.wx.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

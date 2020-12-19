@@ -3,11 +3,14 @@ package cn.pkucloud.qa.controller;
 import cn.pkucloud.common.PageResult;
 import cn.pkucloud.common.Result;
 import cn.pkucloud.qa.entity.Report;
+import cn.pkucloud.qa.service.QaService;
+import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("report")
+@RequestMapping("api/report")
 @CrossOrigin
+@Api(tags = {"投诉 API"})
 public class ReportController {
     private final QaService qaService;
 

@@ -1,0 +1,9 @@
+spring:
+  cloud:
+    nacos:
+      config:
+        server-addr: nacos.pkucs.cn:8848
+      discovery:
+        server-addr: nacos.pkucs.cn:8848
+server:
+  port: 30082

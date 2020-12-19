@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/pkucloud-auth-sms/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pkucloud-auth-wxa/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/pkucloud-auth/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/pkucloud-common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/pkucloud-gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/pkucloud-msg/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pkucloud-obs/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/pkucloud-pay/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/pkucloud-qa/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/pkucloud-tl/src/main/java" charset="UTF-8" />

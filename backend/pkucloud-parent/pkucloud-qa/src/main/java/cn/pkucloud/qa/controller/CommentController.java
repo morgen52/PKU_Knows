@@ -4,11 +4,14 @@ import cn.pkucloud.common.PageResult;
 import cn.pkucloud.common.Result;
 import cn.pkucloud.qa.entity.Comment;
 import cn.pkucloud.qa.entity.Report;
+import cn.pkucloud.qa.service.QaService;
+import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("comment")
+@RequestMapping("api/comment")
 @CrossOrigin
+@Api(tags = {"评论 API"})
 public class CommentController {
     private final QaService qaService;
 
@@ -19,11 +22,6 @@ public class CommentController {
     @GetMapping("{id}")
     public Result<Comment> getCommentById(@PathVariable String id) {
         return qaService.getCommentById(id);
-    }
-
-    @GetMapping("page/{page}")
-    public PageResult<Comment> getCommentByPage(@PathVariable String page) {
-        return qaService.getCommentByPage(page);
     }
 
     @GetMapping("{id}/report")

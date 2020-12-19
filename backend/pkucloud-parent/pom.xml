@@ -18,6 +18,9 @@
         <module>pkucloud-qa</module>
         <module>pkucloud-tl</module>
         <module>pkucloud-gateway</module>
+        <module>pkucloud-auth-wxa</module>
+        <module>pkucloud-auth-sms</module>
+        <module>pkucloud-obs</module>
     </modules>
 
     <parent>

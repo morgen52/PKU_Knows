@@ -2,4 +2,4 @@ spring:
   application:
     name: pkucloud-auth
   profiles:
-    active: dev
+    active: prod

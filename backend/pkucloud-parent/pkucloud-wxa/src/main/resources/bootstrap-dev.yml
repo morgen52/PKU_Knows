@@ -2,10 +2,10 @@ spring:
   cloud:
     nacos:
       config:
-        server-addr: nacos.mryao.ac.cn:8848
+        server-addr: nacos.pkucs.cn:8848
         group: WXA_GROUP
         file-extension: yml
       discovery:
-        server-addr: nacos.mryao.ac.cn:8848
+        server-addr: nacos.pkucs.cn:8848
 server:
   port: 11082

@@ -1,226 +1,306 @@
 package cn.pkucloud.auth.service.impl;
 
+import cn.pkucloud.auth.crypto.CryptoUtil;
+import cn.pkucloud.auth.crypto.SHA1;
 import cn.pkucloud.auth.dto.PkuUserInfoDto;
+import cn.pkucloud.auth.dto.WxaLoginDto;
 import cn.pkucloud.auth.dto.WxaUserInfoDto;
-import cn.pkucloud.auth.entity.*;
+import cn.pkucloud.auth.entity.Auth;
+import cn.pkucloud.auth.entity.PkuUserInfo;
+import cn.pkucloud.auth.entity.WxUserInfo;
+import cn.pkucloud.auth.entity.WxaScene;
 import cn.pkucloud.auth.entity.wx.AccessToken;
-import cn.pkucloud.auth.feign.MsgClient;
+import cn.pkucloud.auth.feign.SmsAuthClient;
 import cn.pkucloud.auth.feign.WxSnsClient;
-import cn.pkucloud.auth.feign.WxspClient;
+import cn.pkucloud.auth.feign.WxaAuthClient;
+import cn.pkucloud.auth.feign.WxaClient;
 import cn.pkucloud.auth.mapper.AuthMapper;
 import cn.pkucloud.auth.mapper.PkuUserInfoMapper;
 import cn.pkucloud.auth.mapper.WxUserInfoMapper;
 import cn.pkucloud.auth.service.AuthService;
 import cn.pkucloud.common.Result;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.incrementer.DefaultIdentifierGenerator;
-import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.BoundValueOperations;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.security.Key;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Date;
 
 import static cn.pkucloud.auth.entity.wx.WxLoginType.*;
-import static cn.pkucloud.common.ResultCode.*;
+import static cn.pkucloud.common.ResultCode.AUTHORIZATION_REQUIRED;
+import static cn.pkucloud.common.ResultCode.NOT_FOUND;
 
 @Service
 public class AuthServiceImpl implements AuthService {
-    private final AuthMapper authMapper;
+    @Autowired
+    private AuthMapper authMapper;
 
-    private final WxUserInfoMapper wxUserInfoMapper;
+    @Autowired
+    private PkuUserInfoMapper pkuUserInfoMapper;
 
-    private final PkuUserInfoMapper pkuUserInfoMapper;
+    @Autowired
+    private WxUserInfoMapper wxUserInfoMapper;
 
-    private final StringRedisTemplate redisTemplate;
+    @Autowired
+    private WxaAuthClient wxaAuthClient;
 
-    private final ObjectMapper objectMapper;
+    @Autowired
+    private SmsAuthClient smsAuthClient;
 
-    private final WxspClient wxspClient;
+    @Autowired
+    private WxaClient wxaClient;
 
-    private final MsgClient msgClient;
+    @Autowired
+    private WxSnsClient wxSnsClient;
 
-    private final WxSnsClient wxSnsClient;
+    @Autowired
+    private CryptoUtil cryptoUtil;
 
-    @Value("${sms.ttl}")
-    private int ttl;
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Value("${wx.wxa.cloudbase.token}")
+    private String TOKEN;
+
+    @Value("${wx.wxa.cloudbase.key}")
+    private String KEY;
 
     @Value("${wx.app.appid}")
-    private String appAppid;
+    private String APP_APPID;
 
     @Value("${wx.app.secret}")
-    private String appSecret;
+    private String APP_SECRET;
 
     @Value("${wx.web.appid}")
-    private String webAppid;
+    private String WEB_APPID;
 
     @Value("${wx.web.secret}")
-    private String webSecret;
+    private String WEB_SECRET;
 
     @Value("${wx.wxh5.appid}")
-    private String wxh5Appid;
+    private String WXH5_APPID;
 
     @Value("${wx.wxh5.secret}")
-    private String wxh5Secret;
+    private String WXH5_SECRET;
 
-    public AuthServiceImpl(StringRedisTemplate redisTemplate, ObjectMapper objectMapper, WxspClient wxspClient, MsgClient msgClient, WxSnsClient wxSnsClient, AuthMapper authMapper, WxUserInfoMapper wxUserInfoMapper, PkuUserInfoMapper pkuUserInfoMapper) {
-        this.redisTemplate = redisTemplate;
-        this.objectMapper = objectMapper;
-        this.wxspClient = wxspClient;
-        this.msgClient = msgClient;
-        this.wxSnsClient = wxSnsClient;
-        this.authMapper = authMapper;
-        this.wxUserInfoMapper = wxUserInfoMapper;
-        this.pkuUserInfoMapper = pkuUserInfoMapper;
+    @Value("${jwt.key}")
+    private String JWT_KEY;
+
+    @Override
+    public Result<String> getScene(String ip, String ua) {
+        return wxaAuthClient.getScene(ip, ua);
     }
 
     @Override
-    public Result<?> sendSmsCode(String ip, String ua, String phone) throws JsonProcessingException {
-        WxspResult wxspResult = wxspClient.getPkuId("M MicroMessenger", phone);
-        if (wxspResult.isSuccess()) {
-            String pkuId = wxspResult.getUserid();
-            String code = String.format("%06d", new Random().nextInt(1000000));
-            BoundValueOperations<String, String> ops = redisTemplate.boundValueOps(phone);
-            CodeInfo codeInfo = new CodeInfo(ip, ua, code, pkuId);
-            ops.set(objectMapper.writeValueAsString(codeInfo), 60 * ttl, TimeUnit.SECONDS);
-            return msgClient.sendSmsCode(phone, code, String.valueOf(ttl));
-        }
-        return new Result<>(NOT_FOUND, "no pkuId found for the phone");
-    }
-
-    @Override
-    public Result<?> wxLogin(int type, String code, String state) throws JsonProcessingException {
-        String appid;
-        String secret;
-        switch (type) {
-            case APP:
-                appid = appAppid;
-                secret = appSecret;
-                break;
-            case WEB:
-                appid = webAppid;
-                secret = webSecret;
-                break;
-            case WXH5:
-                appid = wxh5Appid;
-                secret = wxh5Secret;
-                break;
-            default:
-                return new Result<>(BAD_REQUEST, "bad request");
-        }
-        String accessTokenStr = wxSnsClient.getAccessToken(appid, secret, code, "authorization_code");
-        System.out.println("accessTokenStr = " + accessTokenStr);
-        AccessToken accessToken = objectMapper.readValue(accessTokenStr, AccessToken.class);
-        System.out.println("accessToken = " + accessToken.toString());
-        String access_token = accessToken.getAccess_token();
-        String openid = accessToken.getOpenid();
-        String unionid = accessToken.getUnionid();
-        System.out.println("unionid = " + unionid);
-        if (null != unionid) {
-            Auth auth = getByWxUnionId(unionid);
-            if (null != auth) {
-                // 登录
-                String jws = signJwt(auth.getId());
-                return new Result<>(jws);
-            } else {
-                // 要求注册
-                return new Result<>(AUTHORIZATION_REQUIRED, "please register first");
+    public byte[] getWxaCode(String ip, String ua, String scene) {
+        Result<WxaScene> sceneInfoResult = wxaAuthClient.getSceneInfo(scene);
+        if (0 == sceneInfoResult.getCode()) {
+            WxaScene wxaScene = sceneInfoResult.getData();
+            if (ip.equals(wxaScene.getIp()) && ua.equals(wxaScene.getUa())) {
+                return wxaClient.getWxaCode(scene);
             }
         }
-        return new Result<>(BAD_REQUEST, "bad request");
+        return null;
     }
 
     @Override
-    public Result<String> wxaLogin(String wxaUserInfoStr, String pkuUserInfoStr) throws JsonProcessingException {
-        IdentifierGenerator identifierGenerator = new DefaultIdentifierGenerator();
-        WxaUserInfoDto wxaUserInfoDto = objectMapper.readValue(wxaUserInfoStr, WxaUserInfoDto.class);
-        PkuUserInfoDto pkuUserInfoDto = objectMapper.readValue(pkuUserInfoStr, PkuUserInfoDto.class);
-        String wxUnionId = wxaUserInfoDto.getUnionId();
-        String pkuId = pkuUserInfoDto.getPkuId();
-        Auth wxAuth = getByWxUnionId(wxUnionId);
-        Auth pkuAuth = getByPkuId(pkuId);
-        long id = 0;
-        int timestamp = (int) (System.currentTimeMillis() / 1000);
-        WxUserInfo wxUserInfo = new WxUserInfo(wxaUserInfoDto, timestamp, timestamp);
-        if (null == wxAuth) {
-            wxUserInfoMapper.insert(wxUserInfo);
-        } else {
-            wxUserInfo.setCreateTime(0);
-            wxUserInfoMapper.updateById(wxUserInfo);
+    public Result<WxaScene> getSceneInfo(String scene) {
+        Result<WxaScene> sceneInfo = wxaAuthClient.getSceneInfo(scene);
+        System.out.println("sceneInfo = " + sceneInfo);
+        return sceneInfo;
+    }
+
+    @Override
+    public Result<?> wxaLogin(String ip, String ua, String encrypt, String iv, String signature, int timestamp, String nonce) throws Exception {
+        if ("TCB".equals(ua)) {
+            String sign = SHA1.calcSHA1(TOKEN, timestamp, nonce, encrypt);
+            if (signature.equals(sign)) {
+                String decrypt = cryptoUtil.decrypt(encrypt, iv);
+                WxaLoginDto wxaLoginDto = objectMapper.readValue(decrypt, WxaLoginDto.class);
+                String scene = wxaLoginDto.getScene();
+                PkuUserInfoDto pkuUserInfoDto = wxaLoginDto.getPkuUserInfo();
+                WxaUserInfoDto wxaUserInfoDto = wxaLoginDto.getWxaUserInfo();
+                Long id;
+                String pkuId = pkuUserInfoDto.getPkuId();
+                String unionId = wxaUserInfoDto.getUnionId();
+                int access = (int) (System.currentTimeMillis() / 1000);
+
+                // auth
+                Auth auth = getAuthByPkuId(pkuId);
+                Auth newAuth = Auth.builder()
+                        .status(0)
+                        .risk(0)
+                        .access(access)
+                        .pkuId(pkuId)
+                        .wxUnionId(unionId)
+                        .build();
+                if (null == auth) {
+                    newAuth.setRegister(access);
+                    authMapper.insert(newAuth);
+                    id = newAuth.getId();
+                } else {
+                    id = auth.getId();
+                    newAuth.setId(id);
+                    authMapper.updateById(newAuth);
+                }
+
+                // pkuUserInfo
+                PkuUserInfo pkuUserInfo = getPkuUserInfoById(pkuId);
+                PkuUserInfo newPkuUserInfo = new PkuUserInfo(pkuUserInfoDto);
+                newPkuUserInfo.setAccess(access);
+                if (null == pkuUserInfo) {
+                    newPkuUserInfo.setRegister(access);
+                    pkuUserInfoMapper.insert(newPkuUserInfo);
+                } else {
+                    pkuUserInfoMapper.updateById(newPkuUserInfo);
+                }
+
+                // wxUserInfo
+                WxUserInfo wxUserInfo = getWxUserInfoById(unionId);
+                WxUserInfo newWxUserInfo = new WxUserInfo(wxaUserInfoDto);
+                newWxUserInfo.setAccess(access);
+                if (null == wxUserInfo) {
+                    newWxUserInfo.setRegister(access);
+                    wxUserInfoMapper.insert(newWxUserInfo);
+                } else {
+                    wxUserInfoMapper.updateById(newWxUserInfo);
+                }
+
+                System.out.println("auth = " + auth);
+                System.out.println("newAuth = " + newAuth);
+
+                String jws = signJwt(id, "wxa");
+                System.out.println("jws = " + jws);
+                return new Result<>();
+            }
         }
-        PkuUserInfo pkuUserInfo = new PkuUserInfo(pkuUserInfoDto, timestamp, timestamp);
-        if (null == pkuAuth) {
-            id = (long) identifierGenerator.nextId(null);
-            Auth auth = Auth.builder()
-                    .id(id)
+        return new Result<>(AUTHORIZATION_REQUIRED, "authorization required");
+    }
+
+    @Override
+    public Result<String> wxLogin(int type, String ip, String ua, String code, String state) throws JsonProcessingException {
+        String appid;
+        String secret;
+        String typeStr = "wx-";
+        switch (type) {
+            case APP:
+                appid = APP_APPID;
+                secret = APP_SECRET;
+                typeStr += "app";
+                break;
+            case WEB:
+                appid = WEB_APPID;
+                secret = WEB_SECRET;
+                typeStr += "web";
+                break;
+            case WXH5:
+                appid = WXH5_APPID;
+                secret = WXH5_SECRET;
+                typeStr += "wxh5";
+                break;
+            default:
+                return new Result<>(AUTHORIZATION_REQUIRED, "authorization required");
+        }
+        String accessTokenStr = wxSnsClient.getAccessToken(appid, secret, code, "authorization_code");
+        AccessToken accessToken = objectMapper.readValue(accessTokenStr, AccessToken.class);
+        String unionid = accessToken.getUnionid();
+        if (null != unionid) {
+            Auth auth = getAuthByWxUnionId(unionid);
+            if (null == auth) {
+                return new Result<>(NOT_FOUND, "please register first");
+            } else {
+                Long id = auth.getId();
+                String jws = signJwt(id, typeStr);
+                return new Result<>(jws);
+            }
+        } else {
+            return new Result<>(AUTHORIZATION_REQUIRED, "authorization required");
+        }
+    }
+
+    @Override
+    public Result<?> sendSmsCode(String ip, String ua, String phone) {
+        return smsAuthClient.sendCode(ip, ua, phone);
+    }
+
+    @Override
+    public Result<String> smsLogin(String ip, String ua, String phone, String code) {
+        Result<String> result = smsAuthClient.getPkuId(ip, ua, phone, code);
+        if (0 == result.getCode()) {
+            String pkuId = result.getData();
+            Long id;
+            int access = (int) (System.currentTimeMillis() / 1000);
+            Auth auth = getAuthByPkuId(pkuId);
+            Auth newAuth = Auth.builder()
                     .status(0)
                     .risk(0)
-                    .createTime(timestamp)
-                    .accessTime(timestamp)
+                    .access(access)
                     .pkuId(pkuId)
-                    .wxUnionId(wxUnionId)
+                    .phone(phone)
                     .build();
-            authMapper.insert(auth);
+            if (null == auth) {
+                newAuth.setRegister(access);
+                authMapper.insert(newAuth);
+                id = newAuth.getId();
+            } else {
+                id = auth.getId();
+                newAuth.setId(id);
+                authMapper.updateById(newAuth);
+            }
 
-            pkuUserInfoMapper.insert(pkuUserInfo);
-        } else {
-            id = pkuAuth.getId();
-            Auth auth = Auth.builder()
-                    .id(id)
-                    .accessTime(timestamp)
-                    .build();
-            authMapper.updateById(auth);
-
-            pkuUserInfo.setCreateTime(0);
-            pkuUserInfoMapper.updateById(pkuUserInfo);
+            String jws = signJwt(id, "sms");
+            return new Result<>(jws);
         }
-        String jws = signJwt(id);
-        return new Result<>(jws);
+        return result;
     }
 
     @Override
-    public Result<Auth> getAuthByWxUnionId(String wxUnionId) {
-        Auth auth = getByWxUnionId(wxUnionId);
-        if (null == auth) {
-            return new Result<>(NOT_FOUND, "not found");
-        }
-        return new Result<>(auth);
+    public Result<String> passwordLogin(String userName, String password) {
+        return null;
     }
 
-    private Auth getByWxUnionId(String wxUnionId) {
-        QueryWrapper<Auth> wrapper = new QueryWrapper<>();
-        wrapper.eq("wx_union_id", wxUnionId);
-        return authMapper.selectOne(wrapper);
+    private Auth getAuthById(long id) {
+        return authMapper.selectById(id);
     }
 
-    private Auth getByPkuId(String pkuId) {
+    private Auth getAuthByPkuId(String pkuId) {
         QueryWrapper<Auth> wrapper = new QueryWrapper<>();
         wrapper.eq("pku_id", pkuId);
         return authMapper.selectOne(wrapper);
     }
 
-    private Auth getByUserName(String userName) {
+    private Auth getAuthByWxUnionId(String wxUnionId) {
         QueryWrapper<Auth> wrapper = new QueryWrapper<>();
-        wrapper.eq("user_name", userName);
+        wrapper.eq("wx_union_id", wxUnionId);
         return authMapper.selectOne(wrapper);
     }
 
-    private String signJwt(long id) {
-        SignatureAlgorithm algorithm = SignatureAlgorithm.HS256;
-        Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private PkuUserInfo getPkuUserInfoById(String pkuId) {
+        return pkuUserInfoMapper.selectById(pkuId);
+    }
 
+    private WxUserInfo getWxUserInfoById(String unionId) {
+        return wxUserInfoMapper.selectById(unionId);
+    }
+
+    private String signJwt(Long id, String type) {
+        byte[] keyBytes = Base64.decodeBase64(JWT_KEY);
+        SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "HMACSHA256");
+        long timestamp = System.currentTimeMillis();
         return Jwts.builder()
                 .setSubject(String.valueOf(id))
-                .signWith(key)
+                .setExpiration(new Date(timestamp + 7200000))
+                .claim("type", type)
+                .claim("role", "user")
+                .signWith(keySpec)
                 .compact();
     }
 }

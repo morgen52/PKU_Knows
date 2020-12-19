@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @TableName("tb_wx_user_info")
 public class WxUserInfo {
     private String nickName;
-    private int gender;
+    private Integer gender;
     private String language;
     private String city;
     private String province;
@@ -26,10 +26,10 @@ public class WxUserInfo {
     private String webOpenId;
     @TableId
     private String unionId;
-    private int createTime;
-    private int accessTime;
+    private Integer register;
+    private Integer access;
 
-    public WxUserInfo(WxaUserInfoDto wxaUserInfoDto, int create, int access) {
+    public WxUserInfo(WxaUserInfoDto wxaUserInfoDto) {
         this.nickName = wxaUserInfoDto.getNickName();
         this.gender = wxaUserInfoDto.getGender();
         this.language = wxaUserInfoDto.getLanguage();
@@ -39,9 +39,5 @@ public class WxUserInfo {
         this.avatarUrl = wxaUserInfoDto.getAvatarUrl();
         this.wxaOpenId = wxaUserInfoDto.getOpenId();
         this.unionId = wxaUserInfoDto.getUnionId();
-        if (0 != create) {
-            this.createTime = create;
-        }
-        this.accessTime = access;
     }
 }

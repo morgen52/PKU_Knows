@@ -13,9 +13,9 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package cn.pkucloud.auth.netty;
+package cn.pkucloud.auth.wxa.netty;
 
-import cn.pkucloud.auth.service.AuthService;
+import cn.pkucloud.auth.wxa.service.WxaAuthService;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -32,10 +32,10 @@ public class WebSocketServerInitializer extends ChannelInitializer<SocketChannel
 
     private static final String WEBSOCKET_PATH = "/ws";
 
-    private final AuthService authService;
+    private final WxaAuthService wxaAuthService;
 
-    public WebSocketServerInitializer(AuthService wxaService) {
-        this.authService = wxaService;
+    public WebSocketServerInitializer(WxaAuthService wxaAuthService) {
+        this.wxaAuthService = wxaAuthService;
     }
 
     @Override
@@ -45,9 +45,9 @@ public class WebSocketServerInitializer extends ChannelInitializer<SocketChannel
         pipeline.addLast(new ChunkedWriteHandler());
         pipeline.addLast(new HttpObjectAggregator(65536));
         pipeline.addLast(new WebSocketServerCompressionHandler());
-        pipeline.addLast(new WebSocketSceneHandler(authService));
+        pipeline.addLast(new WebSocketSceneHandler(wxaAuthService));
         pipeline.addLast(new WebSocketServerProtocolHandler(WEBSOCKET_PATH, null, true));
-        pipeline.addLast(new IdleStateHandler(4, 8, 12));
+        pipeline.addLast(new IdleStateHandler(60, 60, 120));
         pipeline.addLast(new WebSocketHeartBeatHandler());
     }
 }

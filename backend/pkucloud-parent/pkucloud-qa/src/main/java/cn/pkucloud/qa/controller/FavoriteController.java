@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/favorite")
+@RequestMapping("qa/favorite")
 @CrossOrigin
 @Api(tags = {"收藏 API"})
 public class FavoriteController {

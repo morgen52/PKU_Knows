@@ -15,4 +15,8 @@ public interface WxaAuthClient {
 
     @GetMapping("scene/{scene}")
     Result<WxaScene> getSceneInfo(@PathVariable String scene);
+
+    @GetMapping("msg")
+    Result<?> sendMsg(@RequestParam String scene,
+                      @RequestParam String msg);
 }

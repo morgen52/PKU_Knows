@@ -1,9 +1,7 @@
 package cn.pkucloud.auth;
 
 import cn.pkucloud.auth.crypto.CryptoUtil;
-import cn.pkucloud.auth.netty.WebSocketServer;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -15,13 +13,7 @@ import springfox.documentation.oas.annotations.EnableOpenApi;
 @EnableDiscoveryClient
 @EnableFeignClients
 @EnableOpenApi
-public class AuthApplication implements CommandLineRunner {
-    private final WebSocketServer webSocketServer;
-
-    public AuthApplication(WebSocketServer webSocketServer) {
-        this.webSocketServer = webSocketServer;
-    }
-
+public class AuthApplication {
     public static void main(String[] args) {
         SpringApplication.run(AuthApplication.class, args);
     }
@@ -35,10 +27,5 @@ public class AuthApplication implements CommandLineRunner {
     @Bean
     public CryptoUtil cryptoUtil() {
         return new CryptoUtil(TOKEN, KEY);
-    }
-
-    @Override
-    public void run(String... args) throws Exception {
-        webSocketServer.run();
     }
 }

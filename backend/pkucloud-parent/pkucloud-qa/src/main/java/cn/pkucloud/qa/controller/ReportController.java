@@ -8,7 +8,7 @@ import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/report")
+@RequestMapping("qa/report")
 @CrossOrigin
 @Api(tags = {"投诉 API"})
 public class ReportController {

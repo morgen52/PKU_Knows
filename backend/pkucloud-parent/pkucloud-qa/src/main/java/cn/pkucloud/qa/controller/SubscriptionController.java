@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/subscription")
+@RequestMapping("qa/subscription")
 @CrossOrigin
 @Api(tags = {"订阅 API"})
 public class SubscriptionController {

@@ -10,7 +10,7 @@ import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/answer")
+@RequestMapping("qa/answer")
 @CrossOrigin
 @Api(tags = {"答案 API"})
 public class AnswerController {

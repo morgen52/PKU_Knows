@@ -9,7 +9,7 @@ import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/comment")
+@RequestMapping("qa/comment")
 @CrossOrigin
 @Api(tags = {"评论 API"})
 public class CommentController {

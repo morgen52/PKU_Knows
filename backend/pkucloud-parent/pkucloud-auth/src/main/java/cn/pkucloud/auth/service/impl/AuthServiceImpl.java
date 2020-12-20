@@ -23,14 +23,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Date;
 
@@ -114,6 +111,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public Result<WxaScene> getSceneInfo(String scene) {
         Result<WxaScene> sceneInfo = wxaAuthClient.getSceneInfo(scene);
+        wxaAuthClient.sendMsg(scene, "SCANNED");
         System.out.println("sceneInfo = " + sceneInfo);
         return sceneInfo;
     }
@@ -179,6 +177,8 @@ public class AuthServiceImpl implements AuthService {
 
                 String jws = signJwt(id, "wxa");
                 System.out.println("jws = " + jws);
+
+                wxaAuthClient.sendMsg(scene, jws);
                 return new Result<>();
             }
         }
@@ -296,10 +296,11 @@ public class AuthServiceImpl implements AuthService {
         SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "HMACSHA256");
         long timestamp = System.currentTimeMillis();
         return Jwts.builder()
-                .setSubject(String.valueOf(id))
+                .setIssuer(type)
                 .setExpiration(new Date(timestamp + 7200000))
-                .claim("type", type)
+                .setSubject(String.valueOf(id))
                 .claim("role", "user")
+                .claim("mod", 6)
                 .signWith(keySpec)
                 .compact();
     }

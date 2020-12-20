@@ -13,9 +13,9 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package cn.pkucloud.auth.netty;
+package cn.pkucloud.auth.wxa.netty;
 
-import cn.pkucloud.auth.service.AuthService;
+import cn.pkucloud.auth.wxa.service.WxaAuthService;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -23,7 +23,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -46,30 +45,32 @@ import org.springframework.stereotype.Component;
  * </ul>
  */
 @Component
-public class WebSocketServer {
+public final class WebSocketServer {
 
-    static final int PORT = 12082;
     private final EventLoopGroup bossGroup;
     private final EventLoopGroup workerGroup;
     private final ServerBootstrap b;
 
-    private AuthService authService = null;
+    static final int PORT = 42082;
 
-    public WebSocketServer() {
+    public WebSocketServer(WxaAuthService wxaAuthService) {
+
         bossGroup = new NioEventLoopGroup();
         workerGroup = new NioEventLoopGroup();
         b = new ServerBootstrap();
-        b
-                .group(bossGroup, workerGroup)
+        b.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .handler(new LoggingHandler(LogLevel.INFO))
-                .childHandler(new WebSocketServerInitializer(authService));
+                .childHandler(new WebSocketServerInitializer(wxaAuthService));
     }
 
-    public void run() throws InterruptedException {
+    public void run() throws Exception {
+
         try {
             Channel ch = b.bind(PORT).sync().channel();
+
             System.out.println("netty server started");
+
             ch.closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();

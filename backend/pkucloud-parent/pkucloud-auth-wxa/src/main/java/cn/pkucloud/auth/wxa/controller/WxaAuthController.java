@@ -23,4 +23,9 @@ public class WxaAuthController {
     public Result<WxaScene> getSceneInfo(@PathVariable String scene) throws JsonProcessingException {
         return wxaAuthService.getSceneInfo(scene);
     }
+
+    @GetMapping("msg")
+    public Result<?> sendToken(String scene, String msg) {
+        return wxaAuthService.sendMsg(scene, msg);
+    }
 }

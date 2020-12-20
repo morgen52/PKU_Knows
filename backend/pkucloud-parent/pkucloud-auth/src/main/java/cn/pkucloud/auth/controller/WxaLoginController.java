@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/wxa")
-@CrossOrigin(origins = {"https://sso.pkucloud.cn"})
+@CrossOrigin
 @Api(tags = {"微信小程序登录 API"})
 public class WxaLoginController {
     private final AuthService authService;

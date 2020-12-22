@@ -237,7 +237,7 @@
                                                 text
                                                 block
                                             >
-                                                <v-list>
+                                                <v-list color="transparent">
                                                     <v-list-item>
                                                         <v-row>
                                                             <v-chip-grop
@@ -307,7 +307,7 @@
                                             text
                                             block
                                         >
-                                            <v-list>
+                                            <v-list color="transparent">
                                                 <v-list-item>
                                                     <v-row>
                                                         <v-chip-grop
@@ -375,7 +375,7 @@
                                             text
                                             block
                                         >
-                                            <v-list>
+                                            <v-list color="transparent">
                                                 <v-list-item>
                                                     <v-row>
                                                         <v-chip-grop

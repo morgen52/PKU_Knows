@@ -32,6 +32,7 @@
 							clearable
 							dense
 							required
+                            placeholder="使用北大门户绑定手机号注册"
 							></v-text-field>
 						</v-col>
 					</v-row>
@@ -98,7 +99,7 @@
 				class="ma-2"
 				color="info"
 				href="#"
-				>下一步：绑定微信及学号</v-btn>
+				>注册</v-btn>
 			</v-row>
 		</v-main>
 	</v-app>

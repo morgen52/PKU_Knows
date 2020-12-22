@@ -194,21 +194,23 @@
                 <v-card flat text width="137">
                     <v-select
                         :items="items0"
-                        label="标签"
+                        v-model="select0"
                         solo
                         text
                         flat
+                        style="font-size: 14px;"
                     >
                     </v-select>
                 </v-card>
                 <v-card flat text width="137">
                     <v-select
                         :items="items1"
-                        label="排序方式"
+                        v-model="select1"
                         solo
                         single-line
                         text
                         flat
+                        style="font-size: 14px;"
                     ></v-select>
                 </v-card>                    
                 <v-tab-item>
@@ -444,6 +446,7 @@
             dialog: false,
             label:['标签'],
             items0: ['全部', '课程', '学术', '生活','情感','娱乐'],
+            select0: '全部',
             itemsx: ['课程', '学术', '生活','情感','娱乐'],
             items:[
                 { title: '全部'},
@@ -454,6 +457,7 @@
                 { title: '娱乐'},
             ],
             items1:['最新提问','最新回答'],
+            select1: '最新提问',
 /*            items1:[
                 { title: '最新提问'},
                 { title: '最新回答'},

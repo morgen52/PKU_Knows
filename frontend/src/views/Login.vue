@@ -28,7 +28,7 @@
                           style="margin-bottom: 10px;"
                         >
                           <v-tab style="color: #FFFFFF;">
-                            密码
+                            密码登录
                           </v-tab>
                           <v-tab style="color: #FFFFFF;">
                             手机验证码
@@ -50,9 +50,29 @@
                         <!--手机号、验证码的输入-->
                         <v-text-field v-model="title" :rules="[rules1.required,rules1.counter]" counter="11" name="user" label=" 请输入手机号"
                         prepend-icon="mdi-account" clearable dark></v-text-field>
-                        
+                        <v-row>
+                            <v-col cols="8" style="padding-right: 0px;">
+                                <v-text-field 
+                                label="请输入验证码"
+                                counter="6" 
+                                prepend-icon="mdi-key"
+                                dark
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="3" style="padding-left: 0px;padding-top: 20px;">
+                                <v-btn class="ma-2" color="info"  height="30px" width="100px" :disabled="disable" :class="{get:isGet}" @click="getVCode" dark>
+                                    {{getC}}
+                                    <template v-slot:loader>
+                                        <span class="custom-loader">
+                                            <v-icon light>mdi-cached</v-icon>
+                                        </span>
+                                    </template>
+                                </v-btn>
+                            </v-col>
+                        </v-row>
+                        <!--
                         <v-text-field label="请输入验证码" prepend-icon="mdi-key" counter=6 dark></v-text-field>
-                        
+                        -->
                         </v-tab-item>
                         </v-tabs-items>
                         
@@ -106,6 +126,10 @@
                 loader: null,
                 loading: false,
                 loading2: false,
+                disable:false,
+                getC:'获取验证码',
+                isGet:false,
+                count:60,
             }
         },
         watch: {
@@ -116,6 +140,24 @@
                 this.loader = null
             },
         },
+        methods:{
+            getVCode(){
+                var countDown=setInterval(()=>{
+                    if(this.count<1){
+                        this.isGet=false;
+                        this.disable=false;
+                        this.getC='获取验证码';
+                        this.count=60;
+                        clearInterval(countDown);
+                    }
+                    else{
+                        this.isGet=true;
+                        this.disable=true;
+                        this.getC=this.count-- + '秒';
+                    }
+                },1000);
+            },
+        }
     }
 </script>
 

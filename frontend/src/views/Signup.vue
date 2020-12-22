@@ -19,7 +19,7 @@
 		</v-app-bar>
 		<v-main class="Main">
 			<v-card style="z-index: 0;">
-				<v-form  ref="form" v-model="valid1" lazy-validation>
+				<v-form  ref="form" v-model="valid1">
 					<v-row cols="12" sm="6" justify="center" align="center" class="rows">
 						<v-col cols="3" sm="2" class="header">
 							<v-header>手机号:</v-header>
@@ -28,8 +28,7 @@
 							<v-text-field 
 							v-model="phone"
 							:rules="rules1" 
-							counter="11" 
-							clearable
+							:counter="11" 
 							dense
 							required
                             placeholder="使用北大门户绑定手机号注册"
@@ -44,8 +43,8 @@
 						<v-col cols="4" sm="3" class="inputs">
 							<v-text-field 
 							v-model="code"
-							counter="6" 
-							clearable
+                            :rules="rules3"
+							:counter="6" 
 							dense
 							required
 							></v-text-field>
@@ -69,11 +68,11 @@
 						<v-col cols="8" sm="6" class="inputs">
 							<v-text-field 
 							v-model="pass"
-							clearable
 							:append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
 							:rules="rules2" 
 							:type="show ? 'text': 'password'"
-							counter @click:append="show = !show"
+							counter 
+                            @click:append="show = !show"
 							required
 							dense
 							></v-text-field>
@@ -84,7 +83,7 @@
 					
 				</v-form>
 			</v-card>
-			<v-form ref="form" v-model="valid2" lazy-validation>
+			<v-form ref="form" v-model="valid2">
 				<v-checkbox style="marginLeft:20px"
 				:rules="[v => !!v || '请阅读北大知道用户协议']"
 				color="blue"
@@ -98,7 +97,7 @@
 				:disabled="!(valid1&&valid2)"
 				class="ma-2"
 				color="info"
-				href="#"
+				to="/"
 				>注册</v-btn>
 			</v-row>
 		</v-main>
@@ -122,12 +121,17 @@
 					v => !!v || '密码必填',
 					m => m.length >= 8 || '密码至少8位',
 				],
+                rules3:[
+                    v=> !!v || '验证码必填',
+                    m=> m.length==6 || '位数不正确'
+                ],
 				getC:'获取验证码',
 				isGet:false,
 				count:60,
 				disable:false,
 				checkbox:false,
-				valid:true,
+                valid1:false,
+                valid2:true,
 				phone:"",
 				code:"",
 				pass:"",

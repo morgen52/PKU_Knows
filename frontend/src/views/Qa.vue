@@ -277,8 +277,11 @@
                                     hide-details
                                     background-color="grey lighten-5"
                                     solo
+                                    clearable
                                     label="请输入文字..."
+                                    :value="replytext"
                                     style="padding: 10px;"
+                                    @click:clear="clearMessage"
                                 >
                                 </v-text-field>
                             </v-responsive>
@@ -327,6 +330,7 @@
                                         <v-spacer></v-spacer>
                                         <v-btn
                                             icon
+                                            @click="replytext='@'+item.name+':'"
                                         >
                                             回复
                                             <v-icon>mdi-reply-outline</v-icon>
@@ -401,6 +405,9 @@
                 }
                 else item.like--;
             },
+            clearMessage () {
+                    this.replytext = ''
+            },
         },
         data: () =>
         ({
@@ -408,6 +415,7 @@
             dialog0: false,
             dialog1: false,
             dialog2: false,
+            replytext:'',
             id:'label1',
             topic:'课程',
             label:'标签',
@@ -473,18 +481,21 @@
             comments:[
                 { 
                     head:'../assets/images/logo.png',
-                    message:'姓名·信科·18本科生',
+                    name:'路人甲',
+                    message:'路人甲·信科·18本科生',
                     time:'2020-12-13 11:34',
                     text:'回答不错，谢谢',
                 },
                 { 
                     head:'../assets/images/logo.png',
-                    message:'姓名·信科·18本科生',
+                    name:'路人乙',
+                    message:'路人乙·信科·18本科生',
                     time:'2020-12-13 11:34',
                     text:'评论...',
                 },
                 { 
                     head:'../assets/images/logo.png',
+                    name:'姓名',
                     message:'姓名·信科·18本科生',
                     time:'2020-12-13 11:34',
                     text:'评论...',

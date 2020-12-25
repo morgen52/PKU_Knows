@@ -14,7 +14,6 @@
         <module>pkucloud-wxa</module>
         <module>pkucloud-auth</module>
         <module>pkucloud-wxmp</module>
-        <module>pkucloud-pay</module>
         <module>pkucloud-qa</module>
         <module>pkucloud-tl</module>
         <module>pkucloud-gateway</module>

@@ -1,27 +1,43 @@
 package cn.pkucloud.qa.controller;
 
 import cn.pkucloud.common.PageResult;
+import cn.pkucloud.common.Result;
 import cn.pkucloud.qa.entity.Question;
 import cn.pkucloud.qa.service.QaService;
-import io.swagger.annotations.Api;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("qa/subscription")
-@CrossOrigin
-@Api(tags = {"订阅 API"})
 public class SubscriptionController {
-    private final QaService qaService;
+    @Autowired
+    private QaService qaService;
 
-    public SubscriptionController(QaService qaService) {
-        this.qaService = qaService;
+    @GetMapping
+    public PageResult<Question> getSubscriptionQuestionByPage(@RequestHeader("iss") String issuer,
+                                                              @RequestHeader("uid") String uid,
+                                                              @RequestHeader("role") String role,
+                                                              @RequestHeader("mod") String mod,
+                                                              @RequestParam int size,
+                                                              @RequestParam int page) {
+        return qaService.getSubscriptionQuestionByPage(issuer, uid, role, mod, size, page);
     }
 
-    @GetMapping("question")
-    public PageResult<Question> getSubscriptionQuestion() {
-        return qaService.getSubscriptionQuestion();
+    @PostMapping
+    public Result<?> postSubscription(@RequestHeader("iss") String issuer,
+                                      @RequestHeader("uid") String uid,
+                                      @RequestHeader("role") String role,
+                                      @RequestHeader("mod") String mod,
+                                      @RequestParam String qid) {
+        return qaService.postSubscription(issuer, uid, role, mod, qid);
+    }
+
+    @DeleteMapping("{id}")
+    public Result<?> deleteSubscriptionById(@RequestHeader("iss") String issuer,
+                                            @RequestHeader("uid") String uid,
+                                            @RequestHeader("role") String role,
+                                            @RequestHeader("mod") String mod,
+                                            @PathVariable String id) {
+        return qaService.deleteSubscriptionById(issuer, uid, role, mod, id);
     }
 }

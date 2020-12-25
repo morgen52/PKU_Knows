@@ -9,7 +9,6 @@
         <outputRelativeToContentRoot value="true" />
         <module name="pkucloud-common" />
         <module name="pkucloud-auth-wxa" />
-        <module name="pkucloud-pay" />
         <module name="pkucloud-wxmp" />
         <module name="pkucloud-qa" />
         <module name="pkucloud-gateway" />
@@ -21,6 +20,9 @@
         <module name="pkucloud-tl" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="pkucloud-pay" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">

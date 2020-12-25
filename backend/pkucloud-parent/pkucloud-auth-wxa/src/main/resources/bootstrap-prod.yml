@@ -8,4 +8,4 @@ spring:
       discovery:
         server-addr: 172.16.0.14:8848
 server:
-  port: 17082
+  port: 12082

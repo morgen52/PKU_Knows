@@ -8,4 +8,4 @@ spring:
       discovery:
         server-addr: nacos.pkucs.cn:8848
 server:
-  port: 14082
+  port: 15082

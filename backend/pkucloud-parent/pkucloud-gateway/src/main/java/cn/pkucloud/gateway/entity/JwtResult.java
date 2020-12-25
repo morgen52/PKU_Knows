@@ -13,8 +13,8 @@ public class JwtResult {
     private String role;
     private int mod;
 
-    public JwtResult(boolean valid, String msg) {
-        this.valid = valid;
+    public JwtResult(String msg) {
+        this.valid = false;
         this.msg = msg;
     }
 }

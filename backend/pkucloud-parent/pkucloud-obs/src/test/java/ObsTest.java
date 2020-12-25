@@ -30,7 +30,7 @@ public class ObsTest {
         request.setObjectKey(key);
         request.setBucketName("wepku-i");
         ArrayList<String> conditions = new ArrayList<>();
-        conditions.add("\"{'x-obs-acl': 'private'}\"")
+        conditions.add("\"{'x-obs-acl': 'private'}\"");
 
         PostSignatureResponse response = obsClient.createPostSignature(request);
         System.out.println("response = " + response.getPolicy());

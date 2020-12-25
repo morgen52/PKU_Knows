@@ -5,50 +5,43 @@ import cn.pkucloud.gateway.entity.JwtResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
-import lombok.Data;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import javax.crypto.spec.SecretKeySpec;
-import java.util.Date;
-
 import static cn.pkucloud.common.ResultCode.AUTHORIZATION_REQUIRED;
 
-@Data
 @Component
 public class AuthFilter implements GlobalFilter, Ordered {
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     @Value("${jwt.secret}")
     private String secret;
 
+    public AuthFilter(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String jwsStr = exchange.getRequest().getHeaders().getFirst("Authorization");
-        if (!StringUtils.isBlank(jwsStr)) {
+        if (null != jwsStr) {
             JwtResult jwtResult = verifyJws(jwsStr);
             if (jwtResult.isValid()) {
                 exchange.getRequest().mutate().headers(httpHeaders -> {
                     httpHeaders.add("iss", jwtResult.getIssuer());
-                    httpHeaders.add("id", jwtResult.getSubject());
+                    httpHeaders.add("uid", jwtResult.getSubject());
                     httpHeaders.add("role", jwtResult.getRole());
                     httpHeaders.add("mod", String.valueOf(jwtResult.getMod()));
                 });
-                System.out.println("jwtResult = " + jwtResult);
                 return chain.filter(exchange);
             }
         }
@@ -88,9 +81,9 @@ public class AuthFilter implements GlobalFilter, Ordered {
             int mod = (int) claims.get("mod");
             return new JwtResult(true, "ok", issuer, subject, role, mod);
         } catch (ExpiredJwtException e) {
-            return new JwtResult(false, "token expired");
+            return new JwtResult("token expired");
         } catch (JwtException e) {
-            return new JwtResult(false, "token invalid");
+            return new JwtResult("token invalid");
         }
     }
 }

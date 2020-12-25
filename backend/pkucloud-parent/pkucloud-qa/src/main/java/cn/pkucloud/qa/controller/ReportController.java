@@ -4,37 +4,31 @@ import cn.pkucloud.common.PageResult;
 import cn.pkucloud.common.Result;
 import cn.pkucloud.qa.entity.Report;
 import cn.pkucloud.qa.service.QaService;
-import io.swagger.annotations.Api;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("qa/report")
-@CrossOrigin
-@Api(tags = {"投诉 API"})
 public class ReportController {
-    private final QaService qaService;
+    @Autowired
+    private QaService qaService;
 
-    public ReportController(QaService qaService) {
-        this.qaService = qaService;
+    @GetMapping
+    public PageResult<Report> getReportByPage(@RequestHeader("iss") String issuer,
+                                              @RequestHeader("uid") String uid,
+                                              @RequestHeader("role") String role,
+                                              @RequestHeader("mod") String mod,
+                                              @RequestParam int size,
+                                              @RequestParam int page) {
+        return qaService.getReportByPage(issuer, uid, role, mod, size, page);
     }
 
     @GetMapping("{id}")
-    public Result<Report> getReportById(@PathVariable String id) {
-        return qaService.getReportById(id);
-    }
-
-    @GetMapping("page/{page}")
-    public PageResult<Report> getReportByPage(@PathVariable String page) {
-        return qaService.getReportByPage(page);
-    }
-
-    @PutMapping("{id}")
-    public Result<?> putReportById(@PathVariable String id) {
-        return qaService.putReportById(id);
-    }
-
-    @DeleteMapping("{id}")
-    public Result<?> deleteReportById(@PathVariable String id) {
-        return qaService.deleteReportById(id);
+    public Result<Report> getReportById(@RequestHeader("iss") String issuer,
+                                        @RequestHeader("uid") String uid,
+                                        @RequestHeader("role") String role,
+                                        @RequestHeader("mod") String mod,
+                                        @PathVariable String id) {
+        return qaService.getReportById(issuer, uid, role, mod, id);
     }
 }

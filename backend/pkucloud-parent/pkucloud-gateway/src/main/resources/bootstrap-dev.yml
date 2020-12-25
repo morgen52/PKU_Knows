@@ -2,10 +2,10 @@ spring:
   cloud:
     nacos:
       config:
-        server-addr: 81.70.105.156:8848
+        server-addr: 124.70.77.13:8848
         group: GATEWAY_GROUP
         file-extension: yml
       discovery:
-        server-addr: 81.70.105.156:8848
+        server-addr: 124.70.77.13:8848
 server:
-  port: 30082
+  port: 40082

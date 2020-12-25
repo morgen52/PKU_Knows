@@ -51,7 +51,7 @@ public final class WebSocketServer {
     private final EventLoopGroup workerGroup;
     private final ServerBootstrap b;
 
-    static final int PORT = 42082;
+    static final int PORT = 13082;
 
     public WebSocketServer(WxaAuthService wxaAuthService) {
 

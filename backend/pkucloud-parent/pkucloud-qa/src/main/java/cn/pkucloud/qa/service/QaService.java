@@ -8,61 +8,43 @@ import cn.pkucloud.qa.entity.Question;
 import cn.pkucloud.qa.entity.Report;
 
 public interface QaService {
-    Result<Question> getQuestionById(String id);
+    PageResult<Question> getQuestionByPage(String issuer, String uid, String role, String mod, int size, int page);
 
-    PageResult<Question> getQuestionByPage(String page);
+    Result<Question> getQuestionById(String issuer, String uid, String role, String mod, String id);
 
-    PageResult<Question> getQuestionByTag(String tag);
+    Result<?> postQuestion(String issuer, String uid, String role, String mod, String title, String txt, String[] img, String[] tag, int setting, boolean subscribe);
 
-    PageResult<Answer> getAnswerByQuestionId(String id);
+    PageResult<Answer> getAnswerByQid(String issuer, String uid, String role, String mod, String qid, int size, int page);
 
-    PageResult<Report> getReportByQuestionId(String id);
+    Result<?> postAnswer(String issuer, String uid, String role, String mod, String qid, String txt, String[] img, int setting, boolean subscribe);
 
-    Result<?> postQuestion();
+    Result<Answer> getAnswerById(String issuer, String uid, String role, String mod, String id);
 
-    Result<?> postAnswerByQuestionId(String id);
+    Result<?> postComment(String issuer, String uid, String role, String mod, String aid, String pid, String txt, String[] img, int setting);
 
-    Result<?> postReportByQuestionId(String id);
+    Result<Comment> getCommentById(String issuer, String uid, String role, String mod, String id);
 
-    Result<?> putQuestionById(String id);
+    PageResult<Report> getReportByPage(String issuer, String uid, String role, String mod, int size, int page);
 
-    Result<?> deleteQuestionById(String id);
+    Result<Report> getReportById(String issuer, String uid, String role, String mod, String id);
 
-    Result<Answer> getAnswerById(String id);
+    PageResult<Comment> getCommentByAid(String issuer, String uid, String role, String mod, String aid, int size, int page);
 
-    PageResult<Comment> getCommentByAnswerId(String id);
+    Result<?> postReport(String issuer, String uid, String role, String mod, String type, String id, String txt);
 
-    PageResult<Report> getReportByAnswerId(String id);
+    Result<?> putQuestionLike(String issuer, String uid, String role, String mod, String id, int like);
 
-    Result<?> postReportByAnswerId(String id);
+    PageResult<Question> getFavoriteQuestionByPage(String issuer, String uid, String role, String mod, int size, int page);
 
-    Result<?> postCommentByCommentId(String id);
+    PageResult<Answer> getFavoriteAnswerByPage(String issuer, String uid, String role, String mod, int size, int page);
 
-    Result<?> putAnswerById(String id);
+    Result<?> postFavorite(String issuer, String uid, String role, String mod, String type, String id);
 
-    Result<?> deleteAnswerById(String id);
+    Result<?> deleteFavoriteById(String issuer, String uid, String role, String mod, String id);
 
-    Result<Comment> getCommentById(String id);
+    PageResult<Question> getSubscriptionQuestionByPage(String issuer, String uid, String role, String mod, int size, int page);
 
-    PageResult<Report> getReportByCommentId(String id);
+    Result<?> postSubscription(String issuer, String uid, String role, String mod, String qid);
 
-    Result<?> postReportByCommentId(String id);
-
-    Result<?> putCommentById(String id);
-
-    Result<?> deleteCommentById(String id);
-
-    Result<Report> getReportById(String id);
-
-    PageResult<Report> getReportByPage(String page);
-
-    Result<?> putReportById(String id);
-
-    Result<?> deleteReportById(String id);
-
-    PageResult<Question> getFavoriteQuestion();
-
-    PageResult<Answer> getFavoriteAnswer();
-
-    PageResult<Question> getSubscriptionQuestion();
+    Result<?> deleteSubscriptionById(String issuer, String uid, String role, String mod, String id);
 }

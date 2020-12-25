@@ -1,22 +1,28 @@
 package cn.pkucloud.qa.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
+@Builder
+@Document("comment")
 public class Comment {
     @Id
     private String _id;
-    private int status;
+    private Integer status;
     @JsonIgnore
-    private long uid;
-    private User user;
+    private String uid;
     private String aid;
     private String pid;
+    private User user;
     private String txt;
     private String[] img;
-    private int like;
-    private int dislike;
-    private int create;
+    private Integer like;
+    private Integer dislike;
+    @JsonIgnore
+    private Integer report;
+    private Integer createTime;
 }

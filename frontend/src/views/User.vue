@@ -3,14 +3,18 @@
     <v-app id="user">
         <v-app-bar 
         app
-        flat
-        color="white">
-            <div class="d-flex align-center">
-                <v-btn icon to="/homepage"><v-icon large>mdi-chevron-left</v-icon></v-btn>
-            </div>
+        color="white"
+        elevate-on-scroll
+        >
+            <v-btn icon color="blue-grey darken-4" x-large to="/homepage">
+                <v-icon>mdi-chevron-left</v-icon>
+            </v-btn>
             <v-spacer></v-spacer>
-            <v-btn icon to="/cog"><v-icon medium="">mdi-cog</v-icon></v-btn>
+            <v-btn icon color="blue-grey darken-4" to="/cog">
+                <v-icon>mdi-cog</v-icon>
+            </v-btn>
         </v-app-bar>
+        
         <v-main class="text-center" style="padding: 0px;">
             <!--最上面的头像、名字-->
             <v-col
@@ -68,106 +72,105 @@
                 </v-row>
             </v-card>
             <!--最下面的个人信息-->
-            <v-form :style="perInfo">
-                <v-container>
-                    <v-row cols="12" sm="6" justify="center" align="center">
-                        <v-col cols="3" sm="2" >
-                            <v-header>性别:</v-header>
-                        </v-col>
-                        <v-col cols="8" sm="6">
-                            <v-select
-                            v-if="!unchange"
-                            v-model="gender"
-                            v-bind:readonly="unchange"
-                            v-bind:autofocus="unchange"
-                            :items="gender_items"
-                            item-text="state"
-                            dense
-                            ></v-select>
-                            <v-text-field
-                            v-if="unchange"
-                            v-model="gender"
-                            v-bind:readonly="unchange"
-                            dense
-                            class="myright"
-                            ></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row cols="12" sm="6" :style="marginBetween" justify="center" align="center">
-                        <v-col cols="3" sm="2">
-                            <v-header>院系:</v-header>
-                        </v-col>
-                        <v-col cols="8" sm="6">
-                            <v-select
-                            v-if="!unchange"
-                            v-model="master"
-                            v-bind:readonly="unchange"
-                            v-bind:autofocus="unchange"
-                            :items="master_items"
-                            item-text="state"
-                            dense
-                            ></v-select>
-                            <v-text-field
-                            v-if="unchange"
-                            v-model="master"
-                            v-bind:readonly="unchange"
-                            dense
-                            class="myright"
-                            ></v-text-field>
-                        </v-col>
-                        
-                    </v-row>
-                    <v-row cols="12" sm="6" :style="marginBetween" justify="center" align="center">
-                        <v-col cols="3" sm="2">
-                            <v-header>年级:</v-header>
-                        </v-col>
-                        <v-col cols="8" sm="6">
-                            <v-select
-                            v-if="!unchange"
-                            v-model="grade"
-                            v-bind:readonly="unchange"
-                            v-bind:autofocus="unchange"
-                            :items="grade_items"
-                            item-text="state"
-                            dense
-                            ></v-select>
-                            <v-text-field
-                            v-if="unchange"
-                            v-model="grade"
-                            v-bind:readonly="unchange"
-                            dense
-                            class="myright"
-                            ></v-text-field>
-                        </v-col>
-                        
-                    </v-row>
-                    <v-row cols="12" sm="6" :style="marginBetween" justify="center" align='center'>
-                        <v-col cols="3" sm="2" >
-                            <v-header>简介:</v-header>
-                        </v-col>
-                        <v-col cols="8" sm="6">
-                            <v-textarea
-                            v-model="motto"
-                            rows=1
-                            v-bind:readonly="unchange"
-                            v-bind:clearable="!unchange"
-                            v-bind:hide-details="unchange"
-                            dense
-                            no-resize=True
-                            auto-grow=True
-                            class="myright"
-                            counter="50"
-                            ></v-textarea>
-                        </v-col>
-                        
-                    </v-row>
-                </v-container>
-            </v-form>
+            <v-container>
+                <v-row cols="12" sm="6" justify="center" align="center">
+                    <v-col cols="2" sm="2">
+                        <v-header>性别:</v-header>
+                    </v-col>
+                    <v-col cols="8" sm="6">
+                        <v-select
+                        v-if="!unchange"
+                        v-model="gender"
+                        v-bind:readonly="unchange"
+                        v-bind:autofocus="unchange"
+                        :items="gender_items"
+                        item-text="state"
+                        dense
+                        ></v-select>
+                        <v-text-field
+                        v-if="unchange"
+                        v-model="gender"
+                        v-bind:readonly="unchange"
+                        dense
+                        class="myright"
+                        ></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row cols="12" sm="6" :style="marginBetween" justify="center" align="center">
+                    <v-col cols="2" sm="2">
+                        <v-header>院系:</v-header>
+                    </v-col>
+                    <v-col cols="8" sm="6">
+                        <v-select
+                        v-if="!unchange"
+                        v-model="master"
+                        v-bind:readonly="unchange"
+                        v-bind:autofocus="unchange"
+                        :items="master_items"
+                        item-text="state"
+                        dense
+                        ></v-select>
+                        <v-text-field
+                        v-if="unchange"
+                        v-model="master"
+                        v-bind:readonly="unchange"
+                        dense
+                        class="myright"
+                        ></v-text-field>
+                    </v-col>
+                    
+                </v-row>
+                <v-row cols="12" sm="6" :style="marginBetween" justify="center" align="center">
+                    <v-col cols="2" sm="2">
+                        <v-header>年级:</v-header>
+                    </v-col>
+                    <v-col cols="8" sm="6">
+                        <v-select
+                        v-if="!unchange"
+                        v-model="grade"
+                        v-bind:readonly="unchange"
+                        v-bind:autofocus="unchange"
+                        :items="grade_items"
+                        item-text="state"
+                        dense
+                        ></v-select>
+                        <v-text-field
+                        v-if="unchange"
+                        v-model="grade"
+                        v-bind:readonly="unchange"
+                        dense
+                        class="myright"
+                        ></v-text-field>
+                    </v-col>
+                    
+                </v-row>
+                <v-row cols="12" sm="6" :style="marginBetween" justify="center" align='center'>
+                    <v-col cols="2" sm="2" >
+                        <v-header>简介:</v-header>
+                    </v-col>
+                    <v-col cols="8" sm="6">
+                        <v-textarea
+                        v-model="motto"
+                        rows=1
+                        v-bind:readonly="unchange"
+                        v-bind:clearable="!unchange"
+                        v-bind:hide-details="unchange"
+                        dense
+                        no-resize=True
+                        auto-grow=True
+                        class="myright"
+                        counter="50"
+                        ></v-textarea>
+                    </v-col>
+                    
+                </v-row>
+            </v-container>
             <!--编辑/保存按钮-->
             <v-row
                 align="center"
                 justify="space-around">
                 <v-btn 
+                style="margin-top: 10px;"
                 depressed
                 text
                 elevation=1

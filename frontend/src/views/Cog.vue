@@ -5,12 +5,12 @@
 	>
 		<v-app-bar
 		app
-		flat
-		color="white">
-			<div class="d-flex align-center">
-				<v-btn icon to="/user"><v-icon large>mdi-chevron-left</v-icon></v-btn>
-			</div>
-			<v-spacer></v-spacer>
+		color="white"
+		elevate-on-scroll
+        >
+            <v-btn icon color="blue-grey darken-4" x-large to="/user">
+                <v-icon>mdi-chevron-left</v-icon>
+            </v-btn>
 		</v-app-bar>
 		<v-main style="margin-top: 0px;">
 			<v-banner

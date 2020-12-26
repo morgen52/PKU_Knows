@@ -33,6 +33,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         String access_token = ops.get();
         if (null == access_token) {
             AccessToken accessToken = mpClient.getAccessToken("client_credential", APPID, SECRET);
+            System.out.println("accessToken = " + accessToken.getErrmsg());
             if (null != accessToken) {
                 access_token = accessToken.getAccess_token();
                 if (null != access_token) {

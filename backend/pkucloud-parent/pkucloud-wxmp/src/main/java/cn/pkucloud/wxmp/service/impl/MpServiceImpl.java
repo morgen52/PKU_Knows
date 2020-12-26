@@ -184,7 +184,7 @@ public class MpServiceImpl implements MpService {
 //        } else {
 //            wxmpUserInfoMapper.updateById(newWxmpUserInfo);
 //        }
-        MiniProgramPage miniProgramPage = new MiniProgramPage("登录未名云", "wx4e9dcf33a0d1f74a", "pages/auth/index", "DfYb6hy12M4EHKjosI_11ZxHfNW1HDayliGrOjDW-rijycQV5KR8N94hr5pwmF2C");
+        MiniProgramPage miniProgramPage = new MiniProgramPage("登录未名云", "wx4e9dcf33a0d1f74a", "pages/auth/index", "XCiNRTOFqj0VCatvTzlC-7N_LlqJeJ6IlJKGdK2GIpM");
         BaseResult result = mpClient.sendCustomMessage(access_token, new MiniProgramPageRequestEntity(fromUserName, miniProgramPage));
         System.out.println("result = " + result);
         return replyTextMsg(fromUserName, "你好，" + nickname + "。欢迎关注WePKU！");

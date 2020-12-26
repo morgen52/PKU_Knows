@@ -1,5 +1,6 @@
 package cn.pkucloud.auth.controller;
 
+import cn.pkucloud.auth.dto.Wxh5Signature;
 import cn.pkucloud.auth.service.AuthService;
 import cn.pkucloud.common.Result;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -46,5 +47,10 @@ public class WxLoginController {
                                         @ApiParam("微信服务器返回的 code") String code,
                                         @ApiParam("微信服务器返回的 state") String state) throws JsonProcessingException {
         return authService.wxLogin(WXH5, ip, ua, code, state);
+    }
+
+    @GetMapping("wxh5/signature")
+    public Result<Wxh5Signature> getWxh5Signature(@RequestParam String url) {
+        return authService.getWxh5Signature(url);
     }
 }

@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 @RestController
-@RequestMapping("mp")
+@RequestMapping("api/mp")
 @Validated
 public class MpController {
     private final MpService mpService;

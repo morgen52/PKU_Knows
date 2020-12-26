@@ -1,5 +1,6 @@
 package cn.pkucloud.auth.service;
 
+import cn.pkucloud.auth.dto.Wxh5Signature;
 import cn.pkucloud.auth.entity.WxaScene;
 import cn.pkucloud.common.Result;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,4 +21,6 @@ public interface AuthService {
     Result<String> smsLogin(String ip, String ua, String phone, String smsCode);
 
     Result<String> passwordLogin(String userName, String password);
+
+    Result<Wxh5Signature> getWxh5Signature(String url);
 }

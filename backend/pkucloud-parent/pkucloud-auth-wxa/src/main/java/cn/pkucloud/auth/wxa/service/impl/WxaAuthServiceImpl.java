@@ -8,7 +8,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -22,11 +21,14 @@ import static cn.pkucloud.common.ResultCode.NOT_FOUND;
 
 @Service
 public class WxaAuthServiceImpl implements WxaAuthService {
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
+
+    public WxaAuthServiceImpl(StringRedisTemplate stringRedisTemplate, ObjectMapper objectMapper) {
+        this.stringRedisTemplate = stringRedisTemplate;
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public Result<String> getScene(String ip, String ua) throws JsonProcessingException {
@@ -39,10 +41,21 @@ public class WxaAuthServiceImpl implements WxaAuthService {
     }
 
     @Override
+    public Result<?> checkScene(String ip, String ua, String scene) {
+        BoundValueOperations<String, String> boundValueOps = stringRedisTemplate.boundValueOps(scene);
+        String wxaSceneStr = boundValueOps.get();
+        if (null != wxaSceneStr) {
+            return new Result<>();
+        }
+        return new Result<>(NOT_FOUND, "not found");
+    }
+
+    @Override
     public Result<WxaScene> getSceneInfo(String scene) throws JsonProcessingException {
         BoundValueOperations<String, String> boundValueOps = stringRedisTemplate.boundValueOps(scene);
         String wxaSceneStr = boundValueOps.get();
         if (null != wxaSceneStr) {
+            sendMsg(scene, "SCANNED");
             WxaScene wxaScene = objectMapper.readValue(wxaSceneStr, WxaScene.class);
             return new Result<>(wxaScene);
         }
@@ -64,12 +77,13 @@ public class WxaAuthServiceImpl implements WxaAuthService {
     }
 
     @Override
-    public Result<?> sendMsg(String scene, String msg) {
+    public Result<?> sendToken(String scene, String token) {
         Channel channel = SceneChannelMap.get(scene);
         if (null != channel) {
-            channel.writeAndFlush(new TextWebSocketFrame(msg));
+            channel.writeAndFlush(new TextWebSocketFrame(token));
             SceneChannelMap.removeByScene(scene);
             channel.close();
+            stringRedisTemplate.delete(scene);
             return new Result<>();
         }
         return new Result<>(NOT_FOUND, "not found");
@@ -78,5 +92,17 @@ public class WxaAuthServiceImpl implements WxaAuthService {
     @Override
     public void deleteScene(String scene) {
         stringRedisTemplate.delete(scene);
+    }
+
+
+    private boolean sendMsg(String scene, String msg) {
+        Channel channel = SceneChannelMap.get(scene);
+        if (null != channel) {
+            channel.writeAndFlush(new TextWebSocketFrame(msg));
+//            SceneChannelMap.removeByScene(scene);
+//            channel.close();
+            return true;
+        }
+        return false;
     }
 }

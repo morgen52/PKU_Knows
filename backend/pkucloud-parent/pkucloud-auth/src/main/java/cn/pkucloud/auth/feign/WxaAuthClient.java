@@ -14,9 +14,14 @@ public interface WxaAuthClient {
                             @RequestParam String ua);
 
     @GetMapping("scene/{scene}")
+    Result<?> checkScene(@RequestParam String ip,
+                         @RequestParam String ua,
+                         @PathVariable String scene);
+
+    @GetMapping("sceneinfo/{scene}")
     Result<WxaScene> getSceneInfo(@PathVariable String scene);
 
-    @GetMapping("msg")
-    Result<?> sendMsg(@RequestParam String scene,
-                      @RequestParam String msg);
+    @GetMapping("token")
+    Result<?> sendToken(@RequestParam String scene,
+                        @RequestParam String token);
 }

@@ -18,9 +18,4 @@ public class PublicController {
     public PublicController(PublicService publicService) {
         this.publicService = publicService;
     }
-
-    @GetMapping("signature")
-    public Result<Signature> getSignature(@NotBlank String url) {
-        return publicService.getSignature(url);
-    }
 }

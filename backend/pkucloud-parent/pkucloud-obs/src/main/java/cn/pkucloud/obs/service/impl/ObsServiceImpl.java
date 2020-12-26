@@ -25,7 +25,7 @@ public class ObsServiceImpl implements ObsService {
 
     @Override
     public Result<?> getPostSignature() {
-
+        PostSignatureRequest request = new PostSignatureRequest();
         return null;
     }
 }

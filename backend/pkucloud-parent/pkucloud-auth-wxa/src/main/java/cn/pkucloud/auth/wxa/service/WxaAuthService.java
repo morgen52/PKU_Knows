@@ -11,7 +11,9 @@ public interface WxaAuthService {
 
     boolean connectScene(String ip, String ua, String scene) throws JsonProcessingException;
 
-    Result<?> sendMsg(String scene, String msg);
+    Result<?> sendToken(String scene, String token);
 
     void deleteScene(String scene);
+
+    Result<?> checkScene(String ip, String ua, String scene);
 }

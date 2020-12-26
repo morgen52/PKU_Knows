@@ -5,15 +5,13 @@ import cn.pkucloud.auth.crypto.SHA1;
 import cn.pkucloud.auth.dto.PkuUserInfoDto;
 import cn.pkucloud.auth.dto.WxaLoginDto;
 import cn.pkucloud.auth.dto.WxaUserInfoDto;
+import cn.pkucloud.auth.dto.Wxh5Signature;
 import cn.pkucloud.auth.entity.Auth;
 import cn.pkucloud.auth.entity.PkuUserInfo;
 import cn.pkucloud.auth.entity.WxUserInfo;
 import cn.pkucloud.auth.entity.WxaScene;
 import cn.pkucloud.auth.entity.wx.AccessToken;
-import cn.pkucloud.auth.feign.SmsAuthClient;
-import cn.pkucloud.auth.feign.WxSnsClient;
-import cn.pkucloud.auth.feign.WxaAuthClient;
-import cn.pkucloud.auth.feign.WxaClient;
+import cn.pkucloud.auth.feign.*;
 import cn.pkucloud.auth.mapper.AuthMapper;
 import cn.pkucloud.auth.mapper.PkuUserInfoMapper;
 import cn.pkucloud.auth.mapper.WxUserInfoMapper;
@@ -54,6 +52,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private WxaClient wxaClient;
+
+    @Autowired
+    private WxmpClient wxmpClient;
 
     @Autowired
     private WxSnsClient wxSnsClient;
@@ -98,12 +99,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public byte[] getWxaCode(String ip, String ua, String scene) {
-        Result<WxaScene> sceneInfoResult = wxaAuthClient.getSceneInfo(scene);
-        if (0 == sceneInfoResult.getCode()) {
-            WxaScene wxaScene = sceneInfoResult.getData();
-            if (ip.equals(wxaScene.getIp()) && ua.equals(wxaScene.getUa())) {
-                return wxaClient.getWxaCode(scene);
-            }
+
+        Result<?> result = wxaAuthClient.checkScene(ip, ua, scene);
+        if (0 == result.getCode()) {
+            return wxaClient.getWxaCode(scene);
         }
         return null;
     }
@@ -111,7 +110,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public Result<WxaScene> getSceneInfo(String scene) {
         Result<WxaScene> sceneInfo = wxaAuthClient.getSceneInfo(scene);
-        wxaAuthClient.sendMsg(scene, "SCANNED");
+//        wxaAuthClient.sendToken(scene, "SCANNED");
         System.out.println("sceneInfo = " + sceneInfo);
         return sceneInfo;
     }
@@ -178,8 +177,8 @@ public class AuthServiceImpl implements AuthService {
                 String jws = signJwt(id, "wxa");
                 System.out.println("jws = " + jws);
 
-                wxaAuthClient.sendMsg(scene, jws);
-                return new Result<>();
+                wxaAuthClient.sendToken(scene, jws);
+                return new Result<>(jws);
             }
         }
         return new Result<>(AUTHORIZATION_REQUIRED, "authorization required");
@@ -265,6 +264,11 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public Result<String> passwordLogin(String userName, String password) {
         return null;
+    }
+
+    @Override
+    public Result<Wxh5Signature> getWxh5Signature(String url) {
+        return wxmpClient.getWxh5Signature(url);
     }
 
     private Auth getAuthById(long id) {

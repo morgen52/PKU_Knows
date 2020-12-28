@@ -37,8 +37,8 @@
                         <v-tabs-items v-model="tab" style="background-color: transparent;">
                         <!--密码登录-->
                         <v-tab-item>
-                        <!--手机号、密码的输入-->
-                        <v-text-field v-model="title" :rules="[rules1.required,rules1.counter]" counter="11" name="user" label=" 请输入手机号"
+                        <!--用户名、密码的输入-->
+                        <v-text-field v-model="title_user" :rules="[rules1.required,rules1.counter]" name="user" label=" 请输入用户名"
                         prepend-icon="mdi-account" clearable dark></v-text-field>
                         
                         <v-text-field :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'" :rules="[rules2.required,rules2.min]" :type="show ? 'text': 'password'"
@@ -49,7 +49,7 @@
                         <v-tab-item>
                         <!--手机号、验证码的输入-->
                         <v-text-field v-model="title" :rules="[rules1.required,rules1.counter]" counter="11" name="user" label=" 请输入手机号"
-                        prepend-icon="mdi-account" clearable dark></v-text-field>
+                        prepend-icon="mdi-cellphone" clearable dark></v-text-field>
                         <v-row>
                             <v-col cols="8" style="padding-right: 0px;">
                                 <v-text-field 
@@ -116,7 +116,6 @@
                 },
                 rules1: {
                     require: value => !!value || '必填',
-                    counter: value => value.length === 11 || "位数不正确"
                 },
                 show: false,
                 rules2: {
@@ -124,6 +123,7 @@
                     min: m => m.length >= 8 || '密码至少8位',
                     userMatch: () => ('用户不存在或是密码错误！')
                 },
+                title_user:"",
                 loader: null,
                 loading: false,
                 loading2: false,

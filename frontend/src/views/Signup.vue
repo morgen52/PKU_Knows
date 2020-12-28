@@ -61,35 +61,54 @@
 						</v-col>
 					</v-row>
 					<v-divider></v-divider>
-					<v-row cols="12" sm="6" justify="center" align="center" class="rows">
-						<v-col cols="3" sm="2" class="header">
-							<v-header>密码:</v-header>
-						</v-col>
-						<v-col cols="8" sm="6" class="inputs">
-							<v-text-field 
-							v-model="pass"
-							:append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
-							:rules="rules2" 
-							:type="show ? 'text': 'password'"
-							counter 
-                            @click:append="show = !show"
-							required
-							dense
-							></v-text-field>
-						</v-col>
-					</v-row>
-					<v-divider></v-divider>
 					
 					
 				</v-form>
 			</v-card>
 			<v-form ref="form" v-model="valid2">
 				<v-checkbox style="marginLeft:20px"
-				:rules="[v => !!v || '请阅读北大知道用户协议']"
+				:rules="[affirm]"
 				color="blue"
 				required
-				label="我已阅读北大知道用户协议"
-				></v-checkbox>
+				>
+                    <template v-slot:label>
+                        <div class="blue--text" style="font-size: 15px;">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{on}">
+                                    <v-dialog v-model="dialog" v-on="on">
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-btn
+                                            text
+                                            class="blue--text"
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            style="padding: 0px;margin: 0px;font-size: 15px;text-decoration: underline;"
+                                            @click="read=true">
+                                            我已阅读北大知道用户协议
+                                            </v-btn>
+                                        </template>
+                                        <v-card text flat>
+                                            <v-toolbar dark color="white" elevation="1">
+                                                <v-btn color="black" icon dark @click="dialog = false">
+                                                    收起
+                                                </v-btn>
+                                                <v-spacer></v-spacer>
+                                            </v-toolbar>
+                                            <v-list one-line flat text>
+                                                <v-list-item flat text>
+                                                    <v-list-item-content>
+                                                        北大知道是2020年秋季软件工程课程项目，是一个以相对明确的问答形式为主的平台，旨在为北大校内各方提供一个快速获取有效信息的平台，尽可能解决信息不对称问题。
+                                                    </v-list-item-content>
+                                                </v-list-item>
+                                            </v-list>
+                                          </v-card>
+                                    </v-dialog>
+                                    
+                                </template>
+                            </v-tooltip>
+                        </div>
+                    </template>
+                </v-checkbox>
 			</v-form>
 			<v-row justify="center" align="center" class="bottons">
 				<v-btn
@@ -116,11 +135,6 @@
 					value => !!value || '手机号必填',
 					value => value.length === 11 || "位数不正确"
 				],
-				show: false,
-				rules2: [
-					v => !!v || '密码必填',
-					m => m.length >= 8 || '密码至少8位',
-				],
                 rules3:[
                     v=> !!v || '验证码必填',
                     m=> m.length==6 || '位数不正确'
@@ -135,6 +149,8 @@
 				phone:"",
 				code:"",
 				pass:"",
+                dialog:false,
+                read:false,
 			}
 		},
 		methods:{
@@ -175,6 +191,12 @@
 			validate(){
 				this.$refs.form.validate()
 			},
+            affirm(val){
+                if(!val||!this.read){
+                    return "请阅读北大知道用户协议！";
+                }
+                return true;
+            }
 		}
 	}
 </script>
@@ -193,7 +215,7 @@
 		border-width: 0px;
 	}
 	.Main{
-		margin-top: 0px;
+		margin-top: 30px;
 		padding-top: 20px;
 		background-color: #EFF3F5;
 	}

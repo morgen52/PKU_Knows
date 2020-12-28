@@ -54,6 +54,7 @@
                             <v-col cols="8" style="padding-right: 0px;">
                                 <v-text-field 
                                 label="请输入验证码"
+								v-model="code"
                                 counter="6" 
                                 prepend-icon="mdi-key"
                                 dark
@@ -82,8 +83,8 @@
                             &nbsp;|&nbsp;没有账号？<router-link to="/signup" class="white--text">注册</router-link>
                         </p>
                         <!--最下方的登录按钮-->
-                        <v-btn class="ma-2" :loading="loading2" :disabled="loading2" color="info" width="150px" @click="loader='loading2'"
-                        dark to="/homepage">
+                        <v-btn class="ma-2" :loading="loading2" :disabled="loading2" color="info" width="150px" @click="signIn"
+                        dark>
                             登录
                             <template v-slot:loader>
                                 <span class="custom-loader">
@@ -141,6 +142,27 @@
             },
         },
         methods:{
+			signIn(){
+				this.loader = this.loading2;
+				var data = {
+					'code':this.code,
+					'phone':this.title
+				}
+				var _self = this;
+				this.$axios.post('https://auth.pkucs.cn/api/sms/token',this.$qs.stringify(data)
+				).then(function(response){
+					console.log(response);
+					if(response.data.code == 0){
+						_self.token = response.data.data;
+						_self.$router.push("/homepage");
+					}
+					else{
+						alert("登录失败");
+					}
+				}).catch(function(error){
+					console.log(error);
+				})
+			},
             getVCode(){
                 var countDown=setInterval(()=>{
                     if(this.count<1){
@@ -156,7 +178,25 @@
                         this.getC=this.count-- + '秒';
                     }
                 },1000);
-            },
+				var _self = this;
+				var data = {'phone':this.title};
+				this.$axios.post('https://auth.pkucs.cn/api/sms/code',this.$qs.stringify(data)
+				).then(function (response) {
+					console.log(response);
+					if(response.data.code == 404){
+						_self.count = 0;
+						alert("该手机号尚未绑定北大学号！");
+					}
+					if(response.data.code == 400){
+						_self.count = 0;
+						alert("一小时内该手机号获取验证码的次数已达上限！");
+					}
+					// console.log(response)
+				}).catch(function(err){
+					_self.count = 0;
+					console.log(err);
+				})
+            }
         }
     }
 </script>

@@ -23,4 +23,8 @@ public interface AuthService {
     Result<String> passwordLogin(String userName, String password);
 
     Result<Wxh5Signature> getWxh5Signature(String url);
+
+    Result<?> getUserInfo(String jws);
+
+    Result<?> setPassword(String jws, String userName, String password);
 }

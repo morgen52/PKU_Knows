@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/sms")
-@CrossOrigin(origins = {"https://sso.pkucloud.cn"})
+@CrossOrigin
 @Api(tags = {"短信验证码登录 API"})
 public class SmsLoginController {
     private final AuthService authService;

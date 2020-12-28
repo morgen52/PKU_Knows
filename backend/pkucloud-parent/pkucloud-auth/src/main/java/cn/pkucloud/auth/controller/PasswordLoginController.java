@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/password")
-@CrossOrigin(origins = {"https://sso.pkucloud.cn"})
+@CrossOrigin
 @Api(tags = {"密码登录 API"})
 public class PasswordLoginController {
     private final AuthService authService;

@@ -6,10 +6,7 @@ import cn.pkucloud.auth.dto.PkuUserInfoDto;
 import cn.pkucloud.auth.dto.WxaLoginDto;
 import cn.pkucloud.auth.dto.WxaUserInfoDto;
 import cn.pkucloud.auth.dto.Wxh5Signature;
-import cn.pkucloud.auth.entity.Auth;
-import cn.pkucloud.auth.entity.PkuUserInfo;
-import cn.pkucloud.auth.entity.WxUserInfo;
-import cn.pkucloud.auth.entity.WxaScene;
+import cn.pkucloud.auth.entity.*;
 import cn.pkucloud.auth.entity.wx.AccessToken;
 import cn.pkucloud.auth.feign.*;
 import cn.pkucloud.auth.mapper.AuthMapper;
@@ -20,6 +17,9 @@ import cn.pkucloud.common.Result;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +30,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.util.Date;
 
 import static cn.pkucloud.auth.entity.wx.WxLoginType.*;
-import static cn.pkucloud.common.ResultCode.AUTHORIZATION_REQUIRED;
-import static cn.pkucloud.common.ResultCode.NOT_FOUND;
+import static cn.pkucloud.common.ResultCode.*;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -89,7 +88,7 @@ public class AuthServiceImpl implements AuthService {
     @Value("${wx.wxh5.secret}")
     private String WXH5_SECRET;
 
-    @Value("${jwt.key}")
+    @Value("${jwt.secret}")
     private String JWT_KEY;
 
     @Override
@@ -263,12 +262,90 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public Result<String> passwordLogin(String userName, String password) {
-        return null;
+        Auth auth = getAuthByUserName(userName);
+        if (null != auth) {
+            String password1 = auth.getPassword();
+            if (password.equals(password1)) {
+                Long id = auth.getId();
+                String jws = signJwt(id, "passwd");
+                return new Result<>(jws);
+            }
+        }
+        return new Result<>(AUTHORIZATION_REQUIRED, "authorization required");
     }
 
     @Override
     public Result<Wxh5Signature> getWxh5Signature(String url) {
         return wxmpClient.getWxh5Signature(url);
+    }
+
+    @Override
+    public Result<UserInfoDto> getUserInfo(String jws) {
+        JwtResult jwtResult = verifyJws(jws);
+        if (jwtResult.isValid()) {
+            String subject = jwtResult.getSubject();
+            long id = Long.parseLong(subject);
+            Auth auth = getAuthById(id);
+            if (null != auth) {
+                String pkuId = auth.getPkuId();
+                String wxUnionId = auth.getWxUnionId();
+                String userName = auth.getUserName();
+                String enroll = "20" + pkuId.substring(0, 2);
+                PkuUserInfo pkuUserInfo = getPkuUserInfoById(pkuId);
+                WxUserInfo wxUserInfo = getWxUserInfoById(wxUnionId);
+                String gender = null;
+                String usrT = null;
+                String stuT = null;
+                String dept = null;
+                String major = null;
+                String name = null;
+                String avatar = null;
+                if (null != pkuUserInfo) {
+                    gender = pkuUserInfo.getGender();
+                    usrT = pkuUserInfo.getUsrT();
+                    stuT = pkuUserInfo.getStuT();
+                    dept = pkuUserInfo.getDept();
+                    major = pkuUserInfo.getMajor();
+                    name = pkuUserInfo.getName();
+                }
+                if (null != wxUserInfo) {
+                    avatar = wxUserInfo.getAvatarUrl();
+                }
+                UserInfoDto userInfoDto = new UserInfoDto(
+                        userName,
+                        avatar,
+                        gender,
+                        usrT,
+                        stuT,
+                        enroll,
+                        dept,
+                        major,
+                        name);
+                return new Result<>(userInfoDto);
+            }
+        }
+        return new Result<>(AUTHORIZATION_REQUIRED, "authorization required");
+    }
+
+    @Override
+    public Result<?> setPassword(String jws, String userName, String password) {
+        JwtResult jwtResult = verifyJws(jws);
+        if (jwtResult.isValid()) {
+            String issuer = jwtResult.getIssuer();
+            if ("wxa".equals(issuer) || "sms".equals(issuer)) {
+                String subject = jwtResult.getSubject();
+                long id = Long.parseLong(subject);
+                Auth auth = getAuthById(id);
+                if (null != auth) {
+                    auth.setUserName(userName);
+                    auth.setPassword(password);
+                    authMapper.updateById(auth);
+                    return new Result<>();
+                }
+                return new Result<>(INTERNAL_SERVER_ERROR, "internal server error");
+            }
+        }
+        return new Result<>(AUTHORIZATION_REQUIRED, "authorization required");
     }
 
     private Auth getAuthById(long id) {
@@ -284,6 +361,12 @@ public class AuthServiceImpl implements AuthService {
     private Auth getAuthByWxUnionId(String wxUnionId) {
         QueryWrapper<Auth> wrapper = new QueryWrapper<>();
         wrapper.eq("wx_union_id", wxUnionId);
+        return authMapper.selectOne(wrapper);
+    }
+
+    private Auth getAuthByUserName(String userName) {
+        QueryWrapper<Auth> wrapper = new QueryWrapper<>();
+        wrapper.eq("user_name", userName);
         return authMapper.selectOne(wrapper);
     }
 
@@ -307,5 +390,25 @@ public class AuthServiceImpl implements AuthService {
                 .claim("mod", 6)
                 .signWith(keySpec)
                 .compact();
+    }
+
+    private JwtResult verifyJws(String jwsStr) {
+        Claims claims;
+        try {
+            claims = Jwts.parserBuilder()
+                    .setSigningKey(JWT_KEY)
+                    .build()
+                    .parseClaimsJws(jwsStr)
+                    .getBody();
+            String issuer = claims.getIssuer();
+            String subject = claims.getSubject();
+            String role = claims.get("role", String.class);
+            int mod = (int) claims.get("mod");
+            return new JwtResult(true, "ok", issuer, subject, role, mod);
+        } catch (ExpiredJwtException e) {
+            return new JwtResult("token expired");
+        } catch (JwtException e) {
+            return new JwtResult("token invalid");
+        }
     }
 }

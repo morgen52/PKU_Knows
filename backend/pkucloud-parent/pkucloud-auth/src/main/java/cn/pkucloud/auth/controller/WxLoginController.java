@@ -13,7 +13,7 @@ import static cn.pkucloud.auth.entity.wx.WxLoginType.*;
 
 @RestController
 @RequestMapping("api/wx")
-@CrossOrigin(origins = {"https://sso.pkucloud.cn"})
+@CrossOrigin
 @Api(tags = {"微信登录 API"})
 public class WxLoginController {
     private final AuthService authService;

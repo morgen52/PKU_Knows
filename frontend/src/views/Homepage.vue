@@ -38,7 +38,7 @@
                         </v-btn>
                         <v-spacer></v-spacer>
                         <v-toolbar-items>
-                            <v-btn color="primary" dark text @click="dialog = false">
+                            <v-btn color="primary" dark text @click="postQuestion">
                                 发布问题
                             </v-btn>
                         </v-toolbar-items>
@@ -85,7 +85,6 @@
                                     hide-details
                                     rows=1
                                     background-color="white"
-                                    
                                     flat
                                     filled
                                     auto-grow
@@ -436,6 +435,10 @@
                 document.documentElement.scrollTop = 0;
                 this.$forceUpdate();
             }
+			postQuestion(){
+				this.dialog = false;
+				
+			}
         },
         data: () =>
         ({

@@ -16,6 +16,7 @@
             background-color="grey lighten-5"
             rounded
             solo
+            v-model="searchtext"
             clearable
             label="请输入搜索内容"
         >
@@ -51,6 +52,7 @@
                                     :rules="rules"
                                     hide-details
                                     background-color="white"
+                                    v-model="questext"
                                     flat
                                     text
                                 >
@@ -63,6 +65,7 @@
                                     label="补充：说明(选填)"
                                     hide-details
                                     background-color="white"
+                                    v-model="detailtext"
                                     flat
                                     filled
                                     auto-grow
@@ -85,6 +88,7 @@
                                     hide-details
                                     rows=1
                                     background-color="white"
+                                    v-model="labeltext"
                                     flat
                                     filled
                                     auto-grow
@@ -100,16 +104,17 @@
     </v-app-bar>
 
     <v-main style="padding: 0px;">
-        <v-btn
-        fab
-        fixed
-        bottom
-        right
-        elevation=1
-        @click="btrefresh"
+<!--        <v-btn
+            fab
+            fixed
+            right
+            class="mx-auto"
+            elevation=1
+            icon
+            @click="toptop"
         >
-        <v-icon>mdi-refresh</v-icon>
-        </v-btn>
+            <v-icon>mdi-chevron-double-up</v-icon>
+        </v-btn>-->
         <v-card color="grey lighten-5" flat>
             <v-tabs
                 show-arrows
@@ -120,76 +125,7 @@
                 <v-tab>关注</v-tab>
                 <v-tab>收藏</v-tab>
                 <v-tab>实时</v-tab>
-<!--                    <v-menu
-                      :close-on-click="closeOnClick"
-                    >
-                      <template v-slot:activator="{ on, attrs }">
-                        <v-btn
-                            v-bind="attrs"
-                            v-on="on"
-                            centered
-                            width="137"
-                            color="grey"
-                            height="47"
-                            activator
-                            auto
-                            text
-                        > 话题
-                          <v-img
-                               alt="antOutline-caret-down Logo"
-                               class="shrink mr-2"
-                               contain
-                               src="../assets/icons/antOutline-caret-down.svg"
-                               transition="scale-transition"
-                               width="14"
-                          />
-                        </v-btn>
-                      </template>
-                        <v-list>
-                            <v-list-item
-                              v-for="(item, index) in items"
-                              :key="index"
-                              @click="item"
-                            >
-                            <v-list-item-title>{{ item.title }}</v-list-item-title>
-                            </v-list-item>
-                        </v-list>
-                    </v-menu>
-                <v-menu
-                  :close-on-click="closeOnClick"
-                >
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                        v-bind="attrs"
-                        v-on="on"
-                        centered
-                        width="137"
-                        color="grey"
-                        height="47"
-                        activator
-                        auto
-                        text
-                    > 排序方式
-                      <v-img
-                           alt="antOutline-caret-down Logo"
-                           class="shrink mr-2"
-                           contain
-                           src="../assets/icons/antOutline-caret-down.svg"
-                           transition="scale-transition"
-                           width="14"
-                      />
-                    </v-btn>
-                  </template>
-                    <v-list>
-                        <v-list-item
-                          v-for="(item, index) in items1"
-                          :key="index"
-                          @click="item"
-                        >
-                        <v-list-item-title>{{ item.title }}</v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>-->
+
                 <v-card flat text width="137">
                     <v-select
                         :items="items0"
@@ -251,7 +187,7 @@
                                                                 </v-chip>
                                                             </v-chip-grop>
                                                             <v-chip-grop
-                                                                v-for="(item, index) in label1"
+                                                                v-for="(item, index) in item.label"
                                                                 :key="index"
                                                                 column
                                                                 class="ma-2"
@@ -260,7 +196,7 @@
                                                                 <v-chip
                                                                     color="primary lighten-3"
                                                                 >
-                                                                    {{item.label}}
+                                                                    {{item}}
                                                                 </v-chip>
                                                             </v-chip-grop>
                                                         </v-row>
@@ -321,7 +257,7 @@
                                                             </v-chip>
                                                         </v-chip-grop>
                                                         <v-chip-grop
-                                                            v-for="(item, index) in label1"
+                                                            v-for="(item, index) in item.label"
                                                             :key="index"
                                                             column
                                                             class="ma-2"
@@ -330,7 +266,7 @@
                                                             <v-chip
                                                                 color="primary lighten-3"
                                                             >
-                                                                {{item.label}}
+                                                                {{item}}
                                                             </v-chip>
                                                         </v-chip-grop>
                                                     </v-row>
@@ -355,7 +291,7 @@
                     <v-container>
                         <v-row background-color="grey">
                             <v-col
-                                v-for="(item, index) in items2"
+                                v-for="(item, index) in items4"
                                 :key="index"
                                 @click="item"
                                 cols=12
@@ -389,7 +325,7 @@
                                                             </v-chip>
                                                         </v-chip-grop>
                                                         <v-chip-grop
-                                                            v-for="(item, index) in label1"
+                                                            v-for="(item, index) in item.label"
                                                             :key="index"
                                                             column
                                                             class="ma-2"
@@ -398,7 +334,7 @@
                                                             <v-chip
                                                                 color="primary lighten-3"
                                                             >
-                                                                {{item.label}}
+                                                                {{item}}
                                                             </v-chip>
                                                         </v-chip-grop>
                                                     </v-row>
@@ -422,6 +358,37 @@
             </v-tabs>
         </v-card>
     </v-main>
+    <v-bottom-navigation
+        grow
+        fixed
+        text
+        flat
+        height="40"
+    >
+        <v-btn
+            flat
+            text
+            icon
+            @click="leftbtrefresh(pagenow)"
+        >
+            <v-icon>mdi-chevron-left</v-icon>
+        </v-btn>
+        <v-text
+            auto-grow
+            class="mx-auto"
+            color="grey"
+        >
+            {{pagenow}}/{{pagesum}}
+        </v-text>
+        <v-btn
+            text
+            flat
+            icon
+            @click="rightbtrefresh(pagenow,pagesum)"
+        >
+            <v-icon>mdi-chevron-right</v-icon>
+        </v-btn>
+    </v-bottom-navigation>
   </v-app>
 </template>
 
@@ -430,15 +397,26 @@
     {
         name:"Homepage",
         methods: {
-            btrefresh() {
+            leftbtrefresh(pagen) {
                 document.body.scrollTop = 0;
                 document.documentElement.scrollTop = 0;
                 this.$forceUpdate();
-            }
+                if(pagen>1)this.pagenow--;
+            },
+            rightbtrefresh(pagen,pages) {
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+                this.$forceUpdate();
+                if(pagen<pages)this.pagenow++;
+            },
+            toptop(){
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            },
 			postQuestion(){
 				this.dialog = false;
 				
-			}
+			},
         },
         data: () =>
         ({
@@ -447,10 +425,16 @@
                 value => (value && value.length >= 1) || 'Min 1 characters',
             ],
             dialog: false,
+            pagenow:"1",
+            pagesum:"3",
             label:['标签'],
             items0: ['全部', '课程', '学术', '生活','情感','娱乐'],
             select0: '全部',
             itemsx: ['课程', '学术', '生活','情感','娱乐'],
+            searchtext:'',
+            questext:'',
+            detailtext:'',
+            labeltext:'',
             items:[
                 { title: '全部'},
                 { title: '课程'},
@@ -467,32 +451,32 @@
             ],*/
             items2:[
                 { 
-                    id:'label1',
                     topic:'课程',
+                    label:['软件工程','设计'],
                     ques:'如何进行软件开发？',
                     imfo:'3回答 10关注 20浏览 20-12-14 10:10:00',
                     ans0bar:'最新回答：路人甲 20-12-14 12:23:20',
                     ans0text:'学习计算机编程语言。想要进行软件开发……'
                 },
                 { 
-                    id:'label1',
                     topic:'课程',
+                    label:['软件工程','设计'],
                     ques:'如何进行UI设计？',
                     imfo:'3回答 4关注 10浏览 20-12-14 10:09:00',
                     ans0bar:'最新回答：路人乙 20-12-14 12:25:20',
                     ans0text:'这个问题很简单很简单，所以我不想回答……'
                 },
                 { 
-                    id:'label1',
                     topic:'课程',
+                    label:['软件工程','设计'],
                     ques:'如何进行软件测试？',
                     imfo:'4回答 10关注 12浏览 20-12-14 10:08:00',
                     ans0bar:'最新回答：路人丙 20-12-14 12:26:20',
                     ans0text:'这个问题很简单很简单，所以我不想回答……'
                 },
                 { 
-                    id:'label1',
                     topic:'课程',
+                    label:['软件工程','设计'],
                     ques:'如何进行软件重构？',
                     imfo:'2回答 12关注 15浏览 20-12-14 10:07:00',
                     ans0bar:'最新回答：路人丁 20-12-14 12:28:20',
@@ -502,6 +486,7 @@
             items3:[
                 { 
                     topic:'课程',
+                    label:['软件工程','设计'],
                     ques:'如何进行软件重构？',
                     ansbar:'卷王',
                     anstext:'软件重构是指在不改变软件的功能和外部……',
@@ -509,19 +494,46 @@
                 },
                 { 
                     topic:'课程',
+                    label:['软件工程','设计'],
                     ques:'如何进行软件重构？',
                     ansbar:'超级卷王',
                     anstext:'为了改善软件的结构，提高软件的清晰……',
                     imfo:'20赞同 20评论 20-12-14 10:14:00',
                 },
             ],
-            label1:[
-                {
-                    label:'软件工程'
+            items4:[
+                { 
+                    topic:'课程',
+                    label:['软件工程','设计'],
+                    ques:'如何进行软件开发？',
+                    imfo:'3回答 10关注 20浏览 20-12-14 10:10:00',
+                    ans0bar:'最新回答：路人甲 20-12-14 12:23:20',
+                    ans0text:'学习计算机编程语言。想要进行软件开发……'
                 },
-                {
-                    label:'设计'
-                }
+                { 
+                    topic:'课程',
+                    label:['软件工程','设计'],
+                    ques:'如何进行UI设计？',
+                    imfo:'3回答 4关注 10浏览 20-12-14 10:09:00',
+                    ans0bar:'最新回答：路人乙 20-12-14 12:25:20',
+                    ans0text:'这个问题很简单很简单，所以我不想回答……'
+                },
+                { 
+                    topic:'课程',
+                    label:['软件工程','设计'],
+                    ques:'如何进行软件测试？',
+                    imfo:'4回答 10关注 12浏览 20-12-14 10:08:00',
+                    ans0bar:'最新回答：路人丙 20-12-14 12:26:20',
+                    ans0text:'这个问题很简单很简单，所以我不想回答……'
+                },
+                { 
+                    topic:'课程',
+                    label:['软件工程','设计'],
+                    ques:'如何进行软件重构？',
+                    imfo:'2回答 12关注 15浏览 20-12-14 10:07:00',
+                    ans0bar:'最新回答：路人丁 20-12-14 12:28:20',
+                    ans0text:'这个问题很简单很简单，所以我不想回答……'
+                },
             ],
         }),
    }

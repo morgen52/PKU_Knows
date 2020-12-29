@@ -64,7 +64,7 @@
                 :disabled="!valid"
                 class="ma-2"
                 color="info"
-                to="/cog"
+                to="/user"
                 >确认</v-btn>
             </v-row>
 		</v-main>

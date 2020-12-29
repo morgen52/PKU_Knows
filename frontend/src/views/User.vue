@@ -24,7 +24,11 @@
             style="margin-bottom: 10px;"
             >
                 <v-avatar size="80px">
-                    <img alt="头像" v-bind:src="image_src" >
+                    <img
+                    v-if="unchange"
+                    alt="头像"
+                    v-bind:src="image_src"
+                    >
                 </v-avatar>
                 <v-col
                 cols="9"

@@ -376,7 +376,7 @@
         <v-text
             auto-grow
             class="mx-auto"
-            color="grey"
+            style='color: grey; display: flex; align-items: center; justify-content: center;'
         >
             {{pagenow}}/{{pagesum}}
         </v-text>

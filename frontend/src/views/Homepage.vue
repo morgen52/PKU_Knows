@@ -369,6 +369,7 @@
             flat
             text
             icon
+            color="grey"
             @click="leftbtrefresh(pagenow)"
         >
             <v-icon>mdi-chevron-left</v-icon>
@@ -376,7 +377,7 @@
         <v-text
             auto-grow
             class="mx-auto"
-            style='color: grey; display: flex; align-items: center; justify-content: center;'
+            style="color: grey; display: flex; align-items: center; justify-content: center;"
         >
             {{pagenow}}/{{pagesum}}
         </v-text>
@@ -384,6 +385,7 @@
             text
             flat
             icon
+            color="grey"
             @click="rightbtrefresh(pagenow,pagesum)"
         >
             <v-icon>mdi-chevron-right</v-icon>

@@ -112,7 +112,7 @@
                 note: {//加入背景图片
                     backgroundImage: "url(" + require("../assets/images/background.jpg") + ")",
                     backgroundRepeat: "no-repeat",
-                    backgroundSize: "100% 100%",
+                    backgroundSize:"100% 100%"
                 },
                 rules1: {
                     require: value => !!value || '必填',

@@ -2,14 +2,8 @@ package cn.pkucloud.qa.service.impl;
 
 import cn.pkucloud.common.PageResult;
 import cn.pkucloud.common.Result;
-import cn.pkucloud.qa.entity.Answer;
-import cn.pkucloud.qa.entity.Comment;
-import cn.pkucloud.qa.entity.Question;
-import cn.pkucloud.qa.entity.Report;
-import cn.pkucloud.qa.repository.AnswerRepository;
-import cn.pkucloud.qa.repository.CommentRepository;
-import cn.pkucloud.qa.repository.QuestionRepository;
-import cn.pkucloud.qa.repository.ReportRepository;
+import cn.pkucloud.qa.entity.*;
+import cn.pkucloud.qa.repository.*;
 import cn.pkucloud.qa.service.QaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,11 +16,11 @@ import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static cn.pkucloud.common.ResultCode.BAD_REQUEST;
-import static cn.pkucloud.common.ResultCode.NOT_FOUND;
+import static cn.pkucloud.common.ResultCode.*;
 
 @Service
 public class QaServiceImpl implements QaService {
@@ -47,6 +41,12 @@ public class QaServiceImpl implements QaService {
 
     @Autowired
     private ReportRepository reportRepository;
+
+    @Autowired
+    private FavoriteRepository favoriteRepository;
+
+    @Autowired
+    private SubscriptionRepository subscriptionRepository;
 
     @Override
     public PageResult<Question> getQuestionByPage(String issuer, String uid, String role, String mod, int size, int page) {
@@ -70,7 +70,7 @@ public class QaServiceImpl implements QaService {
     }
 
     @Override
-    public Result<?> postQuestion(String issuer, String uid, String role, String mod, String title, String txt, String[] img, String[] tag, int setting, boolean subscribe) {
+    public Result<?> postQuestion(String issuer, String uid, String role, String mod, String title, String txt, String[] img, String[] topic, String[] tag, int setting, boolean subscribe) {
         int timestamp = (int) (System.currentTimeMillis() / 1000);
         Question question = Question.builder()
                 .status(0)
@@ -78,6 +78,7 @@ public class QaServiceImpl implements QaService {
                 .title(title)
                 .txt(txt)
                 .img(img)
+                .topic(topic)
                 .tag(tag)
                 .like(0)
                 .dislike(0)
@@ -281,37 +282,118 @@ public class QaServiceImpl implements QaService {
     }
 
     @Override
-    public PageResult<Question> getFavoriteQuestionByPage(String issuer, String uid, String role, String mod, int size, int page) {
-        return null;
-    }
-
-    @Override
-    public PageResult<Answer> getFavoriteAnswerByPage(String issuer, String uid, String role, String mod, int size, int page) {
-        return null;
+    public PageResult<?> getFavoriteByPage(String issuer, String uid, String role, String mod, String type, int size, int page) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Favorite> favoritePage = favoriteRepository.findByUidAndType(uid, type, pageRequest);
+        List<String> ids = new ArrayList<>();
+        for (Favorite favorite : favoritePage) {
+            ids.add(favorite.getId());
+        }
+        switch (type) {
+            case "question":
+                Iterable<Question> questionIterable = questionRepository.findAllById(ids);
+                List<Question> questions = new ArrayList<>();
+                for (Question question : questionIterable) {
+                    questions.add(question);
+                }
+                return new PageResult<>(questions);
+            case "answer":
+                Iterable<Answer> answerIterable = answerRepository.findAllById(ids);
+                List<Answer> answers = new ArrayList<>();
+                for (Answer answer : answerIterable) {
+                    answers.add(answer);
+                }
+                return new PageResult<>(answers);
+            default:
+                return new PageResult<>(BAD_REQUEST, "bad request");
+        }
     }
 
     @Override
     public Result<?> postFavorite(String issuer, String uid, String role, String mod, String type, String id) {
-        return null;
+        switch (type) {
+            case "question":
+                Optional<Question> questionOptional = questionRepository.findById(id);
+                if (!questionOptional.isPresent()) {
+                    return new Result<>(NOT_FOUND, "not found");
+                }
+                break;
+            case "answer":
+                Optional<Answer> answerOptional = answerRepository.findById(id);
+                if (!answerOptional.isPresent()) {
+                    return new Result<>(NOT_FOUND, "not found");
+                }
+                break;
+            default:
+                return new Result<>(BAD_REQUEST, "bad request");
+        }
+        int timestamp = (int) (System.currentTimeMillis() / 1000);
+        Favorite favorite = Favorite.builder()
+                .type(type)
+                .id(id)
+                .uid(uid)
+                .createTime(timestamp)
+                .build();
+        favoriteRepository.save(favorite);
+        return new Result<>();
     }
 
     @Override
     public Result<?> deleteFavoriteById(String issuer, String uid, String role, String mod, String id) {
-        return null;
+        Optional<Favorite> optional = favoriteRepository.findById(id);
+        if (optional.isPresent()) {
+            Favorite favorite = optional.get();
+            if (favorite.getUid().equals(uid)) {
+                favoriteRepository.deleteById(id);
+            }
+            return new Result<>(AUTHORIZATION_REQUIRED, "authorization required");
+        }
+        return new Result<>(NOT_FOUND, "not found");
     }
 
     @Override
     public PageResult<Question> getSubscriptionQuestionByPage(String issuer, String uid, String role, String mod, int size, int page) {
-        return null;
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Subscription> subscriptionPage = subscriptionRepository.findByUid(uid, pageRequest);
+        List<String> ids = new ArrayList<>();
+        for (Subscription subscription : subscriptionPage) {
+            ids.add(subscription.getId());
+        }
+        Iterable<Question> questionIterable = questionRepository.findAllById(ids);
+        List<Question> questions = new ArrayList<>();
+        for (Question question : questionIterable) {
+            questions.add(question);
+        }
+        return new PageResult<>(questions);
     }
 
     @Override
     public Result<?> postSubscription(String issuer, String uid, String role, String mod, String qid) {
-        return null;
+        Optional<Question> optional = questionRepository.findById(qid);
+        if (optional.isPresent()) {
+            int timestamp = (int) (System.currentTimeMillis() / 1000);
+            Subscription subscription = Subscription.builder()
+                    .id(qid)
+                    .uid(uid)
+                    .createTime(timestamp)
+                    .build();
+            subscriptionRepository.save(subscription);
+            return new Result<>();
+        }
+        return new Result<>(NOT_FOUND, "not found");
     }
 
     @Override
     public Result<?> deleteSubscriptionById(String issuer, String uid, String role, String mod, String id) {
-        return null;
+        Optional<Subscription> optional = subscriptionRepository.findById(id);
+        if (optional.isPresent()) {
+            Subscription subscription = optional.get();
+            if (subscription.getUid().equals(uid)) {
+                subscriptionRepository.deleteById(id);
+                return new Result<>();
+            }
+            return new Result<>(AUTHORIZATION_REQUIRED, "authorization required");
+        }
+        return new Result<>(NOT_FOUND, "not found");
     }
 }

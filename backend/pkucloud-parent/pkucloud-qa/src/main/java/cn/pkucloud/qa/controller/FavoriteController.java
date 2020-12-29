@@ -15,23 +15,23 @@ public class FavoriteController {
     private QaService qaService;
 
     @GetMapping("question")
-    public PageResult<Question> getFavoriteQuestionByPage(@RequestHeader("iss") String issuer,
+    public PageResult<?> getFavoriteQuestionByPage(@RequestHeader("iss") String issuer,
                                                           @RequestHeader("uid") String uid,
                                                           @RequestHeader("role") String role,
                                                           @RequestHeader("mod") String mod,
                                                           @RequestParam int size,
                                                           @RequestParam int page) {
-        return qaService.getFavoriteQuestionByPage(issuer, uid, role, mod, size, page);
+        return qaService.getFavoriteByPage(issuer, uid, role, mod, "question", size, page);
     }
 
     @GetMapping("answer")
-    public PageResult<Answer> getFavoriteAnswerByPage(@RequestHeader("iss") String issuer,
+    public PageResult<?> getFavoriteAnswerByPage(@RequestHeader("iss") String issuer,
                                                       @RequestHeader("uid") String uid,
                                                       @RequestHeader("role") String role,
                                                       @RequestHeader("mod") String mod,
                                                       @RequestParam int size,
                                                       @RequestParam int page) {
-        return qaService.getFavoriteAnswerByPage(issuer, uid, role, mod, size, page);
+        return qaService.getFavoriteByPage(issuer, uid, role, mod, "answer", size, page);
     }
 
     @PostMapping

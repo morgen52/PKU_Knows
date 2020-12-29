@@ -12,7 +12,7 @@ public interface QaService {
 
     Result<Question> getQuestionById(String issuer, String uid, String role, String mod, String id);
 
-    Result<?> postQuestion(String issuer, String uid, String role, String mod, String title, String txt, String[] img, String[] tag, int setting, boolean subscribe);
+    Result<?> postQuestion(String issuer, String uid, String role, String mod, String title, String txt, String[] img, String[] topic, String[] tag, int setting, boolean subscribe);
 
     PageResult<Answer> getAnswerByQid(String issuer, String uid, String role, String mod, String qid, int size, int page);
 
@@ -34,9 +34,7 @@ public interface QaService {
 
     Result<?> putQuestionLike(String issuer, String uid, String role, String mod, String id, int like);
 
-    PageResult<Question> getFavoriteQuestionByPage(String issuer, String uid, String role, String mod, int size, int page);
-
-    PageResult<Answer> getFavoriteAnswerByPage(String issuer, String uid, String role, String mod, int size, int page);
+    PageResult<?> getFavoriteByPage(String issuer, String uid, String role, String mod, String type, int size, int page);
 
     Result<?> postFavorite(String issuer, String uid, String role, String mod, String type, String id);
 

@@ -41,10 +41,11 @@ public class QuestionController {
                                   @RequestParam String title,
                                   @RequestParam String txt,
                                   @RequestParam(required = false) String[] img,
+                                  @RequestParam String[] topic,
                                   @RequestParam String[] tag,
                                   @RequestParam int setting,
                                   @RequestParam boolean subscribe) {
-        return qaService.postQuestion(issuer, uid, role, mod, title, txt, img, tag, setting, subscribe);
+        return qaService.postQuestion(issuer, uid, role, mod, title, txt, img, topic, tag, setting, subscribe);
     }
 
     @GetMapping("{qid}/answer")

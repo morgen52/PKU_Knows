@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: pkucloud-auth-sms
+  profiles:
+    active: prod

@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: pkucloud-tl
+  profiles:
+    active: dev

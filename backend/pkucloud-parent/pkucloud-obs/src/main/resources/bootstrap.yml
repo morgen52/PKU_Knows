@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: pkucloud-obs
+  profiles:
+    active: dev

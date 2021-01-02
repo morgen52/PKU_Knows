@@ -172,7 +172,7 @@
                         center
                         text
                         v-if="isFocus"
-                        @click="isFocus=!isFocus"
+                        @click="deleteSubscribe"
                     >       
                         <v-icon
                             alt="md-bookmark_border Logo"
@@ -185,6 +185,7 @@
                         已经关注
                     </v-btn>
                 </v-card>
+
                 <v-card
                     class="mx-auto"
                     width="100"
@@ -228,7 +229,7 @@
                         >mdi-star</v-icon>
                         已经收藏
                     </v-btn>
-                </v-card>
+                </v-card>				
             </v-list-item>
             <v-list-item>
                 <v-container>
@@ -431,6 +432,12 @@
 		mounted:function(){
 			this.getQuestion();
 			this.getAnswers();
+			if(this.$store.state.subscribeList.indexOf(this.$store.state.questionId) != -1){
+				this.isFocus = true;
+			}
+			else{
+				this.isFocus = false;
+			}
 			this.btrefresh();
 		},
         methods: {
@@ -439,28 +446,36 @@
 				var data = {
 					qid:this.$store.state.questionId
 				};
+				var _self = this;
 				this.$axios.post("https://qa.pkucs.cn/api/qa/subscription",this.$qs.stringify(data),{
 					headers: {
 						'Authorization':this.$store.state.token
 					}
 				}).then(function(response){
-					if(response.data.code == 0)
+					console.log(response);
+					if(response.data.code == 0){
+						_self.$store.commit('addSubscribe');
 						alert('关注成功');
+					}
 					else
 						alert('关注失败');
-				}).catch(function(){
+				}).catch(function(error){
+					console.log(error);
 					alert('关注失败');
 				})
 			},
 			deleteSubscribe(){
 				this.isFocus=!this.isFocus;
+				var _self = this;
 				this.$axios.delete("https://qa.pkucs.cn/api/qa/subscription/"+this.$store.state.questionId,{
 					headers: {
 						'Authorization':this.$store.state.token
 					}
 				}).then(function(response){
-					if(response.data.code == 0)
+					if(response.data.code == 0){
+						_self.$store.commit('deleteSubscribe');
 						alert('取消关注成功');
+					}
 					else
 						alert('取消关注失败');
 				}).catch(function(){
@@ -478,7 +493,7 @@
 				var url = 'https://qa.pkucs.cn/api/qa/answer/'+this.aid+'/comment';
 				var data = {
 					txt:this.replyTxt,
-					setting:9,
+					setting:this.$store.state.setting,
 					pid:0
 				};
 				if(this.cid != 0){
@@ -614,7 +629,7 @@
 						_self.tag = response.data.data.tag;
 						_self.title = response.data.data.title;
 						_self.txt = response.data.data.txt;
-						_self.info = response.data.data.answer+'回答  '+response.data.data.subscribe+'收藏  '+response.data.data.like + '喜欢  '+commonTime;
+						_self.info = response.data.data.answer+'回答  '+response.data.data.subscribe+'关注  '+response.data.data.favorite + '收藏  '+commonTime;
 						_self.tag = response.data.data.tag;
 					}
 					else{
@@ -631,7 +646,6 @@
             },
             //用于处理赞和踩
             putLike(id,liked){
-				
 				var url = 'https://qa.pkucs.cn/api/qa/answer/'+id;
 				var data = { like:liked};
 				this.$axios.put(url,this.$qs.stringify(data),{
@@ -689,7 +703,7 @@
 				var url = 'https://qa.pkucs.cn/api/qa/question/'+this.$store.state.questionId+'/answer';
 				var data = {
 					txt:this.answerText,
-					setting:9,
+					setting:this.$store.state.setting,
 					subscribe:true
 				};
 				this.$axios.post(url,this.$qs.stringify(data),{
@@ -728,7 +742,7 @@
             info:'',
 			answerText:'',
             isFocus:false,
-            isCollected:false,
+			isCollected:false,
 			aid:'',
 			cid:0,
             tag:[],

@@ -166,13 +166,9 @@
                                     height="172"
                                 >
                                     <template>
-                                        <v-row>
-                                            <v-btn
-                                                class="auto"
-                                                height="174"
-                                                text
-                                                block
-                                            >
+                                        <v-row style="margin-left: 10px; margin-right: 10px;">
+                                            
+                                            
                                                 <v-list color="transparent">
                                                     <v-list-item>
                                                         <v-row>
@@ -211,7 +207,7 @@
                                                         </v-list-item-content>
                                                     </v-list-item>
                                                 </v-list>
-                                            </v-btn>
+                                            
                                         </v-row>
                                     </template>
                                 </v-card>
@@ -242,13 +238,8 @@
                                     height="158"
                                     
                                 >
-                                    <v-row>
-                                        <v-btn
-                                            class="auto"
-                                            height="160"
-                                            text
-                                            block
-                                        >
+                                    <v-row style="margin-left: 10px; margin-right: 10px;">
+                                        
                                             <v-list color="transparent">
                                                 <v-list-item>
                                                     <v-row>
@@ -287,7 +278,7 @@
                                                     </v-list-item-content>
                                                 </v-list-item>
                                             </v-list>
-                                        </v-btn>
+                                        
                                     </v-row>
                                 </v-card>
                             </v-col>
@@ -316,13 +307,8 @@
                                     class="mx-auto"
                                     height="172"
                                 >
-                                    <v-row>
-                                        <v-btn
-                                            class="auto"
-                                            height="174"
-                                            text
-                                            block
-                                        >
+                                    <v-row style="margin-left: 10px; margin-right: 10px;">
+                                        
                                             <v-list color="transparent">
                                                 <v-list-item>
                                                     <v-row>
@@ -361,7 +347,7 @@
                                                     </v-list-item-content>
                                                 </v-list-item>
                                             </v-list>
-                                        </v-btn>
+                                        
                                     </v-row>
                                 </v-card>
                             </v-col>

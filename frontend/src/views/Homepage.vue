@@ -79,7 +79,7 @@
                                     <v-select
                                       style="margin-top:20px; width:80px; margin-left:20px"
                                       :items="itemsx"
-                                      v-model="topic"
+									  v-model="topic"
                                       label="话题"      
                                     ></v-select>
                         <v-list-item flat text>
@@ -167,8 +167,6 @@
                                 >
                                     <template>
                                         <v-row style="margin-left: 10px; margin-right: 10px;">
-                                            
-                                            
                                                 <v-list color="transparent">
                                                     <v-list-item>
                                                         <v-row>
@@ -201,18 +199,17 @@
                                                     <v-list-item>
                                                         <v-list-item-content>
                                                             <v-list-item-title>{{item.title}}</v-list-item-title>
-                                                            <v-list-item-subtitle>{{item.answer+'回答  '+item.subscribe+'收藏  '+item.like + '喜欢  '+item.createTime}}</v-list-item-subtitle>
-                                                            <v-text style="margin-top:10px">{{item.user}}</v-text>
+                                                            <v-list-item-subtitle>{{item.answer+'回答  '+item.subscribe+'关注  '+item.favorite + '收藏  '+item.createTime}}</v-list-item-subtitle>
+                                                            <v-text style="margin-top:10px">{{item.info}}</v-text>
                                                             <v-text>{{item.txt}}</v-text>
                                                         </v-list-item-content>
                                                     </v-list-item>
                                                 </v-list>
-                                            
                                         </v-row>
                                     </template>
                                 </v-card>
                             </v-col>
-                        </v-row> 
+                        </v-row>
                         <v-row justify="center" align="center" style="text-align: center;" class="mx-auto">
                             <v-text center style="justify-content: center;font-size: 10px;">
                                 已经没有关注的问题了
@@ -222,7 +219,7 @@
                 </v-tab-item>
                   
                 <v-tab-item>
-                    <v-container >
+                    <v-container>
                         <v-row background-color="grey">
                             <v-col
                                 v-for="(item, index) in items3"
@@ -231,15 +228,13 @@
                                 cols=12
                                 fluid
                                 md="12"
-                                placeholder="没有收藏内容"
+								placeholder="没有收藏内容"
                             >
                                 <v-card
                                     class="mx-auto"
                                     height="158"
-                                    
                                 >
                                     <v-row style="margin-left: 10px; margin-right: 10px;">
-                                        
                                             <v-list color="transparent">
                                                 <v-list-item>
                                                     <v-row>
@@ -272,13 +267,12 @@
                                                 <v-list-item>
                                                     <v-list-item-content>
 														<v-list-item-title>{{item.title}}</v-list-item-title>
-														<v-list-item-subtitle>{{item.answer+'回答  '+item.subscribe+'收藏  '+item.like + '喜欢  '+item.createTime}}</v-list-item-subtitle>
-														<v-text style="margin-top:10px">{{item.user}}</v-text>
+														<v-list-item-subtitle>{{item.answer+'回答  '+item.subscribe+'关注  '+item.favorite + '收藏  '+item.createTime}}</v-list-item-subtitle>
+														<v-text style="margin-top:10px">{{item.info}}</v-text>
 														<v-text>{{item.txt}}</v-text>
                                                     </v-list-item-content>
                                                 </v-list-item>
                                             </v-list>
-                                        
                                     </v-row>
                                 </v-card>
                             </v-col>
@@ -287,8 +281,7 @@
                             <v-text center style="justify-content: center;font-size: 10px;">
                                 已经没有收藏的问题了
                             </v-text>
-                        </v-row>
-                        
+                        </v-row>						
                     </v-container>
                 </v-tab-item>
                 
@@ -308,7 +301,6 @@
                                     height="172"
                                 >
                                     <v-row style="margin-left: 10px; margin-right: 10px;">
-                                        
                                             <v-list color="transparent">
                                                 <v-list-item>
                                                     <v-row>
@@ -341,13 +333,12 @@
                                                 <v-list-item>
                                                     <v-list-item-content>
                                                         <v-list-item-title>{{item.title}}</v-list-item-title>
-                                                        <v-list-item-subtitle>{{item.answer+'回答  '+item.subscribe+'收藏  '+item.like + '喜欢  '+item.createTime}}</v-list-item-subtitle>
-                      <v-text style="margin-top:10px">{{item.user}}</v-text>
+                                                        <v-list-item-subtitle>{{item.answer+'回答  '+item.subscribe+'关注  '+item.favorite + '收藏  '+item.createTime}}</v-list-item-subtitle>
+                      <v-text style="margin-top:10px">{{item.info}}</v-text>
                                                         <v-text>{{item.txt}}</v-text>
                                                     </v-list-item-content>
                                                 </v-list-item>
                                             </v-list>
-                                        
                                     </v-row>
                                 </v-card>
                             </v-col>
@@ -402,7 +393,11 @@
 			this.getFavorite();
 			this.getSubscription();
 			this.$forceUpdate();
-			this.getLikedAnswer();
+			if(this.$store.state.times == 1){
+				this.getLikedAnswer();
+				this.getSubscribeList();
+				this.$store.commit('subTimes');
+			}
 		},
 		watch:{
 			tabNum(){
@@ -414,6 +409,21 @@
 			}
 		},
         methods: {
+			getSubscribeList(){
+				var _self = this;
+				var url = 'https://qa.pkucs.cn/api/qa/subscription/ids';
+				this.$axios.get(url,{
+					headers:{
+						'Authorization':this.$store.state.token
+					}
+				}).then(function(response){
+					console.log(response);
+					_self.$store.commit('setSubscribeList',{subscribeList:response.data.data});
+				}).catch(function(error){
+					alert('获取subscribe list失败');
+					console.log(error);
+				})
+			},
 			getLikedAnswer(){
 				var _self = this;
 				var url = 'https://qa.pkucs.cn/api/qa/like/answer';
@@ -425,13 +435,16 @@
 					//console.log(response);
 					_self.$store.commit('setLikedAnswers',response.data.data);
 				}).catch(function(error){
-					//alert('获取liked answers失败');
+					alert('获取liked answers失败');
 					console.log(error);
 				})
 			},
 			questionDetail(item){
 				console.log(item);
-				this.$store.state.questionId = item._id;
+				if(this.tabNum == 1)
+					this.$store.state.questionId = item.oid;
+				else
+					this.$store.state.questionId = item._id;
 				this.$router.push('/qa');
 			},
 			getUserInfo(){
@@ -589,13 +602,12 @@
             },
 			postQuestion(){
 				this.dialog = false;
-				
 				var data = {
 					'title':this.questext,
 					'txt':this.detailtext,
 					'tag':this.labeltext,
 					'topic':this.topic,
-					'setting':9,
+					'setting':this.$store.state.setting,
 					'subscribe':true
 				};
 				this.$axios.post("https://qa.pkucs.cn/api/qa/question",this.$qs.stringify(data),{

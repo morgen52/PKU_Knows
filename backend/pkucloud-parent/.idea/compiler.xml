@@ -7,17 +7,19 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="pkucloud-common" />
         <module name="pkucloud-auth-wxa" />
         <module name="pkucloud-wxmp" />
         <module name="pkucloud-qa" />
-        <module name="pkucloud-gateway" />
         <module name="pkucloud-msg" />
         <module name="pkucloud-wxa" />
         <module name="pkucloud-obs" />
         <module name="pkucloud-auth-sms" />
-        <module name="pkucloud-auth" />
         <module name="pkucloud-tl" />
+        <module name="pkucloud-common" />
+        <module name="pkucloud-search" />
+        <module name="pkucloud-gateway" />
+        <module name="pkucloud-auth" />
+        <module name="pkucloud-reward" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -36,6 +38,8 @@
       <module name="pkucloud-parent" options="-parameters" />
       <module name="pkucloud-pay" options="-parameters" />
       <module name="pkucloud-qa" options="-parameters" />
+      <module name="pkucloud-reward" options="-parameters" />
+      <module name="pkucloud-search" options="-parameters" />
       <module name="pkucloud-tl" options="-parameters" />
       <module name="pkucloud-wxa" options="-parameters" />
       <module name="pkucloud-wxmp" options="-parameters" />

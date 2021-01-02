@@ -22,7 +22,8 @@ public class AuthController {
     @PostMapping("password")
     public Result<?> setPassword(@RequestHeader("Authorization") String jws,
                                  @RequestParam String userName,
-                                 @RequestParam String password) {
-        return authService.setPassword(jws, userName, password);
+                                 @RequestParam String password,
+                                 @RequestParam(required = false) String motto) {
+        return authService.setPassword(jws, userName, password, motto);
     }
 }

@@ -7,6 +7,8 @@ import cn.pkucloud.qa.service.QaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("qa/subscription")
 public class SubscriptionController {
@@ -21,6 +23,14 @@ public class SubscriptionController {
                                                               @RequestParam int size,
                                                               @RequestParam int page) {
         return qaService.getSubscriptionQuestionByPage(issuer, uid, role, mod, size, page);
+    }
+
+    @GetMapping("ids")
+    public Result<List<String>> getSubscriptionQuestionIds(@RequestHeader("iss") String issuer,
+                                                           @RequestHeader("uid") String uid,
+                                                           @RequestHeader("role") String role,
+                                                           @RequestHeader("mod") String mod) {
+        return qaService.getSubscriptionIds(uid);
     }
 
     @PostMapping

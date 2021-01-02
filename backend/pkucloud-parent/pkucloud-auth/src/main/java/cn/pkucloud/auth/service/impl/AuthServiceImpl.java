@@ -290,6 +290,7 @@ public class AuthServiceImpl implements AuthService {
                 String pkuId = auth.getPkuId();
                 String wxUnionId = auth.getWxUnionId();
                 String userName = auth.getUserName();
+                String motto = auth.getMotto();
                 String enroll = "20" + pkuId.substring(0, 2);
                 PkuUserInfo pkuUserInfo = getPkuUserInfoById(pkuId);
                 WxUserInfo wxUserInfo = getWxUserInfoById(wxUnionId);
@@ -313,6 +314,7 @@ public class AuthServiceImpl implements AuthService {
                 }
                 UserInfoDto userInfoDto = new UserInfoDto(
                         userName,
+                        motto,
                         avatar,
                         gender,
                         usrT,
@@ -328,7 +330,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Result<?> setPassword(String jws, String userName, String password) {
+    public Result<?> setPassword(String jws, String userName, String password, String motto) {
         JwtResult jwtResult = verifyJws(jws);
         if (jwtResult.isValid()) {
             String issuer = jwtResult.getIssuer();
@@ -339,11 +341,57 @@ public class AuthServiceImpl implements AuthService {
                 if (null != auth) {
                     auth.setUserName(userName);
                     auth.setPassword(password);
+                    auth.setMotto(motto);
                     authMapper.updateById(auth);
                     return new Result<>();
                 }
                 return new Result<>(INTERNAL_SERVER_ERROR, "internal server error");
             }
+        }
+        return new Result<>(AUTHORIZATION_REQUIRED, "authorization required");
+    }
+
+    @Override
+    public Result<UserInfoDto> getPrivateUserInfo(Long id) {
+        Auth auth = getAuthById(id);
+        if (null != auth) {
+            String pkuId = auth.getPkuId();
+            String wxUnionId = auth.getWxUnionId();
+            String userName = auth.getUserName();
+            String motto = auth.getMotto();
+            String enroll = "20" + pkuId.substring(0, 2);
+            PkuUserInfo pkuUserInfo = getPkuUserInfoById(pkuId);
+            WxUserInfo wxUserInfo = getWxUserInfoById(wxUnionId);
+            String gender = null;
+            String usrT = null;
+            String stuT = null;
+            String dept = null;
+            String major = null;
+            String name = null;
+            String avatar = null;
+            if (null != pkuUserInfo) {
+                gender = pkuUserInfo.getGender();
+                usrT = pkuUserInfo.getUsrT();
+                stuT = pkuUserInfo.getStuT();
+                dept = pkuUserInfo.getDept();
+                major = pkuUserInfo.getMajor();
+                name = pkuUserInfo.getName();
+            }
+            if (null != wxUserInfo) {
+                avatar = wxUserInfo.getAvatarUrl();
+            }
+            UserInfoDto userInfoDto = new UserInfoDto(
+                    userName,
+                    motto,
+                    avatar,
+                    gender,
+                    usrT,
+                    stuT,
+                    enroll,
+                    dept,
+                    major,
+                    name);
+            return new Result<>(userInfoDto);
         }
         return new Result<>(AUTHORIZATION_REQUIRED, "authorization required");
     }

@@ -1,6 +1,7 @@
 package cn.pkucloud.auth.service;
 
 import cn.pkucloud.auth.dto.Wxh5Signature;
+import cn.pkucloud.auth.entity.UserInfoDto;
 import cn.pkucloud.auth.entity.WxaScene;
 import cn.pkucloud.common.Result;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -26,5 +27,7 @@ public interface AuthService {
 
     Result<?> getUserInfo(String jws);
 
-    Result<?> setPassword(String jws, String userName, String password);
+    Result<?> setPassword(String jws, String userName, String password, String motto);
+
+    Result<UserInfoDto> getPrivateUserInfo(Long id);
 }

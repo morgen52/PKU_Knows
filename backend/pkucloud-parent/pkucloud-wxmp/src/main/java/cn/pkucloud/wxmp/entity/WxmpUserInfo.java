@@ -3,9 +3,15 @@ package cn.pkucloud.wxmp.entity;
 import cn.pkucloud.wxmp.dto.wx.WxmpUserInfoDto;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @TableName("tb_wxmp_user_info")
 public class WxmpUserInfo {
     private int subscribe;
@@ -21,7 +27,7 @@ public class WxmpUserInfo {
     private int subscribe_time;
     private String unionid;
     private String subscribe_scene;
-    private int update;
+    private int access_time;
 
     public WxmpUserInfo(WxmpUserInfoDto wxmpUserInfoDto) {
         this.subscribe = wxmpUserInfoDto.getSubscribe();
@@ -36,6 +42,6 @@ public class WxmpUserInfo {
         this.subscribe_time = wxmpUserInfoDto.getSubscribe_time();
         this.unionid = wxmpUserInfoDto.getUnionid();
         this.subscribe_scene = wxmpUserInfoDto.getSubscribe_scene();
-        this.update = (int) (System.currentTimeMillis() / 1000);
+        this.access_time = (int) (System.currentTimeMillis() / 1000);
     }
 }

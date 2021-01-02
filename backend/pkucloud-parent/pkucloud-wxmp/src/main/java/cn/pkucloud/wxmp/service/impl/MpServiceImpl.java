@@ -7,16 +7,28 @@ import cn.pkucloud.wxmp.dto.wx.BaseResult;
 import cn.pkucloud.wxmp.dto.wx.WxmpUserInfoDto;
 import cn.pkucloud.wxmp.dto.wx.common.*;
 import cn.pkucloud.wxmp.dto.wx.custom.MiniProgramPageRequestEntity;
+import cn.pkucloud.wxmp.dto.wx.template.Keyword;
+import cn.pkucloud.wxmp.dto.wx.template.Keywords;
+import cn.pkucloud.wxmp.dto.wx.template.TemplateMessage;
 import cn.pkucloud.wxmp.dto.wx.xml.*;
 import cn.pkucloud.wxmp.entity.Auth;
+import cn.pkucloud.wxmp.entity.PkuUserInfo;
+import cn.pkucloud.wxmp.entity.WxUserInfo;
 import cn.pkucloud.wxmp.entity.WxmpUserInfo;
 import cn.pkucloud.wxmp.feign.AuthClient;
 import cn.pkucloud.wxmp.feign.MpClient;
+import cn.pkucloud.wxmp.mapper.AuthMapper;
+import cn.pkucloud.wxmp.mapper.PkuUserInfoMapper;
+import cn.pkucloud.wxmp.mapper.WxUserInfoMapper;
 import cn.pkucloud.wxmp.mapper.WxmpUserInfoMapper;
 import cn.pkucloud.wxmp.service.AccessTokenService;
 import cn.pkucloud.wxmp.service.MpService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class MpServiceImpl implements MpService {
@@ -24,15 +36,24 @@ public class MpServiceImpl implements MpService {
 
     private final WxmpUserInfoMapper wxmpUserInfoMapper;
 
+    private final AuthMapper authMapper;
+
+    private final WxUserInfoMapper wxUserInfoMapper;
+
+    private final PkuUserInfoMapper pkuUserInfoMapper;
+
     private final MpClient mpClient;
 
     private final AuthClient authClient;
 
     private final CryptoUtil cryptoUtil;
 
-    public MpServiceImpl(AccessTokenService accessTokenService, WxmpUserInfoMapper wxmpUserInfoMapper, MpClient mpClient, AuthClient authClient, CryptoUtil cryptoUtil) {
+    public MpServiceImpl(AccessTokenService accessTokenService, WxmpUserInfoMapper wxmpUserInfoMapper, AuthMapper authMapper, WxUserInfoMapper wxUserInfoMapper, PkuUserInfoMapper pkuUserInfoMapper, MpClient mpClient, AuthClient authClient, CryptoUtil cryptoUtil) {
         this.accessTokenService = accessTokenService;
         this.wxmpUserInfoMapper = wxmpUserInfoMapper;
+        this.authMapper = authMapper;
+        this.wxUserInfoMapper = wxUserInfoMapper;
+        this.pkuUserInfoMapper = pkuUserInfoMapper;
         this.mpClient = mpClient;
         this.authClient = authClient;
         this.cryptoUtil = cryptoUtil;
@@ -143,6 +164,43 @@ public class MpServiceImpl implements MpService {
         }
     }
 
+    @Override
+    public Result<?> getSubscribe(Long id) {
+        return null;
+    }
+
+    @Override
+    public Result<?> sendAnswerMsg(List<String> idList, String first, String title, String userName, String time, String remark) {
+        List<Auth> authList = authMapper.selectBatchIds(idList);
+        ArrayList<String> wxUnionIdList = new ArrayList<>();
+        for (Auth auth : authList) {
+            String wxUnionId = auth.getWxUnionId();
+            wxUnionIdList.add(wxUnionId);
+        }
+        List<WxUserInfo> wxUserInfoList = wxUserInfoMapper.selectBatchIds(wxUnionIdList);
+        String access_token = accessTokenService.getAccessToken();
+        for (WxUserInfo wxUserInfo : wxUserInfoList) {
+            String mpOpenId = wxUserInfo.getMpOpenId();
+            if (null == mpOpenId) {
+                continue;
+            }
+            Keywords keywords = Keywords.builder()
+                    .first(new Keyword(first))
+                    .keyword1(new Keyword(title))
+                    .keyword2(new Keyword(userName))
+                    .keyword3(new Keyword(time))
+                    .remark(new Keyword(remark))
+                    .build();
+            TemplateMessage templateMessage = TemplateMessage.builder()
+                    .touser(mpOpenId)
+                    .template_id("EjI3qinEYZZoEKbC3VLCHYj0D0Mk5vQfWsvJysm1sbU")
+                    .data(keywords)
+                    .build();
+            mpClient.sendTemplateMessage(access_token, templateMessage);
+        }
+        return new Result<>();
+    }
+
     private XmlResponse textMsgHandler(String fromUserName, String content, int bizmsgmenuid) throws CryptoException, JsonProcessingException {
         return replyTextMsg(fromUserName, content);
     }
@@ -171,26 +229,67 @@ public class MpServiceImpl implements MpService {
         return replyNewsMsg(fromUserName, new Article[]{new Article(title, description, url, null)});
     }
 
-
     private XmlResponse subscribeEventHandler(String fromUserName, String subscribeEventKey, String subscribeEventTicket) throws CryptoException, JsonProcessingException {
         String access_token = accessTokenService.getAccessToken();
         WxmpUserInfoDto wxmpUserInfoDto = mpClient.getUserInfo(access_token, fromUserName, "zh_CN");
-        String nickname = wxmpUserInfoDto.getNickname();
         String unionid = wxmpUserInfoDto.getUnionid();
-//        WxmpUserInfo oldWxmpUserInfo = wxmpUserInfoMapper.selectById(fromUserName);
+        if (null == unionid) {
+            return null;
+        }
+
         WxmpUserInfo newWxmpUserInfo = new WxmpUserInfo(wxmpUserInfoDto);
-//        if (oldWxmpUserInfo == null) {
-//            wxmpUserInfoMapper.insert(newWxmpUserInfo);
-//        } else {
-//            wxmpUserInfoMapper.updateById(newWxmpUserInfo);
-//        }
-        MiniProgramPage miniProgramPage = new MiniProgramPage("登录未名云", "wx4e9dcf33a0d1f74a", "pages/auth/index", "XCiNRTOFqj0VCatvTzlC-7N_LlqJeJ6IlJKGdK2GIpM");
-        BaseResult result = mpClient.sendCustomMessage(access_token, new MiniProgramPageRequestEntity(fromUserName, miniProgramPage));
-        System.out.println("result = " + result);
-        return replyTextMsg(fromUserName, "你好，" + nickname + "。欢迎关注WePKU！");
+        WxmpUserInfo oldWxmpUserInfo = wxmpUserInfoMapper.selectById(fromUserName);
+        if (null == oldWxmpUserInfo) {
+            wxmpUserInfoMapper.insert(newWxmpUserInfo);
+        } else {
+            wxmpUserInfoMapper.updateById(newWxmpUserInfo);
+        }
+
+        WxUserInfo newWxUserInfo = WxUserInfo.builder()
+                .mpOpenId(fromUserName)
+                .unionId(unionid)
+                .build();
+        WxUserInfo oldWxUserInfo = wxUserInfoMapper.selectById(unionid);
+        if (null == oldWxUserInfo) {
+            int timestamp = (int) (System.currentTimeMillis() / 1000);
+            newWxUserInfo.setRegister(timestamp);
+            newWxUserInfo.setAccess(timestamp);
+            wxUserInfoMapper.insert(newWxUserInfo);
+        } else {
+            if (null == oldWxUserInfo.getMpOpenId()) {
+                wxUserInfoMapper.updateById(newWxUserInfo);
+            }
+        }
+
+        Auth auth = getAuthByWxUnionId(unionid);
+        if (null == auth) {
+            String nickname = wxmpUserInfoDto.getNickname();
+            MiniProgramPage miniProgramPage = new MiniProgramPage("登录未名云", "wx4e9dcf33a0d1f74a", "pages/auth/index", "XCiNRTOFqj0VCatvTzlC-7N_LlqJeJ6IlJKGdK2GIpM");
+            BaseResult result = mpClient.sendCustomMessage(access_token, new MiniProgramPageRequestEntity(fromUserName, miniProgramPage));
+            System.out.println("result = " + result);
+            return replyTextMsg(fromUserName, "你好，" + nickname + "。欢迎关注WePKU！\n你还没有注册，请点击小程序注册。");
+        }
+        String pkuId = auth.getPkuId();
+
+        PkuUserInfo pkuUserInfo = pkuUserInfoMapper.selectById(pkuId);
+        if (null == pkuUserInfo) {
+            return null;
+        } else {
+            String dept = pkuUserInfo.getDept();
+            String name = pkuUserInfo.getName();
+            return replyTextMsg(fromUserName, "你好，" + dept + " " + name + "。欢迎关注WePKU！");
+        }
     }
 
     private XmlResponse unsubscribeEventHandler(String fromUserName) {
+        WxmpUserInfo oldWxmpUserInfo = wxmpUserInfoMapper.selectById(fromUserName);
+        if (null != oldWxmpUserInfo) {
+            WxmpUserInfo newWxmpUserInfo = WxmpUserInfo.builder()
+                    .openid(fromUserName)
+                    .subscribe(0)
+                    .build();
+            wxmpUserInfoMapper.updateById(newWxmpUserInfo);
+        }
         return null;
     }
 
@@ -243,5 +342,19 @@ public class MpServiceImpl implements MpService {
     private XmlResponse replyNewsMsg(String toUserName, Article[] articles) throws CryptoException, JsonProcessingException {
         NewsResponseEntity entity = new NewsResponseEntity(toUserName, articles);
         return cryptoUtil.encryptMsg(entity);
+    }
+
+    private Auth getAuthByWxUnionId(String wxUnionId) {
+        QueryWrapper<Auth> wrapper = new QueryWrapper<>();
+        wrapper.eq("wx_union_id", wxUnionId);
+        return authMapper.selectOne(wrapper);
+    }
+
+    private PkuUserInfo getPkuUserInfoById(String pkuId) {
+        return pkuUserInfoMapper.selectById(pkuId);
+    }
+
+    private WxUserInfo getWxUserInfoById(String unionId) {
+        return wxUserInfoMapper.selectById(unionId);
     }
 }

@@ -20,6 +20,8 @@
         <module>pkucloud-auth-wxa</module>
         <module>pkucloud-auth-sms</module>
         <module>pkucloud-obs</module>
+        <module>pkucloud-search</module>
+        <module>pkucloud-reward</module>
     </modules>
 
     <parent>
@@ -53,6 +55,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-bootstrap</artifactId>-->
+<!--            <version>3.0.0</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>

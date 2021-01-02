@@ -19,6 +19,7 @@ public class Question {
     private String title;
     private String txt;
     private String[] img;
+    private String topic;
     private String[] tag;
     private Integer like;
     private Integer dislike;

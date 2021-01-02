@@ -7,6 +7,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class UserInfoDto {
     private String userName;
+    private String motto;
     private String avatar;
     private String gender;
     private String usrT;

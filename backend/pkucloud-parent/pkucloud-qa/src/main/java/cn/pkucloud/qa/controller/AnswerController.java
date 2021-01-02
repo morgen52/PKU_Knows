@@ -23,6 +23,16 @@ public class AnswerController {
         return qaService.getAnswerById(issuer, uid, role, mod, id);
     }
 
+    @PutMapping("{id}")
+    public Result<?> putLike(@RequestHeader("iss") String issuer,
+                             @RequestHeader("uid") String uid,
+                             @RequestHeader("role") String role,
+                             @RequestHeader("mod") String mod,
+                             @PathVariable String id,
+                             @RequestParam int like) {
+        return qaService.putAnswerLike(issuer, uid, role, mod, id, like);
+    }
+
     @PostMapping("{aid}/comment")
     public Result<?> postComment(@RequestHeader("iss") String issuer,
                                  @RequestHeader("uid") String uid,

@@ -7,12 +7,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @Builder
-@Document("favorite")
-public class Favorite {
+@Document("subscription")
+public class Subscription {
     @Id
     private String _id;
-    private String type;
-    private String id;
+    private String qid;
     private String uid;
     private int createTime;
 }

@@ -524,6 +524,8 @@
 								else{
 									response.data.data[i].info = "";
 									for(var key in response.data.data[i].user){
+										if(key != 'userName' && key != 'dept' && key != 'motto')
+												continue;
 										var value = response.data.data[i].user[key];
 										if(value != undefined){
 											response.data.data[i].info += (value+' ');
@@ -650,6 +652,8 @@
 								else{
 									response.data.data[i].info = "";
 									for(var key in response.data.data[i].user){
+										if(key != 'userName' && key != 'dept' && key != 'motto')
+												continue;
 										var value = response.data.data[i].user[key];
 										if(value != undefined){
 											response.data.data[i].info += (value+' ');
@@ -701,6 +705,8 @@
 								else{
 									response.data.data[i].info = "";
 									for(var key in response.data.data[i].user){
+										if(key != 'userName' && key != 'dept' && key != 'motto')
+												continue;
 										var value = response.data.data[i].user[key];
 										if(value != undefined){
 											response.data.data[i].info += (value+' ');

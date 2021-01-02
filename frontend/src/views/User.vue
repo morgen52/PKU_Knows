@@ -24,7 +24,7 @@
             style="margin-bottom: 10px;"
             >
                 <v-avatar size="80px">
-                    <img alt="头像" v-bind:src="image_src" >
+                    <img alt="头像" v-bind:src="avator">
                 </v-avatar>
                 <v-col
                 cols="9"
@@ -34,7 +34,7 @@
                 >
                     <v-text-field
                     single-line
-                    v-model="username"
+                    v-model="userName"
                     dense
                     v-bind:readonly="unchange"
                     v-bind:solo="unchange"
@@ -103,7 +103,7 @@
                     <v-col cols="8" sm="6">
                         <v-select
                         v-if="!unchange"
-                        v-model="master"
+                        v-model="dept"
                         v-bind:readonly="unchange"
                         v-bind:autofocus="unchange"
                         :items="master_items"
@@ -112,7 +112,7 @@
                         ></v-select>
                         <v-text-field
                         v-if="unchange"
-                        v-model="master"
+                        v-model="dept"
                         v-bind:readonly="unchange"
                         dense
                         class="myright"
@@ -127,7 +127,7 @@
                     <v-col cols="8" sm="6">
                         <v-select
                         v-if="!unchange"
-                        v-model="grade"
+                        v-model="enroll"
                         v-bind:readonly="unchange"
                         v-bind:autofocus="unchange"
                         :items="grade_items"
@@ -136,7 +136,7 @@
                         ></v-select>
                         <v-text-field
                         v-if="unchange"
-                        v-model="grade"
+                        v-model="enroll"
                         v-bind:readonly="unchange"
                         dense
                         class="myright"
@@ -187,7 +187,7 @@
                 text
                 elevation=1
                 v-if="!unchange"
-                @click="unchange=!unchange">
+                @click="saveChange">
                     保存
                 </v-btn>
             </v-row>
@@ -199,28 +199,41 @@
     export default{
         el:"#user",
         name:'User',
+		methods:{
+			saveChange(){
+				this.unchange=!this.unchange;
+				this.$store.commit('setShowInfo',{
+					gender:this.gender,
+					dept:this.dept,
+					enroll:this.enroll,
+					motto:this.motto,
+					userName:this.userName})
+			},
+			setUserName(){
+				this.$store.commit('setUserName',this.username);
+			}
+		},
         data(){
+			var _self = this;
             return{
-                username:"未名被卷王",
-                image_src: require('../assets/images/portrait.jpg'),
-                master:"信息科学技术学院",
-                gender:"男",
-                grade:"2018级本科生",
-                email:"111111111@qq.com",
-                motto:"啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊",
                 unchange:true,
+				avator:_self.$store.state.showInfo.avator,
+				gender:_self.$store.state.showInfo.gender,
+				dept:_self.$store.state.showInfo.dept,
+				enroll:_self.$store.state.showInfo.enroll,
+				motto:_self.$store.state.showInfo.motto,
+				userName:_self.$store.state.showInfo.userName,
                 gender_items:[
                     {state:'不展示'},
-                    {state:'男'},
-                    {state:'女'},
+                    {state:_self.$store.state.user.gender}
                 ],
                 master_items:[
                     {state:'不展示'},
-                    {state:'信息科学技术学院'},
+                    {state:_self.$store.state.user.dept},
                 ],
                 grade_items:[
                     {state:'不展示'},
-                    {state:'2018级本科生'},
+                    {state:_self.$store.state.user.enroll},
                 ],
                 sides:{
                     padding:"0px",

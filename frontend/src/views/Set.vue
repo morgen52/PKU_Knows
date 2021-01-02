@@ -97,7 +97,7 @@
 				var data = {
 					userName:this.$store.state.showInfo.userName,
 					password:this.pass1,
-					motto:this.$store.showInfo.motto
+					motto:this.$store.state.showInfo.motto
 				}
 				this.$axios.post('https://auth.pkucs.cn/api/auth/password',this.$qs.stringify(data),{
 					headers: {

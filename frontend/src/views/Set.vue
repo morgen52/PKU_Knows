@@ -64,7 +64,6 @@
                 :disabled="!valid"
                 class="ma-2"
                 color="info"
-                to="/user"
                 >确认</v-btn>
             </v-row>
 		</v-main>
@@ -90,14 +89,30 @@
 		methods:{
 			validate(){
 				this.$refs.form.validate();  
-                },
-            affirm(val){
-                if(val!=this.pass1){
-                    return "两次密码不一致";
-                    }
-                return true;
-                },
-			}
+				var _self = this;
+				if(this.pass1 != this.pass2){
+					alert("两次密码不一致");
+					return;
+				}
+				var data = {
+					userName:this.$store.state.showInfo.userName,
+					password:this.pass1,
+					motto:this.$store.showInfo.motto
+				}
+				this.$axios.post('https://auth.pkucs.cn/api/auth/password',this.$qs.stringify(data),{
+					headers: {
+						'Authorization':this.$store.state.token
+					}
+				}).then(function(response){
+					console.log(response);
+					alert("设置成功");
+					_self.$router.push('/user');
+				}).catch(function(error){
+					console.log(error);
+					alert("发送失败");
+				})
+            }
+		}
 	}
 </script>
 

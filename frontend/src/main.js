@@ -10,7 +10,6 @@ Vue.config.productionTip = false
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 Vue.prototype.$axios = axios
 Vue.prototype.$qs = qs
-Vue.prototype.token = ""
 
 new Vue({
   router,

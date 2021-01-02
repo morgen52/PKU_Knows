@@ -86,12 +86,12 @@
                         <v-card
                             class="mx-auto"
                             center
-                            width="140"
+                            width="100"
                         >
                             <v-btn
                                 v-bind="attrs"
                                 v-on="on"
-                                width="140"
+                                width="100"
                                 center
                                 text
                             >
@@ -143,14 +143,14 @@
                 
                 <v-card 
                     class="mx-auto"
-                    width="140"
+                    width="100"
                     center
                     color="white"
                 >
                     <v-btn
                         v-bind="attrs"
                         v-on="on"
-                        width="140"
+                        width="100"
                         center
                         text
                         v-if="!isFocus"
@@ -168,7 +168,7 @@
                     <v-btn
                         v-bind="attrs"
                         v-on="on"
-                        width="140"
+                        width="100"
                         center
                         text
                         v-if="isFocus"
@@ -183,6 +183,50 @@
                             color="blue"
                         >mdi-bookmark</v-icon>
                         已经关注
+                    </v-btn>
+                </v-card>
+                <v-card
+                    class="mx-auto"
+                    width="100"
+                    center
+                    color="white"
+                >
+                    <v-btn
+                        v-bind="attrs"
+                        v-on="on"
+                        width="100"
+                        center
+                        text
+                        v-if="!isCollected"
+                        @click="isColleted=!isCollected"
+                    >       
+                        <v-icon
+                            alt="md-bookmark_border Logo"
+                            class="shrink mr-2"
+                            contain
+                            width="24"
+                            center
+                        >mdi-star-outline</v-icon>
+                        收藏问题
+                    </v-btn>
+                    <v-btn
+                        v-bind="attrs"
+                        v-on="on"
+                        width="100"
+                        center
+                        text
+                        v-if="isCollected"
+                        @click="isColleted=!isCollected"
+                    >       
+                        <v-icon
+                            alt="md-bookmark_border Logo"
+                            class="shrink mr-2"
+                            contain
+                            width="24"
+                            center
+                            color="yellow"
+                        >mdi-star</v-icon>
+                        已经收藏
                     </v-btn>
                 </v-card>
             </v-list-item>
@@ -404,7 +448,7 @@
 						alert('关注成功');
 					else
 						alert('关注失败');
-				}).catch(function(error){
+				}).catch(function(){
 					alert('关注失败');
 				})
 			},
@@ -419,7 +463,7 @@
 						alert('取消关注成功');
 					else
 						alert('取消关注失败');
-				}).catch(function(error){
+				}).catch(function(){
 					alert('取消关注失败');
 				})
 			},
@@ -454,7 +498,7 @@
 					else{
 						alert('回答失败');
 					}
-				}).catch(function(error){
+				}).catch(function(){
 					alert('发表评论请求失败');
 				})
 			},
@@ -542,7 +586,7 @@
 									}
 								}
 							}
-						};
+						}
 						_self.answer = response.data.data;
 						// console.log(_self.answer);
 					}
@@ -587,7 +631,7 @@
             },
             //用于处理赞和踩
             putLike(id,liked){
-				var _self = this;
+				
 				var url = 'https://qa.pkucs.cn/api/qa/answer/'+id;
 				var data = { like:liked};
 				this.$axios.put(url,this.$qs.stringify(data),{
@@ -684,6 +728,7 @@
             info:'',
 			answerText:'',
             isFocus:false,
+            isCollected:false,
 			aid:'',
 			cid:0,
             tag:[],

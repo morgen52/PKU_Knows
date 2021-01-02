@@ -54,7 +54,7 @@ export default new Vuex.Store({
 		subPageNow(state,data){
 			state.pagenow[data.idx] = state.pagenow[data.idx] - 1;
 		},
-		addPageSum(state){
+		addPageSum(state,data){
 			state.pagesum[data.idx] = state.pagesum[data.idx] + 1;
 		},
 		setShowInfo(state,info){

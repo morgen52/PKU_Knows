@@ -79,7 +79,7 @@
                                     <v-select
                                       style="margin-top:20px; width:80px; margin-left:20px"
                                       :items="itemsx"
-									  v-model="topic"
+                                      v-model="topic"
                                       label="话题"      
                                     ></v-select>
                         <v-list-item flat text>
@@ -216,12 +216,17 @@
                                     </template>
                                 </v-card>
                             </v-col>
+                        </v-row> 
+                        <v-row justify="center" align="center" style="text-align: center;" class="mx-auto">
+                            <v-text center style="justify-content: center;font-size: 10px;">
+                                已经没有关注的问题了
+                            </v-text>
                         </v-row>
                     </v-container>
                 </v-tab-item>
                   
                 <v-tab-item>
-                    <v-container>
+                    <v-container >
                         <v-row background-color="grey">
                             <v-col
                                 v-for="(item, index) in items3"
@@ -230,10 +235,12 @@
                                 cols=12
                                 fluid
                                 md="12"
+                                placeholder="没有收藏内容"
                             >
                                 <v-card
                                     class="mx-auto"
                                     height="158"
+                                    
                                 >
                                     <v-row>
                                         <v-btn
@@ -285,6 +292,12 @@
                                 </v-card>
                             </v-col>
                         </v-row>
+                        <v-row justify="center" align="center" style="text-align: center;" class="mx-auto">
+                            <v-text center style="justify-content: center;font-size: 10px;">
+                                已经没有收藏的问题了
+                            </v-text>
+                        </v-row>
+                        
                     </v-container>
                 </v-tab-item>
                 
@@ -406,7 +419,7 @@
 			this.getLikedAnswer();
 		},
 		watch:{
-			tabNum(val){
+			tabNum(){
 				if(this.tabNum <= 2){
 					this.pagenow = this.$store.state.pagenow[this.tabNum];
 					this.pagesum = this.$store.state.pagesum[this.tabNum];
@@ -426,7 +439,7 @@
 					//console.log(response);
 					_self.$store.commit('setLikedAnswers',response.data.data);
 				}).catch(function(error){
-					alert('获取liked answers失败');
+					//alert('获取liked answers失败');
 					console.log(error);
 				})
 			},
@@ -575,9 +588,9 @@
 					if(this.tabNum == 0)
 						this.getSubscription();
 					else if(this.tabNum == 1)
-						l = this.getFavorite();
+						this.getFavorite();
 					else if(this.tabNum == 2)
-						l = this.getQuestionByPage();
+						this.getQuestionByPage();
 					this.btrefresh();
 				}
 				else{
@@ -590,7 +603,7 @@
             },
 			postQuestion(){
 				this.dialog = false;
-				var _self = this;
+				
 				var data = {
 					'title':this.questext,
 					'txt':this.detailtext,
@@ -603,10 +616,10 @@
 					headers: {
 						'Authorization':this.$store.state.token
 					}
-				}).then(function(response){
+				}).then(function(){
 					//console.log(response);
 					alert("发送成功");
-				}).catch(function(error){
+				}).catch(function(){
 					//console.log(error);
 					alert("发送失败");
 				})

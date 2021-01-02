@@ -10,7 +10,7 @@
                     <v-col cols="12" sm="4" md="4" align="center" dark>
                         <!--最上面的logo-->
                         <v-img alt="北大知道LOGO" 
-                        :src="require('../assets/images/myLogo.png')" 
+                        :src="require('../assets/images/myLogo.png')"
                         class="logos"
                         contain dark width="278px" 
                         height="58px" >
@@ -42,7 +42,7 @@
                         prepend-icon="mdi-account" clearable dark></v-text-field>
                         
                         <v-text-field :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'" :rules="[rules2.required,rules2.min]" :type="show ? 'text': 'password'"
-                        v-model="passward" name="passward" label="请输入密码" prepend-icon="mdi-key" @click:append="show = !show"
+                        v-model="password" name="password" label="请输入密码" prepend-icon="mdi-key" @click:append="show = !show"
                         dark></v-text-field>
                         </v-tab-item>
                         <!--手机验证码登录-->
@@ -123,6 +123,7 @@
                     min: m => m.length >= 8 || '密码至少8位',
                     userMatch: () => ('用户不存在或是密码错误！')
                 },
+				password:"",
                 title_user:"",
                 loader: null,
                 loading: false,
@@ -144,24 +145,47 @@
         methods:{
 			signIn(){
 				this.loader = this.loading2;
-				var data = {
-					'code':this.code,
-					'phone':this.title
+				if(this.tab == 1){
+					var data = {
+						'code':this.code,
+						'phone':this.title
+					}
+					var _self = this;
+					this.$axios.post('https://auth.pkucs.cn/api/sms/token',this.$qs.stringify(data)
+					).then(function(response){
+						// console.log(response);
+						if(response.data.code == 0){
+							_self.$store.commit('setToken', response.data.data);
+							_self.$router.push("/homepage");
+						}
+						else{
+							alert("登录失败");
+						}
+					}).catch(function(error){
+						alert(error);
+						// console.log(error);
+					})
 				}
-				var _self = this;
-				this.$axios.post('https://auth.pkucs.cn/api/sms/token',this.$qs.stringify(data)
-				).then(function(response){
-					console.log(response);
-					if(response.data.code == 0){
-						_self.token = response.data.data;
-						_self.$router.push("/homepage");
+				else{
+					var data = {
+						'password':this.password,
+						'userName':this.title_user
 					}
-					else{
-						alert("登录失败");
-					}
-				}).catch(function(error){
-					console.log(error);
-				})
+					var _self = this;
+					this.$axios.post('https://auth.pkucs.cn/api/password/token',this.$qs.stringify(data)
+					).then(function(response){
+						console.log(response);
+						if(response.data.code == 0){
+							_self.$store.commit('setToken', response.data.data);
+							_self.$router.push("/homepage");
+						}
+						else{
+							alert("登录失败");
+						}
+					}).catch(function(error){
+						console.log(error);
+					})
+				}
 			},
             getVCode(){
                 var countDown=setInterval(()=>{

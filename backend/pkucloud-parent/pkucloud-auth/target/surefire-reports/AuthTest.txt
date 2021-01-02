@@ -1,9 +1,0 @@
--------------------------------------------------------------------------------
-Test set: AuthTest
--------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 13.108 s <<< FAILURE! - in AuthTest
-AuthTest  Time elapsed: 0.002 s  <<< ERROR!
-java.lang.IllegalStateException: Failed to load ApplicationContext
-Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'authApplication': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'wx.wxa.cloudbase.token' in value "${wx.wxa.cloudbase.token}"
-Caused by: java.lang.IllegalArgumentException: Could not resolve placeholder 'wx.wxa.cloudbase.token' in value "${wx.wxa.cloudbase.token}"
-

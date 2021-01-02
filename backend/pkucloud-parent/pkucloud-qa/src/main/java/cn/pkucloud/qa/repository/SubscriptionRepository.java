@@ -13,4 +13,6 @@ public interface SubscriptionRepository extends PagingAndSortingRepository<Subsc
     List<Subscription> findByUid(String uid);
 
     List<Subscription> findByQid(String qid);
+
+    Subscription findByUidAndQid(String uid, String qid);
 }

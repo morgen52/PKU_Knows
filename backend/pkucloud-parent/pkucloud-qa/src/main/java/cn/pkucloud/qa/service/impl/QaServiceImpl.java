@@ -10,6 +10,7 @@ import cn.pkucloud.qa.service.QaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -57,7 +58,9 @@ public class QaServiceImpl implements QaService {
 
     @Override
     public PageResult<Question> getQuestionByPage(String issuer, String uid, String role, String mod, int size, int page) {
-        PageRequest pageRequest = PageRequest.of(page, size);
+        Sort.Order order = new Sort.Order(Sort.Direction.DESC, "_id");
+        Sort sort = Sort.by(order);
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
         Page<Question> questionPage = questionRepository.findAll(pageRequest);
         List<Question> questions = questionPage.getContent();
 //        if (questions.isEmpty()) {
@@ -337,7 +340,7 @@ public class QaServiceImpl implements QaService {
         Page<Favorite> favoritePage = favoriteRepository.findByUidAndType(uid, type, pageRequest);
         List<String> ids = new ArrayList<>();
         for (Favorite favorite : favoritePage) {
-            ids.add(favorite.getId());
+            ids.add(favorite.getOid());
         }
         switch (type) {
             case "question":
@@ -360,17 +363,28 @@ public class QaServiceImpl implements QaService {
     }
 
     @Override
-    public Result<?> postFavorite(String issuer, String uid, String role, String mod, String type, String id) {
+    public Result<?> postFavorite(String issuer, String uid, String role, String mod, String type, String oid) {
+        Favorite oldFavorite = favoriteRepository.findByUidAndTypeAndOid(uid, type, oid);
+        if (null != oldFavorite) {
+            return new Result<>();
+        }
+
+        Query query = new Query(Criteria.where("_id").is(oid));
+        Update update = new Update();
+        update.inc("favorite");
+
         switch (type) {
             case "question":
-                Optional<Question> questionOptional = questionRepository.findById(id);
-                if (!questionOptional.isPresent()) {
+                Question question = mongoTemplate.findAndModify(query, update, Question.class, "question");
+//                Optional<Question> questionOptional = questionRepository.findById(id);
+                if (null == question) {
                     return new Result<>(NOT_FOUND, "not found");
                 }
                 break;
             case "answer":
-                Optional<Answer> answerOptional = answerRepository.findById(id);
-                if (!answerOptional.isPresent()) {
+                Answer answer = mongoTemplate.findAndModify(query, update, Answer.class, "answer");
+//                Optional<Answer> answerOptional = answerRepository.findById(id);
+                if (null == answer) {
                     return new Result<>(NOT_FOUND, "not found");
                 }
                 break;
@@ -380,7 +394,7 @@ public class QaServiceImpl implements QaService {
         int timestamp = (int) (System.currentTimeMillis() / 1000);
         Favorite favorite = Favorite.builder()
                 .type(type)
-                .id(id)
+                .oid(oid)
                 .uid(uid)
                 .createTime(timestamp)
                 .build();
@@ -394,7 +408,32 @@ public class QaServiceImpl implements QaService {
         if (optional.isPresent()) {
             Favorite favorite = optional.get();
             if (favorite.getUid().equals(uid)) {
+                String type = favorite.getType();
+                String oid = favorite.getOid();
                 favoriteRepository.deleteById(id);
+                Query query = new Query(Criteria.where("_id").is(oid));
+                Update update = new Update();
+                update.inc("favorite", -1);
+
+                switch (type) {
+                    case "question":
+                        Question question = mongoTemplate.findAndModify(query, update, Question.class, "question");
+//                Optional<Question> questionOptional = questionRepository.findById(id);
+                        if (null == question) {
+                            return new Result<>(NOT_FOUND, "not found");
+                        }
+                        break;
+                    case "answer":
+                        Answer answer = mongoTemplate.findAndModify(query, update, Answer.class, "answer");
+//                Optional<Answer> answerOptional = answerRepository.findById(id);
+                        if (null == answer) {
+                            return new Result<>(NOT_FOUND, "not found");
+                        }
+                        break;
+                    default:
+                        return new Result<>(BAD_REQUEST, "bad request");
+                }
+                return new Result<>();
             }
             return new Result<>(AUTHORIZATION_REQUIRED, "authorization required");
         }
@@ -419,8 +458,17 @@ public class QaServiceImpl implements QaService {
 
     @Override
     public Result<?> postSubscription(String issuer, String uid, String role, String mod, String qid) {
-        Optional<Question> optional = questionRepository.findById(qid);
-        if (optional.isPresent()) {
+        Subscription oldSubscription = subscriptionRepository.findByUidAndQid(uid, qid);
+        if (null != oldSubscription) {
+            return new Result<>();
+        }
+        Query query = new Query(Criteria.where("_id").is(qid));
+        Update update = new Update();
+        update.inc("subscribe");
+        Question question = mongoTemplate.findAndModify(query, update, Question.class, "question");
+
+//        Optional<Question> optional = questionRepository.findById(qid);
+        if (null != question) {
             int timestamp = (int) (System.currentTimeMillis() / 1000);
             Subscription subscription = Subscription.builder()
                     .qid(qid)
@@ -439,7 +487,15 @@ public class QaServiceImpl implements QaService {
         if (optional.isPresent()) {
             Subscription subscription = optional.get();
             if (subscription.getUid().equals(uid)) {
+                String qid = subscription.getQid();
                 subscriptionRepository.deleteById(id);
+                Query query = new Query(Criteria.where("_id").is(qid));
+                Update update = new Update();
+                update.inc("subscribe", -1);
+                Question question = mongoTemplate.findAndModify(query, update, Question.class, "question");
+                if (null == question) {
+                    return new Result<>(NOT_FOUND, "not found");
+                }
                 return new Result<>();
             }
             return new Result<>(AUTHORIZATION_REQUIRED, "authorization required");
@@ -529,7 +585,7 @@ public class QaServiceImpl implements QaService {
         List<Favorite> favoriteList = favoriteRepository.findByUidAndType(uid, type);
         List<String> ids = new ArrayList<>();
         for (Favorite favorite : favoriteList) {
-            ids.add(favorite.getId());
+            ids.add(favorite.getOid());
         }
         return new Result<>(ids);
     }

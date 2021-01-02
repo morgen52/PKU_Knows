@@ -11,4 +11,6 @@ public interface FavoriteRepository extends PagingAndSortingRepository<Favorite,
     Page<Favorite> findByUidAndType(String uid, String type, Pageable pageable);
 
     List<Favorite> findByUidAndType(String uid, String type);
+
+    Favorite findByUidAndTypeAndOid(String uid, String type, String oid);
 }

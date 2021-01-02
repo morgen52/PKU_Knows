@@ -12,7 +12,7 @@ public class Favorite {
     @Id
     private String _id;
     private String type;
-    private String id;
+    private String oid;
     private String uid;
     private int createTime;
 }

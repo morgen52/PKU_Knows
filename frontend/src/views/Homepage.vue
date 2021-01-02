@@ -79,7 +79,7 @@
                                     <v-select
                                       style="margin-top:20px; width:80px; margin-left:20px"
                                       :items="itemsx"
-									  v-model="topic"
+                                      v-model="topic"
                                       label="话题"      
                                     ></v-select>
                         <v-list-item flat text>

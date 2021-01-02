@@ -55,19 +55,14 @@
             flat
             >
                 <v-row justify="center" align="center">
-                    <v-col cols="3" sm="2" md="1" align="center" justify="center">
+                    <v-col cols="5" sm="2" md="1" align="center" justify="center">
                         <v-list-item-title>{{focus}}</v-list-item-title>
-                        <v-list-item-subtitle>关注</v-list-item-subtitle>
+                        <v-list-item-subtitle>关注问题数</v-list-item-subtitle>
                     </v-col>
                     <v-divider vertical></v-divider>
-                    <v-col cols="3" sm="2" md="1" align="center" justify="center">
+                    <v-col cols="5" sm="2" md="1" align="center" justify="center">
                         <v-list-item-title>{{collects}}</v-list-item-title>
-                        <v-list-item-subtitle>收藏</v-list-item-subtitle>
-                    </v-col>
-                    <v-divider vertical></v-divider>
-                    <v-col cols="3" sm="2" md="1" align="center" justify="center">
-                        <v-list-item-title>{{reply}}</v-list-item-title>
-                        <v-list-item-subtitle>回答</v-list-item-subtitle>
+                        <v-list-item-subtitle>收藏问题数</v-list-item-subtitle>
                     </v-col>
                 </v-row>
             </v-card>

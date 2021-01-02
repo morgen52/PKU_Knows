@@ -10,7 +10,7 @@
         </v-btn>
 <!--        <v-toolbar-title style="padding: 0px;">{{ques.substring(0,10)+(ques.length>10? "...":"")}}</v-toolbar-title>-->
          
-        <v-toolbar-title style="padding: 0px;">{{ques}}</v-toolbar-title>
+        <v-toolbar-title style="padding: 0px;">{{title}}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn
             fab
@@ -56,7 +56,7 @@
                                     </v-chip>
                                 </v-chip-grop>
                                 <v-chip-grop
-                                    v-for="(item, index) in label1"
+                                    v-for="(item, index) in tag"
                                     :key="index"
                                     column
                                     class="ma-2"
@@ -65,7 +65,7 @@
                                     <v-chip
                                         color="primary lighten-3"
                                     >
-                                        {{item.label}}
+                                        {{item}}
                                     </v-chip>
                                 </v-chip-grop>
                             </v-row>
@@ -73,8 +73,8 @@
                         <v-list-item>
                             <v-list-item-content>
                                 <v-text class="headline mb-2" v-html="ques"></v-text>
-                                <v-text>{{disc}}</v-text>
-                                <v-list-item-subtitle style="margin-top:10px">{{imfo}}</v-list-item-subtitle>
+                                <v-text>{{txt}}</v-text>
+                                <v-list-item-subtitle style="margin-top:10px">{{info}}</v-list-item-subtitle>
                             </v-list-item-content>
                         </v-list-item>
                     </v-list>
@@ -114,7 +114,7 @@
                             </v-btn>
                             <v-spacer></v-spacer>
                             <v-toolbar-items>
-                                <v-btn color="primary" dark text @click="dialog = false">
+                                <v-btn color="primary" dark text @click="postAnswer">
                                     发布
                                 </v-btn>
                             </v-toolbar-items>
@@ -124,6 +124,7 @@
                                 <v-list-item-content>
                                     <v-textarea
                                         label="在此处撰写答案"
+										v-model='answerText'
                                         hide-details
                                         background-color="white"
                                         flat
@@ -153,7 +154,7 @@
                         center
                         text
                         v-if="!isFocus"
-                        @click="isFocus=!isFocus"
+                        @click="subcribeQuestion"
                     >       
                         <v-icon
                             alt="md-bookmark_border Logo"
@@ -191,7 +192,6 @@
                         <v-col
                             v-for="(item, index) in answer"
                             :key="index"
-                            @click="item"
                             cols=12
                             fluid
                             md="12"
@@ -203,12 +203,12 @@
                                 <v-list-item>
                                     <v-list-item-avatar color="white">
                                       <v-img
-                                        src="../assets/images/logo.png"
+                                        src=item.user.avator
                                       ></v-img>
                                     </v-list-item-avatar>
                                     <v-list-item-content>
-                                        <v-list-item-title>{{item.message}}</v-list-item-title>
-                                        <v-list-item-subtitle>{{item.time}}</v-list-item-subtitle>
+                                        <v-list-item-title>{{item.info}}</v-list-item-title>
+                                        <v-list-item-subtitle>{{item.createTime}}</v-list-item-subtitle>
                                     </v-list-item-content>
                                     <v-btn
                                         fab
@@ -222,18 +222,18 @@
                                     </v-btn>
                                 </v-list-item>
                                 <v-list-item>
-                                    <v-text center>{{item.anstext}}</v-text>
+                                    <v-text center>{{item.txt}}</v-text>
                                 </v-list-item>
                                 <v-list-item>
                                     <v-container>
-                                        <v-btn icon @click="like(item)">
-                                            <v-icon :color="item.liked?'blue':'none'">
+                                        <v-btn icon @click="likeAnswer(item)">
+                                            <v-icon :color="(item.liked == 1)?'blue':'none'">
                                                 mdi-thumb-up
                                             </v-icon>
                                             {{item.like}}
                                         </v-btn>
-                                        <v-btn icon style="margin-left:10px" @click="dislike(item)">
-                                            <v-icon :color="item.disliked?'blue':'none'">
+                                        <v-btn icon style="margin-left:10px" @click="dislikeAnswer(item)">
+                                            <v-icon :color="(item.liked == 2)?'blue':'none'">
                                                 mdi-thumb-down
                                             </v-icon>
                                             {{item.dislike}}
@@ -244,15 +244,17 @@
                                                 class="mx-auto"
                                                 text
                                                 icon
-                                                @click="dialog0 = true"
+												@click="getCommentByAid(item)"
                                             >       
                                             <v-icon>
                                                 mdi-comment-text-outline
                                             </v-icon>
                                         </v-btn>
+										<!--
                                         <v-btn icon @click="item.collected=!item.collected">
                                             <v-icon :color="item.collected?'yellow':'none'">mdi-star</v-icon>
                                         </v-btn>
+										-->
                                     </v-container>
                                 </v-list-item>
                             </v-card>
@@ -281,11 +283,12 @@
                                     label="请输入文字..."
                                     :value="replytext"
                                     style="padding: 10px;"
+									v-model="replyTxt"
                                     @click:clear="clearMessage"
                                 >
                                 </v-text-field>
                             </v-responsive>
-                            <v-btn color="primary" dark text>
+                            <v-btn color="primary" dark text @click="postComment">
                                 发布
                             </v-btn>
                         </v-container>
@@ -293,7 +296,6 @@
                             <v-col
                                 v-for="(item, index) in comments"
                                 :key="index"
-                                @click="item"
                                 cols=12
                                 fluid
                                 md="12"
@@ -309,8 +311,8 @@
                                           ></v-img>
                                         </v-list-item-avatar>
                                         <v-list-item-content>
-                                            <v-list-item-title>{{item.message}}</v-list-item-title>
-                                            <v-list-item-subtitle>{{item.time}}</v-list-item-subtitle>
+                                            <v-list-item-title>{{item.userName}}</v-list-item-title>
+                                            <v-list-item-subtitle>{{item.createTime}}</v-list-item-subtitle>
                                         </v-list-item-content>
                                             <v-btn
                                                 fab
@@ -324,13 +326,13 @@
                                             </v-btn>
                                     </v-list-item>
                                     <v-list-item>
-                                        <v-text center>{{item.text}}</v-text>
+                                        <v-text center>{{item.txt}}</v-text>
                                     </v-list-item>
                                     <v-list-item>
                                         <v-spacer></v-spacer>
                                         <v-btn
                                             icon
-                                            @click="replytext='@'+item.name+':'"
+                                            @click="ReplyComment(item)"
                                         >
                                             回复
                                             <v-icon>mdi-reply-outline</v-icon>
@@ -382,29 +384,288 @@
     export default 
     {
 		name:"Qa",
+		mounted:function(){
+			this.getQuestion();
+			this.getAnswers();
+			this.btrefresh();
+		},
         methods: {
+			subcribeQuestion(){
+				this.isFocus=!this.isFocus;
+				var data = {
+					qid:this.$store.state.questionId
+				};
+				this.$axios.post("https://qa.pkucs.cn/api/qa/subscription",this.$qs.stringify(data),{
+					headers: {
+						'Authorization':this.$store.state.token
+					}
+				}).then(function(response){
+					if(response.data.code == 0)
+						alert('关注成功');
+					else
+						alert('关注失败');
+				}).catch(function(error){
+					alert('关注失败');
+				})
+			},
+			deleteSubscribe(){
+				this.isFocus=!this.isFocus;
+				this.$axios.delete("https://qa.pkucs.cn/api/qa/subscription/"+this.$store.state.questionId,{
+					headers: {
+						'Authorization':this.$store.state.token
+					}
+				}).then(function(response){
+					if(response.data.code == 0)
+						alert('取消关注成功');
+					else
+						alert('取消关注失败');
+				}).catch(function(error){
+					alert('取消关注失败');
+				})
+			},
+			ReplyComment(item){
+				// console.log(item);
+				this.replyTxt='@'+item.userName+':';
+				this.cid=item._id;
+			},
+			postComment(){
+				this.dialog = false;
+				var _self = this;
+				var url = 'https://qa.pkucs.cn/api/qa/answer/'+this.aid+'/comment';
+				var data = {
+					txt:this.replyTxt,
+					setting:9,
+					pid:0
+				};
+				if(this.cid != 0){
+					data.pid = this.cid;
+					this.cid = 0;
+				}
+				this.$axios.post(url,this.$qs.stringify(data),{
+					headers: {
+						'Authorization':this.$store.state.token
+					}
+				}).then(function(response){
+					if(response.data.code == 0){
+						alert('评论成功');
+						_self.getCommentByAid({_id:_self.aid});
+						_self.$forceUpdate();
+					}
+					else{
+						alert('回答失败');
+					}
+				}).catch(function(error){
+					alert('发表评论请求失败');
+				})
+			},
+			getCommentByAid(item){
+				this.dialog0 = true;
+				this.aid = item._id;
+				var id = item._id;
+				var _self = this;
+				var url = 'https://qa.pkucs.cn/api/qa/answer/'+id+'/comment';
+				console.log(item);
+				this.$axios.get(url,{
+					headers:{
+						'Authorization':this.$store.state.token
+					},
+					params:{
+						page:0,
+						size:100
+					}
+				}).then(function(response){
+					console.log(response);
+					if(response.data.code == 0){
+						var i = 0;
+						var l = response.data.data.length;
+						for (i = 0; i < l; i++){
+							var unixTimestamp = new Date(response.data.data[i].createTime * 1000);
+							var commonTime = unixTimestamp.toLocaleString();
+							response.data.data[i].createTime = commonTime;	
+							if(response.data.data[i].user == undefined){
+								response.data.data[i].userName = '匿名用户';
+							}
+							else{
+								if(response.data.data[i].user.userName == undefined){
+									response.data.data[i].userName = '匿名用户';
+								}
+								else{
+									response.data.data[i].userName = response.data.data[i].user.userName;
+								}
+							}						  
+						}
+						_self.comments = response.data.data;
+						console.log(_self.comments);
+					}
+					else{
+						alert(response.data);
+					}
+				}).catch(function(error){
+					alert(error);
+				})
+			},
+			getAnswers(){
+				var id = this.$store.state.questionId;
+				var _self = this;
+				var url = 'https://qa.pkucs.cn/api/qa/question/'+id+'/answer';
+				this.$axios.get(url,{
+					headers:{
+						'Authorization':this.$store.state.token
+					},
+					params:{
+						page:0,
+						size:100
+					}
+				}).then(function(response){
+					console.log(response);
+					if(response.data.code == 0){
+						var i = 0;
+						var l = response.data.data.length;
+						for (i = 0; i < l; i++){
+							var unixTimestamp = new Date(response.data.data[i].createTime * 1000);
+							var commonTime = unixTimestamp.toLocaleString();
+							response.data.data[i].createTime = commonTime;
+							if(_self.$store.state.likedAnswers[response.data.data[i]._id] == 1)
+								response.data.data[i].liked = 1;
+							else if (_self.$store.state.likedAnswers[response.data.data[i]._id] == 2)
+								response.data.data[i].liked = 2;
+							else
+								response.data.data[i].liked = 0;
+							if(response.data.data[i].user == undefined)
+								response.data.data[i].info = '匿名用户';
+							else{
+								response.data.data[i].info = "";
+								for(var key in response.data.data[i].user){
+									var value = response.data.data[i].user[key];
+									if(value != undefined){
+										response.data.data[i].info += (value+' ');
+									}
+								}
+							}
+						};
+						_self.answer = response.data.data;
+						// console.log(_self.answer);
+					}
+					else{
+						alert(response.data);
+					}
+				}).catch(function(error){
+					alert(error);
+				})
+			},
+			getQuestion(){
+				var id = this.$store.state.questionId;
+				var _self = this;
+				var url = 'https://qa.pkucs.cn/api/qa/question/'+id;
+				this.$axios.get(url,{
+					headers:{
+						'Authorization':this.$store.state.token
+					}
+				}).then(function(response){
+					//console.log(response);
+					if(response.data.code == 0){
+						var unixTimestamp = new Date(response.data.data.createTime * 1000);
+						var commonTime = unixTimestamp.toLocaleString();
+						_self.topic = response.data.data.topic;
+						_self.tag = response.data.data.tag;
+						_self.title = response.data.data.title;
+						_self.txt = response.data.data.txt;
+						_self.info = response.data.data.answer+'回答  '+response.data.data.subscribe+'收藏  '+response.data.data.like + '喜欢  '+commonTime;
+						_self.tag = response.data.data.tag;
+					}
+					else{
+						alert(response.data);
+					}
+				}).catch(function(error){
+					alert(error);
+				})
+			},
             btrefresh() {
                 document.body.scrollTop = 0;
                 document.documentElement.scrollTop = 0;
                 this.$forceUpdate();
             },
             //用于处理赞和踩
-            dislike(item){
-                if(item.liked)return;
-                item.disliked=!item.disliked;
-                if(item.disliked){
-                    item.dislike++;
-                }
-                else item.dislike--;
+            putLike(id,liked){
+				var _self = this;
+				var url = 'https://qa.pkucs.cn/api/qa/answer/'+id;
+				var data = { like:liked};
+				this.$axios.put(url,this.$qs.stringify(data),{
+					headers: {
+						'Authorization':this.$store.state.token
+					}
+				}).then(function(response){
+					console.log(response);
+				}).catch(function(error){
+					console.log(error);
+				})
+			},
+			dislikeAnswer(item){
+                if(item.liked == 2)
+					return;
+				else if(item.liked == 1){
+					this.putLike(item._id,0);
+					item.like = item.like - 1;
+					this.putLike(item._id,2);
+				}
+				else{
+					this.putLike(item._id,2);
+				}
+				item.liked = 2;
+				item.dislike = item.dislike + 1;
+				this.$store.commit('updateLikedAnswers',{
+									id:item._id,
+									change:2,
+									});
+				this.$forceUpdate();
             },
-            like(item){
-                if(item.disliked)return;
-                item.liked=!item.liked;
-                if(item.liked){
-                    item.like++;
-                }
-                else item.like--;
+            likeAnswer(item){
+				console.log(item);
+                if(item.liked == 1)
+					return;
+				else if(item.liked == 2){
+					this.putLike(item._id,0);
+					item.dislike = item.dislike - 1;
+					this.putLike(item._id,1);
+				}
+				else{
+					this.putLike(item._id,1);
+				}
+				item.liked = 1;
+				item.like = item.like + 1;
+				this.$store.commit('updateLikedAnswers',{
+									id:item._id,
+									change:1,
+									});
+				this.$forceUpdate();
             },
+			postAnswer(){
+				this.dialog = false;
+				var _self = this;
+				var url = 'https://qa.pkucs.cn/api/qa/question/'+this.$store.state.questionId+'/answer';
+				var data = {
+					txt:this.answerText,
+					setting:9,
+					subscribe:true
+				};
+				this.$axios.post(url,this.$qs.stringify(data),{
+					headers: {
+						'Authorization':this.$store.state.token
+					}
+				}).then(function(response){
+					// console.log(response);
+					if(response.data.code == 0){
+						alert('回答成功');
+						_self.getAnswers();
+						_self.btrefresh();
+					}
+					else{
+						alert('回答失败');
+					}
+				}).catch(function(error){
+					alert(error);
+				})
+			},
             clearMessage () {
                     this.replytext = ''
             },
@@ -416,91 +677,18 @@
             dialog1: false,
             dialog2: false,
             replytext:'',
-            id:'label1',
-            topic:'课程',
-            label:'标签',
-            ques:'如何进行软件开发怎么进行软件开发？',
-            disc:'如题：如何进行软件开发,如何进行软件开发,如何进行软件开发,如何进行软件开发,如何进行软件开发,如何进行软件开发,',
-            imfo:'3回答 10关注 20浏览 20-12-14 10:10:00',
+			replyTxt:'',
+            topic:'',
+            title:'',
+            txt:'',
+            info:'',
+			answerText:'',
             isFocus:false,
-            label1:[
-                {
-                    label:'软件工程'
-                },
-                {
-                    label:'设计'
-                }
-            ],
-            //增加了用户对回答的状态信息
-            answer:[
-                { 
-                    head:'../assets/images/logo.png',
-                    message:'路人甲·男·信科·18本',
-                    time:'20-12-14 12:23:20',
-                    anstext:'学习计算机编程语言。想要进行软件开发，学习计算机编程语言是必不可少的。例如java、php、python、html、css、js等等。',
-                    like:'4',
-                    dislike:'0',
-                    liked:false,
-                    disliked:false,
-                    collected:false,
-                },
-                { 
-                    head:'../assets/images/logo.png',
-                    message:'姓名·信科·18本科生',
-                    time:'2020-12-13 11:34',
-                    anstext:'回答...',
-                    like:'2',
-                    dislike:'0',
-                    liked:false,
-                    disliked:false,
-                    collected:false,
-                },
-                { 
-                    head:'../assets/images/logo.png',
-                    message:'姓名·信科·18本科生',
-                    time:'2020-12-13 11:34',
-                    anstext:'回答...',
-                    like:'2',
-                    dislike:'0',
-                    liked:false,
-                    disliked:false,
-                    collected:false,
-                },
-                { 
-                    head:'../assets/images/logo.png',
-                    message:'姓名·信科·18本科生',
-                    time:'2020-12-13 11:34',
-                    anstext:'回答...',
-                    like:'2',
-                    dislike:'0',
-                    liked:false,
-                    disliked:false,
-                    collected:false,
-                },
-            ],
-            comments:[
-                { 
-                    head:'../assets/images/logo.png',
-                    name:'路人甲',
-                    message:'路人甲·信科·18本科生',
-                    time:'2020-12-13 11:34',
-                    text:'回答不错，谢谢',
-                },
-                { 
-                    head:'../assets/images/logo.png',
-                    name:'路人乙',
-                    message:'路人乙·信科·18本科生',
-                    time:'2020-12-13 11:34',
-                    text:'评论...',
-                },
-                { 
-                    head:'../assets/images/logo.png',
-                    name:'姓名',
-                    message:'姓名·信科·18本科生',
-                    time:'2020-12-13 11:34',
-                    text:'评论...',
-                },
-            ],
+			aid:'',
+			cid:0,
+            tag:[],
+            answer:[],
+            comments:[],
         }),
         
    }

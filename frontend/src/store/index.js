@@ -1,13 +1,9 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
 
-Vue.use(Vuex)
-
-export default new Vuex.Store({
 	
 	state: {
 		token:"",
 		setting:0,
+		times:1,
 		user:{
 			avator:"",
 			dept:"",
@@ -19,6 +15,8 @@ export default new Vuex.Store({
 			usrT:"",
 			enroll:""
 		},
+		subscribe:0,
+		favorite:0,
 		getInfoAlready:false,
 		showInfo:{
 			gender:"",
@@ -31,8 +29,37 @@ export default new Vuex.Store({
 		pagesum:[1,1,1],
 		questionId:0,
 		likedAnswers:{},
+		subscribeList:[]
 	},
 	mutations: {
+		setSubscribe(state,data){
+			state.subscribe = data.num;
+		},
+		setFavorite(state,data){
+			state.favorite = data.num;
+		},
+		addSubscribe(state){
+			if(state.subscribeList.indexOf(state.questionId) != -1)
+				return;
+			else
+				state.subscribeList.push(state.questionId);
+		},
+		deleteSubscribe(state){
+			var i = 0;
+			var l = state.subscribeList.length;
+			for (i = 0;i < l; i ++){
+				if (state.subscribeList[i] == state.questionId)
+					break;
+			}
+			if(i > -1)	
+				state.subscribeList.splice(i,1);
+		},
+		subTimes(state){
+			state.times = 0;
+		},
+		setSubscribeList(state,data){
+			state.subscribeList = data.subscribeList;
+		},
 		setLikedAnswers(state,liked){
 			state.likedAnswers = liked;
 		},
@@ -63,6 +90,10 @@ export default new Vuex.Store({
 			state.showInfo.enroll = info.enroll;
 			state.showInfo.motto = info.motto;
 			state.showInfo.userName = info.userName;
+			if(state.showInfo.gender == '不展示' && state.showInfo.dept == '不展示' && state.showInfo.enroll == '不展示')
+				state.setting = 0;
+			else
+				state.setting = 3;
 		},
 		setAlready(state){
 			state.getInfoAlready = !state.getInfoAlready;
@@ -86,3 +117,4 @@ export default new Vuex.Store({
 	modules: {
 	}
 })
+

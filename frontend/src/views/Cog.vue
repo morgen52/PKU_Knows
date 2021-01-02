@@ -111,6 +111,7 @@
             
 			<v-row justify="center" align="center" style="margin-top: 40px;">
 				<v-btn
+				@click="exit"
 				text
 				color="red"
 				to="/"
@@ -128,7 +129,30 @@
                 dialog:false,
                 dialog1:false,
             }
-        }
+        },
+		methods:{
+			exit(){
+				this.$store.commit('setUser',{
+									dept:"",
+									gender:"",
+									major:"",
+									name:"",
+									stuT:"",
+									userName:"",
+									usrT:"",
+									enroll:""
+								});
+				this.$store.commit('setShowInfo',{
+										gender:"",
+										dept:"",
+										enroll:"",
+										motto:"",
+										userName:""
+									});
+				this.$store.commit('setToken',"");
+				this.$store.commit('setAlready');
+			}
+		}
 	}
 </script>
 

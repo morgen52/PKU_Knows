@@ -43,8 +43,10 @@ export default new Vuex.Store({
 		addFavorite(state){
 			if(state.favoriteList.length > 0 && state.favoriteList.indexOf(state.questionId) != -1)
 				return;
-			else
+			else{
 				state.favoriteList.push(state.questionId);
+				state.favorite = state.favorite + 1;
+			}
 		},
 		deleteFavorite(state){
 			var i = 0;
@@ -53,8 +55,10 @@ export default new Vuex.Store({
 				if (state.favoriteList[i] == state.questionId)
 					break;
 			}
-			if(i > -1)	
+			if(i > -1){
 				state.favoriteList.splice(i,1);
+				state.favorite = state.favorite - 1;
+			}
 		},
 		addFavoriteAns(state,data){
 			if(state.favoriteAnsList.length > 0 && state.favoriteAnsList.indexOf(data.id) != -1)
@@ -75,14 +79,18 @@ export default new Vuex.Store({
 		addSubscribe(state){
 			if(state.subscribeList.length > 0 && state.subscribeList.indexOf(state.questionId) != -1)
 				return;
-			else
+			else{
 				state.subscribeList.push(state.questionId);
+				state.subscribe = state.subscribe + 1;
+			}
 		},		
 		addSubscribeWithId(state,data){
 			if(state.subscribeList.length > 0 && state.subscribeList.indexOf(data.id) != -1)
 				return;
-			else
+			else{
 				state.subscribeList.push(data.id);
+				state.subscribe = state.subscribe + 1;
+			}
 		},
 		deleteSubscribe(state){
 			var i = 0;
@@ -91,8 +99,10 @@ export default new Vuex.Store({
 				if (state.subscribeList[i] == state.questionId)
 					break;
 			}
-			if(i > -1)	
+			if(i > -1){	
 				state.subscribeList.splice(i,1);
+				state.subscribe = state.subscribe - 1;
+			}
 		},
 		subTimes(state){
 			state.times = 0;
@@ -165,3 +175,4 @@ export default new Vuex.Store({
 	modules: {
 	}
 })
+

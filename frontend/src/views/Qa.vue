@@ -446,13 +446,13 @@
 		},
         methods: {
 			collectAnswer(item){
+				var _self = this;
 				if(!item.collected){
 					item.collected=true;
 					var data = {
 						type:'answer',
 						oid:item._id
 					};
-					var _self = this;
 					this.$axios.post("https://qa.pkucs.cn/api/qa/favorite",this.$qs.stringify(data),{
 						headers: {
 							'Authorization':this.$store.state.token
@@ -472,13 +472,12 @@
 				else{
 					item.collected = false;
 					//写一个delete collect answer的请求,记得改store里的数据
-					var _self = this;
-					var data = {
+					var data1 = {
 						type:'answer',
 						oid:item._id
 					};
 					this.$axios.delete("https://qa.pkucs.cn/api/qa/favorite",{
-						params:data,
+						params:data1,
 						headers: {
 							'Authorization':this.$store.state.token
 						}
@@ -544,7 +543,7 @@
 					if(response.data.code == 0){
 						_self.$store.commit('deleteFavorite');
 					}
-				}).catch(function(){
+				}).catch(function(error){
 					console.log(error);
 				})
 			},
@@ -583,7 +582,7 @@
 					if(response.data.code == 0){
 						_self.$store.commit('deleteSubscribe');
 					}
-				}).catch(function(){
+				}).catch(function(error){
 					console.log(error);
 				})
 			},

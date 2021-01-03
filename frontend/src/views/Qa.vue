@@ -198,8 +198,8 @@
                         width="100"
                         center
                         text
-                        v-if="!isCollected"
-                        @click="isColleted=!isCollected"
+                        v-if="!isCollect"
+                        @click="collectQuestion"
                     >       
                         <v-icon
                             alt="md-bookmark_border Logo"
@@ -216,8 +216,8 @@
                         width="100"
                         center
                         text
-                        v-if="isCollected"
-                        @click="isColleted=!isCollected"
+                        v-if="isCollect"
+                        @click="deleteCollect"
                     >       
                         <v-icon
                             alt="md-bookmark_border Logo"
@@ -295,11 +295,9 @@
                                                 mdi-comment-text-outline
                                             </v-icon>
                                         </v-btn>
-										<!--
-                                        <v-btn icon @click="item.collected=!item.collected">
+                                        <v-btn icon @click="collectAnswer(item)">
                                             <v-icon :color="item.collected?'yellow':'none'">mdi-star</v-icon>
                                         </v-btn>
-										-->
                                     </v-container>
                                 </v-list-item>
                             </v-card>
@@ -432,15 +430,124 @@
 		mounted:function(){
 			this.getQuestion();
 			this.getAnswers();
-			if(this.$store.state.subscribeList.indexOf(this.$store.state.questionId) != -1){
+			if(this.$store.state.subscribeList.length > 0 && this.$store.state.subscribeList.indexOf(this.$store.state.questionId) != -1)
 				this.isFocus = true;
+			else
+				this.isFocus = false;
+			if(this.$store.state.favoriteList.length > 0 && this.$store.state.favoriteList.indexOf(this.$store.state.questionId) != -1){
+				console.log('isCollect = true');
+				this.isCollect= true;
 			}
 			else{
-				this.isFocus = false;
+				this.isCollect = false;
+				console.log('isCollect = false');
 			}
 			this.btrefresh();
 		},
         methods: {
+			collectAnswer(item){
+				if(!item.collected){
+					item.collected=true;
+					var data = {
+						type:'answer',
+						oid:item._id
+					};
+					var _self = this;
+					this.$axios.post("https://qa.pkucs.cn/api/qa/favorite",this.$qs.stringify(data),{
+						headers: {
+							'Authorization':this.$store.state.token
+						}
+					}).then(function(response){
+						console.log(response);
+						if(response.data.code == 0){
+							_self.$store.commit('addFavoriteAns',{id:item._id});
+							if(!_self.isCollect){
+								_self.collectQuestion();
+							}
+						}
+					}).catch(function(error){
+						console.log(error);
+					})
+				}
+				else{
+					item.collected = false;
+					//写一个delete collect answer的请求,记得改store里的数据
+					var _self = this;
+					var data = {
+						type:'answer',
+						oid:item._id
+					};
+					this.$axios.delete("https://qa.pkucs.cn/api/qa/favorite",{
+						params:data,
+						headers: {
+							'Authorization':this.$store.state.token
+						}
+					}).then(function(response){
+						console.log(response);
+						if(response.data.code == 0){
+							_self.$store.commit('deleteFavoriteAns',{id:item._id});
+							console.log('取消收藏成功');
+						}
+					}).catch(function(error){
+						console.log(error);
+					})
+					var l = this.answer.length;
+					var del = true;
+					console.log('this.answer.length:');
+					console.log(this.answer.length);
+					for(var i = 0; i < l ;i ++){
+						if(this.answer[i].collected){
+							del = false;
+							break;
+						}
+					}
+					if(del){
+						this.deleteCollect();
+					}
+				}
+				
+			},
+			collectQuestion(){
+				this.isCollect=!this.isCollect;
+				var data = {
+					type:'question',
+					oid:this.$store.state.questionId
+				};
+				var _self = this;
+				this.$axios.post("https://qa.pkucs.cn/api/qa/favorite",this.$qs.stringify(data),{
+					headers: {
+						'Authorization':this.$store.state.token
+					}
+				}).then(function(response){
+					console.log(response);
+					if(response.data.code == 0){
+						_self.$store.commit('addFavorite');
+					}
+				}).catch(function(error){
+					console.log(error);
+				})
+			},
+			deleteCollect(){
+				this.isCollect=!this.isCollect;
+				var _self = this;
+				var data = {
+					type:'question',
+					oid:this.$store.state.questionId
+				};
+				this.$axios.delete("https://qa.pkucs.cn/api/qa/favorite",{
+					params:data,
+					headers: {
+						'Authorization':this.$store.state.token
+					}
+				}).then(function(response){
+					console.log(response);
+					if(response.data.code == 0){
+						_self.$store.commit('deleteFavorite');
+					}
+				}).catch(function(){
+					console.log(error);
+				})
+			},
 			subcribeQuestion(){
 				this.isFocus=!this.isFocus;
 				var data = {
@@ -455,31 +562,29 @@
 					console.log(response);
 					if(response.data.code == 0){
 						_self.$store.commit('addSubscribe');
-						alert('关注成功');
 					}
-					else
-						alert('关注失败');
 				}).catch(function(error){
 					console.log(error);
-					alert('关注失败');
 				})
 			},
 			deleteSubscribe(){
 				this.isFocus=!this.isFocus;
 				var _self = this;
-				this.$axios.delete("https://qa.pkucs.cn/api/qa/subscription/"+this.$store.state.questionId,{
+				var data = {
+					qid:this.$store.state.questionId
+				};
+				this.$axios.delete("https://qa.pkucs.cn/api/qa/subscription",{
+					params:data,
 					headers: {
 						'Authorization':this.$store.state.token
 					}
 				}).then(function(response){
+					console.log(response);
 					if(response.data.code == 0){
 						_self.$store.commit('deleteSubscribe');
-						alert('取消关注成功');
 					}
-					else
-						alert('取消关注失败');
 				}).catch(function(){
-					alert('取消关注失败');
+					console.log(error);
 				})
 			},
 			ReplyComment(item){
@@ -506,15 +611,11 @@
 					}
 				}).then(function(response){
 					if(response.data.code == 0){
-						alert('评论成功');
 						_self.getCommentByAid({_id:_self.aid});
 						_self.$forceUpdate();
 					}
-					else{
-						alert('回答失败');
-					}
-				}).catch(function(){
-					alert('发表评论请求失败');
+				}).catch(function(error){
+					console.log(error);
 				})
 			},
 			getCommentByAid(item){
@@ -556,11 +657,8 @@
 						_self.comments = response.data.data;
 						console.log(_self.comments);
 					}
-					else{
-						alert(response.data);
-					}
 				}).catch(function(error){
-					alert(error);
+					console.log(error);
 				})
 			},
 			getAnswers(){
@@ -601,15 +699,16 @@
 									}
 								}
 							}
+							if(_self.$store.state.favoriteAnsList.length > 0 && _self.$store.state.favoriteAnsList.indexOf(response.data.data[i]._id) != -1)
+								response.data.data[i].collected = true;
+							else
+								response.data.data[i].collected = false;
 						}
 						_self.answer = response.data.data;
 						// console.log(_self.answer);
 					}
-					else{
-						alert(response.data);
-					}
 				}).catch(function(error){
-					alert(error);
+					console.log(error);
 				})
 			},
 			getQuestion(){
@@ -632,11 +731,8 @@
 						_self.info = response.data.data.answer+'回答  '+response.data.data.subscribe+'关注  '+response.data.data.favorite + '收藏  '+commonTime;
 						_self.tag = response.data.data.tag;
 					}
-					else{
-						alert(response.data);
-					}
 				}).catch(function(error){
-					alert(error);
+					console.log(error);
 				})
 			},
             btrefresh() {
@@ -713,15 +809,11 @@
 				}).then(function(response){
 					// console.log(response);
 					if(response.data.code == 0){
-						alert('回答成功');
 						_self.getAnswers();
 						_self.btrefresh();
 					}
-					else{
-						alert('回答失败');
-					}
 				}).catch(function(error){
-					alert(error);
+					console.log(error);
 				})
 			},
             clearMessage () {
@@ -742,7 +834,7 @@
             info:'',
 			answerText:'',
             isFocus:false,
-			isCollected:false,
+			isCollect:false,
 			aid:'',
 			cid:0,
             tag:[],

@@ -151,7 +151,7 @@ export default new Vuex.Store({
 			if(state.showInfo.gender == '不展示' && state.showInfo.dept == '不展示' && state.showInfo.enroll == '不展示')
 				state.setting = 0;
 			else
-				state.setting = 3;
+				state.setting = 7;
 		},
 		setAlready(state){
 			state.getInfoAlready = !state.getInfoAlready;

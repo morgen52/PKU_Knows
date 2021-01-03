@@ -248,7 +248,7 @@
                                 <v-list-item>
                                     <v-list-item-avatar color="white">
                                       <v-img
-                                        src=item.user.avator
+                                        src=item.avator
                                       ></v-img>
                                     </v-list-item-avatar>
                                     <v-list-item-content>
@@ -350,7 +350,7 @@
                                     <v-list-item>
                                         <v-list-item-avatar color="white">
                                           <v-img
-                                            src="../assets/images/logo.png"
+                                            src=item.avator
                                           ></v-img>
                                         </v-list-item-avatar>
                                         <v-list-item-content>
@@ -643,6 +643,7 @@
 							response.data.data[i].createTime = commonTime;	
 							if(response.data.data[i].user == undefined){
 								response.data.data[i].userName = '匿名用户';
+								response.data.data[i].avator = '../assets/images/logo.png';
 							}
 							else{
 								if(response.data.data[i].user.userName == undefined){
@@ -650,6 +651,12 @@
 								}
 								else{
 									response.data.data[i].userName = response.data.data[i].user.userName;
+								}
+								if(response.data.data[i].user.avator == undefined){
+									response.data.data[i].avator = '../assets/images/logo.png';
+								}
+								else{
+									response.data.data[i].avator = response.data.data[i].user.avator;
 								}
 							}						  
 						}
@@ -687,11 +694,16 @@
 								response.data.data[i].liked = 2;
 							else
 								response.data.data[i].liked = 0;
-							if(response.data.data[i].user == undefined)
+							if(response.data.data[i].user == undefined){
 								response.data.data[i].info = '匿名用户';
+								response.data.data[i].avator = '../assets/images/logo.png';
+							}
 							else{
+								response.data.data[i].avator = response.data.data[i].user.avator;
 								response.data.data[i].info = "";
 								for(var key in response.data.data[i].user){
+									if(key != 'userName' && key != 'motto' && key != 'dept' && key != 'enroll')
+										continue;
 									var value = response.data.data[i].user[key];
 									if(value != undefined){
 										response.data.data[i].info += (value+' ');

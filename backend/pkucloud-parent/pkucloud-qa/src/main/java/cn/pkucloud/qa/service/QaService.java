@@ -2,10 +2,7 @@ package cn.pkucloud.qa.service;
 
 import cn.pkucloud.common.PageResult;
 import cn.pkucloud.common.Result;
-import cn.pkucloud.qa.entity.Answer;
-import cn.pkucloud.qa.entity.Comment;
-import cn.pkucloud.qa.entity.Question;
-import cn.pkucloud.qa.entity.Report;
+import cn.pkucloud.qa.entity.*;
 
 import java.util.List;
 import java.util.Map;
@@ -44,7 +41,7 @@ public interface QaService {
 
     Result<?> deleteFavoriteById(String issuer, String uid, String role, String mod, String id);
 
-    PageResult<Question> getSubscriptionQuestionByPage(String issuer, String uid, String role, String mod, int size, int page);
+    PageResult<SubscriptionQuestion> getSubscriptionQuestionByPage(String issuer, String uid, String role, String mod, int size, int page);
 
     Result<?> postSubscription(String issuer, String uid, String role, String mod, String qid);
 
@@ -59,4 +56,8 @@ public interface QaService {
     Result<List<String>> getFavoriteIds(String uid, String type);
 
     Result<List<String>> getSubscriptionIds(String uid);
+
+    Result<?> deleteFavorite(String issuer, String uid, String role, String mod, String type, String oid);
+
+    Result<?> deleteSubscription(String issuer, String uid, String role, String mod, String qid);
 }

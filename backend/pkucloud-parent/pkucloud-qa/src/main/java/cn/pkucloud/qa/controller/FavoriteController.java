@@ -60,12 +60,22 @@ public class FavoriteController {
         return qaService.postFavorite(issuer, uid, role, mod, type, oid);
     }
 
-    @DeleteMapping("{id}")
-    public Result<?> deleteFavoriteById(@RequestHeader("iss") String issuer,
-                                        @RequestHeader("uid") String uid,
-                                        @RequestHeader("role") String role,
-                                        @RequestHeader("mod") String mod,
-                                        @PathVariable String id) {
-        return qaService.deleteFavoriteById(issuer, uid, role, mod, id);
+//    @DeleteMapping("{id}")
+//    public Result<?> deleteFavoriteById(@RequestHeader("iss") String issuer,
+//                                        @RequestHeader("uid") String uid,
+//                                        @RequestHeader("role") String role,
+//                                        @RequestHeader("mod") String mod,
+//                                        @PathVariable String id) {
+//        return qaService.deleteFavoriteById(issuer, uid, role, mod, id);
+//    }
+
+    @DeleteMapping
+    public Result<?> deleteFavorite(@RequestHeader("iss") String issuer,
+                                  @RequestHeader("uid") String uid,
+                                  @RequestHeader("role") String role,
+                                  @RequestHeader("mod") String mod,
+                                  @RequestParam String type,
+                                  @RequestParam String oid) {
+        return qaService.deleteFavorite(issuer, uid, role, mod, type, oid);
     }
 }

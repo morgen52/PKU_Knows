@@ -27,7 +27,9 @@ public interface AuthService {
 
     Result<?> getUserInfo(String jws);
 
-    Result<?> setPassword(String jws, String userName, String password, String motto);
+    Result<?> setPassword(String jws, String userName, String password);
 
     Result<UserInfoDto> getPrivateUserInfo(Long id);
+
+    Result<?> setProfile(String jws, String userName, String motto);
 }

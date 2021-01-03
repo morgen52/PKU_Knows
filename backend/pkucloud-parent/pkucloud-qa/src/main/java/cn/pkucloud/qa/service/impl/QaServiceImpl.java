@@ -7,6 +7,8 @@ import cn.pkucloud.qa.feign.AuthClient;
 import cn.pkucloud.qa.feign.WxmpClient;
 import cn.pkucloud.qa.repository.*;
 import cn.pkucloud.qa.service.QaService;
+import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.collections4.IteratorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +21,7 @@ import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -106,12 +109,21 @@ public class QaServiceImpl implements QaService {
                 .dislike(0)
                 .answer(0)
                 .favorite(0)
-                .subscribe(0)
+                .subscribe(subscribe ? 1 : 0)
                 .createTime(timestamp)
                 .build();
-        questionRepository.save(question);
-        return new Result<>();
-    }
+        Question newQuestion = questionRepository.save(question);
+        String qid = newQuestion.get_id();
+        if (subscribe) {
+            Subscription subscription = Subscription.builder()
+                    .qid(qid)
+                    .uid(uid)
+                    .createTime(timestamp)
+                    .build();
+            subscriptionRepository.save(subscription);
+        }
+        return new Result<>(qid);
+}
 
     @Override
     public PageResult<Answer> getAnswerByQid(String issuer, String uid, String role, String mod, String qid, int size, int page) {
@@ -338,25 +350,37 @@ public class QaServiceImpl implements QaService {
     public PageResult<?> getFavoriteByPage(String issuer, String uid, String role, String mod, String type, int size, int page) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Favorite> favoritePage = favoriteRepository.findByUidAndType(uid, type, pageRequest);
-        List<String> ids = new ArrayList<>();
+        List<String> fids = new ArrayList<>();
+        List<String> oids = new ArrayList<>();
         for (Favorite favorite : favoritePage) {
-            ids.add(favorite.getOid());
+            fids.add(favorite.get_id());
+            oids.add(favorite.getOid());
         }
         switch (type) {
             case "question":
-                Iterable<Question> questionIterable = questionRepository.findAllById(ids);
-                List<Question> questions = new ArrayList<>();
-                for (Question question : questionIterable) {
-                    questions.add(question);
+                Iterable<Question> questionIterable = questionRepository.findAllById(oids);
+//                List<Question> questions = new ArrayList<>();
+                List<Question> questionList = IterableUtils.toList(questionIterable);
+                List<FavoriteQuestion> favoriteQuestions = new ArrayList<>();
+                for (int i = 0; i < questionList.size(); ++i) {
+                    favoriteQuestions.add(new FavoriteQuestion(fids.get(i), questionList.get(i)));
                 }
-                return new PageResult<>(questions);
+//                for (Question question : questionIterable) {
+//                    questions.add(question);
+//                }
+                return new PageResult<>(favoriteQuestions);
             case "answer":
-                Iterable<Answer> answerIterable = answerRepository.findAllById(ids);
-                List<Answer> answers = new ArrayList<>();
-                for (Answer answer : answerIterable) {
-                    answers.add(answer);
+                Iterable<Answer> answerIterable = answerRepository.findAllById(oids);
+                List<Answer> answerList = IterableUtils.toList(answerIterable);
+                ArrayList<FavoriteAnswer> favoriteAnswers = new ArrayList<>();
+//                List<Answer> answers = new ArrayList<>();
+                for (int i = 0; i < answerList.size(); ++i) {
+                    favoriteAnswers.add(new FavoriteAnswer(fids.get(i), answerList.get(i)));
                 }
-                return new PageResult<>(answers);
+//                for (Answer answer : answerIterable) {
+//                    answers.add(answer);
+//                }
+                return new PageResult<>(favoriteAnswers);
             default:
                 return new PageResult<>(BAD_REQUEST, "bad request");
         }
@@ -441,19 +465,26 @@ public class QaServiceImpl implements QaService {
     }
 
     @Override
-    public PageResult<Question> getSubscriptionQuestionByPage(String issuer, String uid, String role, String mod, int size, int page) {
+    public PageResult<SubscriptionQuestion> getSubscriptionQuestionByPage(String issuer, String uid, String role, String mod, int size, int page) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Subscription> subscriptionPage = subscriptionRepository.findByUid(uid, pageRequest);
-        List<String> ids = new ArrayList<>();
+        List<String> sids = new ArrayList<>();
+        List<String> qids = new ArrayList<>();
         for (Subscription subscription : subscriptionPage) {
-            ids.add(subscription.getQid());
+            sids.add(subscription.get_id());
+            qids.add(subscription.getQid());
         }
-        Iterable<Question> questionIterable = questionRepository.findAllById(ids);
-        List<Question> questions = new ArrayList<>();
-        for (Question question : questionIterable) {
-            questions.add(question);
+        Iterable<Question> questionIterable = questionRepository.findAllById(qids);
+        List<Question> questionList = IterableUtils.toList(questionIterable);
+        List<SubscriptionQuestion> subscriptionQuestions = new ArrayList<>();
+//        List<Question> questions = new ArrayList<>();
+        for (int i = 0; i < questionList.size(); ++i) {
+            subscriptionQuestions.add(new SubscriptionQuestion(sids.get(i), questionList.get(i)));
         }
-        return new PageResult<>(questions);
+//        for (Question question : questionIterable) {
+//            questions.add(question);
+//        }
+        return new PageResult<>(subscriptionQuestions);
     }
 
     @Override
@@ -598,6 +629,63 @@ public class QaServiceImpl implements QaService {
             ids.add(subscription.getQid());
         }
         return new Result<>(ids);
+    }
+
+    @Override
+    public Result<?> deleteFavorite(String issuer, String uid, String role, String mod, String type, String oid) {
+        Favorite favorite = favoriteRepository.findByUidAndTypeAndOid(uid, type, oid);
+        if (null != favorite) {
+            if (favorite.getUid().equals(uid)) {
+                String id = favorite.get_id();
+                favoriteRepository.deleteById(id);
+                Query query = new Query(Criteria.where("_id").is(oid));
+                Update update = new Update();
+                update.inc("favorite", -1);
+
+                switch (type) {
+                    case "question":
+                        Question question = mongoTemplate.findAndModify(query, update, Question.class, "question");
+//                Optional<Question> questionOptional = questionRepository.findById(id);
+                        if (null == question) {
+                            return new Result<>(NOT_FOUND, "not found");
+                        }
+                        break;
+                    case "answer":
+                        Answer answer = mongoTemplate.findAndModify(query, update, Answer.class, "answer");
+//                Optional<Answer> answerOptional = answerRepository.findById(id);
+                        if (null == answer) {
+                            return new Result<>(NOT_FOUND, "not found");
+                        }
+                        break;
+                    default:
+                        return new Result<>(BAD_REQUEST, "bad request");
+                }
+                return new Result<>();
+            }
+            return new Result<>(AUTHORIZATION_REQUIRED, "authorization required");
+        }
+        return new Result<>(NOT_FOUND, "not found");
+    }
+
+    @Override
+    public Result<?> deleteSubscription(String issuer, String uid, String role, String mod, String qid) {
+        Subscription subscription = subscriptionRepository.findByUidAndQid(uid, qid);
+        if (null != subscription) {
+            if (subscription.getUid().equals(uid)) {
+                String id = subscription.get_id();
+                subscriptionRepository.deleteById(id);
+                Query query = new Query(Criteria.where("_id").is(qid));
+                Update update = new Update();
+                update.inc("subscribe", -1);
+                Question question = mongoTemplate.findAndModify(query, update, Question.class, "question");
+                if (null == question) {
+                    return new Result<>(NOT_FOUND, "not found");
+                }
+                return new Result<>();
+            }
+            return new Result<>(AUTHORIZATION_REQUIRED, "authorization required");
+        }
+        return new Result<>(NOT_FOUND, "not found");
     }
 
     private User getUser(User user, int setting) {

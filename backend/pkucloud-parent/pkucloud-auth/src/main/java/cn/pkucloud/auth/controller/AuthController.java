@@ -24,6 +24,13 @@ public class AuthController {
                                  @RequestParam String userName,
                                  @RequestParam String password,
                                  @RequestParam(required = false) String motto) {
-        return authService.setPassword(jws, userName, password, motto);
+        return authService.setPassword(jws, userName, password);
+    }
+
+    @PostMapping("profile")
+    public Result<?> setProfile(@RequestHeader("Authorization") String jws,
+                                @RequestParam String userName,
+                                @RequestParam String motto) {
+        return authService.setProfile(jws, userName, motto);
     }
 }

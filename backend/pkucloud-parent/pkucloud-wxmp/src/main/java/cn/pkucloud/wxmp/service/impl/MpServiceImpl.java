@@ -25,6 +25,7 @@ import cn.pkucloud.wxmp.service.AccessTokenService;
 import cn.pkucloud.wxmp.service.MpService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -184,21 +185,39 @@ public class MpServiceImpl implements MpService {
             if (null == mpOpenId) {
                 continue;
             }
-            Keywords keywords = Keywords.builder()
-                    .first(new Keyword(first))
-                    .keyword1(new Keyword(title))
-                    .keyword2(new Keyword(userName))
-                    .keyword3(new Keyword(time))
-                    .remark(new Keyword(remark))
-                    .build();
-            TemplateMessage templateMessage = TemplateMessage.builder()
-                    .touser(mpOpenId)
-                    .template_id("EjI3qinEYZZoEKbC3VLCHYj0D0Mk5vQfWsvJysm1sbU")
-                    .data(keywords)
-                    .build();
-            mpClient.sendTemplateMessage(access_token, templateMessage);
+            sendOneAnswerMsg(access_token, mpOpenId, first, title, userName, time, remark);
+//            Keywords keywords = Keywords.builder()
+//                    .first(new Keyword(first))
+//                    .keyword1(new Keyword(title))
+//                    .keyword2(new Keyword(userName))
+//                    .keyword3(new Keyword(time))
+//                    .remark(new Keyword(remark))
+//                    .build();
+//            TemplateMessage templateMessage = TemplateMessage.builder()
+//                    .touser(mpOpenId)
+//                    .template_id("EjI3qinEYZZoEKbC3VLCHYj0D0Mk5vQfWsvJysm1sbU")
+//                    .data(keywords)
+//                    .build();
+//            mpClient.sendTemplateMessage(access_token, templateMessage);
         }
         return new Result<>();
+    }
+
+    @Async
+    void sendOneAnswerMsg(String access_token, String mpOpenId, String first, String title, String userName, String time, String remark) {
+        Keywords keywords = Keywords.builder()
+                .first(new Keyword(first))
+                .keyword1(new Keyword(title))
+                .keyword2(new Keyword(userName))
+                .keyword3(new Keyword(time))
+                .remark(new Keyword(remark))
+                .build();
+        TemplateMessage templateMessage = TemplateMessage.builder()
+                .touser(mpOpenId)
+                .template_id("EjI3qinEYZZoEKbC3VLCHYj0D0Mk5vQfWsvJysm1sbU")
+                .data(keywords)
+                .build();
+        mpClient.sendTemplateMessage(access_token, templateMessage);
     }
 
     private XmlResponse textMsgHandler(String fromUserName, String content, int bizmsgmenuid) throws CryptoException, JsonProcessingException {

@@ -330,7 +330,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Result<?> setPassword(String jws, String userName, String password, String motto) {
+    public Result<?> setPassword(String jws, String userName, String password) {
         JwtResult jwtResult = verifyJws(jws);
         if (jwtResult.isValid()) {
             String issuer = jwtResult.getIssuer();
@@ -341,7 +341,6 @@ public class AuthServiceImpl implements AuthService {
                 if (null != auth) {
                     auth.setUserName(userName);
                     auth.setPassword(password);
-                    auth.setMotto(motto);
                     authMapper.updateById(auth);
                     return new Result<>();
                 }
@@ -392,6 +391,24 @@ public class AuthServiceImpl implements AuthService {
                     major,
                     name);
             return new Result<>(userInfoDto);
+        }
+        return new Result<>(AUTHORIZATION_REQUIRED, "authorization required");
+    }
+
+    @Override
+    public Result<?> setProfile(String jws, String userName, String motto) {
+        JwtResult jwtResult = verifyJws(jws);
+        if (jwtResult.isValid()) {
+            String subject = jwtResult.getSubject();
+            long id = Long.parseLong(subject);
+            Auth auth = getAuthById(id);
+            if (null != auth) {
+                auth.setUserName(userName);
+                auth.setMotto(motto);
+                authMapper.updateById(auth);
+                return new Result<>();
+            }
+            return new Result<>(INTERNAL_SERVER_ERROR, "internal server error");
         }
         return new Result<>(AUTHORIZATION_REQUIRED, "authorization required");
     }

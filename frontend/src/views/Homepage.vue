@@ -79,7 +79,7 @@
                                     <v-select
                                       style="margin-top:20px; width:80px; margin-left:20px"
                                       :items="itemsx"
-                                      v-model="topic"
+									  v-model="topic"
                                       label="话题"      
                                     ></v-select>
                         <v-list-item flat text>
@@ -396,6 +396,8 @@
 			if(this.$store.state.times == 1){
 				this.getLikedAnswer();
 				this.getSubscribeList();
+				this.getFavoriteList();
+				this.getFavoriteAnsId();
 				this.$store.commit('subTimes');
 			}
 		},
@@ -409,6 +411,34 @@
 			}
 		},
         methods: {
+			getFavoriteAnsId(){
+				var _self = this;
+				var url = 'https://qa.pkucs.cn/api/qa/favorite/answer/ids';
+				this.$axios.get(url,{
+					headers:{
+						'Authorization':this.$store.state.token
+					}
+				}).then(function(response){
+					console.log(response);
+					_self.$store.commit('setFavoriteAnsList',{favoriteAnsList:response.data.data});
+				}).catch(function(error){
+					console.log(error);
+				})
+			},
+			getFavoriteList(){
+				var _self = this;
+				var url = 'https://qa.pkucs.cn/api/qa/favorite/question/ids';
+				this.$axios.get(url,{
+					headers:{
+						'Authorization':this.$store.state.token
+					}
+				}).then(function(response){
+					console.log(response);
+					_self.$store.commit('setFavoriteList',{favoriteList:response.data.data});
+				}).catch(function(error){
+					console.log(error);
+				})
+			},
 			getSubscribeList(){
 				var _self = this;
 				var url = 'https://qa.pkucs.cn/api/qa/subscription/ids';
@@ -420,7 +450,6 @@
 					console.log(response);
 					_self.$store.commit('setSubscribeList',{subscribeList:response.data.data});
 				}).catch(function(error){
-					alert('获取subscribe list失败');
 					console.log(error);
 				})
 			},
@@ -435,16 +464,12 @@
 					//console.log(response);
 					_self.$store.commit('setLikedAnswers',response.data.data);
 				}).catch(function(error){
-					alert('获取liked answers失败');
 					console.log(error);
 				})
 			},
 			questionDetail(item){
 				console.log(item);
-				if(this.tabNum == 1)
-					this.$store.state.questionId = item.oid;
-				else
-					this.$store.state.questionId = item._id;
+				this.$store.state.questionId = item._id;
 				this.$router.push('/qa');
 			},
 			getUserInfo(){
@@ -484,11 +509,9 @@
 					}
 					else{
 						console.log(response);
-						alert(response.data.msg);
 					}
 				}).catch(function(error){
 					console.log(error);
-					alert("连接失败");
 				})
 			},
             btrefresh() {
@@ -525,7 +548,7 @@
 									response.data.data[i].info = "";
 									for(var key in response.data.data[i].user){
 										if(key != 'userName' && key != 'dept' && key != 'motto')
-												continue;
+											continue;
 										var value = response.data.data[i].user[key];
 										if(value != undefined){
 											response.data.data[i].info += (value+' ');
@@ -536,14 +559,11 @@
 							_self.items4 = response.data.data;
 						}
 						else{
-							if(_self.pagenow>1){
+							if(_self.pagenow >= 1){
 								_self.$store.commit('subPageNow',{idx:_self.tabNum});
 								_self.pagenow = _self.pagenow - 1;
 							}
 						}
-					}
-					else{
-						alert("获取失败");
 					}
 				}).catch(function(error){
 					console.log(error);
@@ -558,13 +578,13 @@
 				else if(this.tabNum == 2)
 					l = this.items4.length;
 				if(l == 20){
+					this.pagenow = this.pagenow + 1;
 					if(this.tabNum == 0)
 						this.getSubscription();
 					else if(this.tabNum == 1)
-						l = this.getFavorite();
+						this.getFavorite();
 					else if(this.tabNum == 2)
-						l = this.getQuestionByPage();
-					this.pagenow = this.pagenow + 1;
+						this.getQuestionByPage();
 					this.$store.commit('addPageNow',{idx:this.tabNum});
 					if(this.pagenow > this.pagesum) {
 						this.$store.commit('addPageSum',{idx:this.tabNum});
@@ -576,9 +596,9 @@
 					if(this.tabNum == 0)
 						this.getSubscription();
 					else if(this.tabNum == 1)
-						l = this.getFavorite();
+						this.getFavorite();
 					else if(this.tabNum == 2)
-						l = this.getQuestionByPage();
+						this.getQuestionByPage();
 					this.btrefresh();
 				}
 			},
@@ -604,6 +624,7 @@
             },
 			postQuestion(){
 				this.dialog = false;
+				var _self = this;
 				var data = {
 					'title':this.questext,
 					'txt':this.detailtext,
@@ -616,12 +637,14 @@
 					headers: {
 						'Authorization':this.$store.state.token
 					}
-				}).then(function(){
-					//console.log(response);
-					alert("发送成功");
-				}).catch(function(){
-					//console.log(error);
-					alert("发送失败");
+				}).then(function(response){
+					console.log(response);
+					_self.$store.commit('addSubscribeWithId',{id:response.data.data});
+					_self.getSubscription();
+					//alert("发送成功");
+				}).catch(function(error){
+					console.log(error);
+					//alert("发送失败");
 				})
 			},
 			getFavorite(){
@@ -653,7 +676,7 @@
 									response.data.data[i].info = "";
 									for(var key in response.data.data[i].user){
 										if(key != 'userName' && key != 'dept' && key != 'motto')
-												continue;
+											continue;
 										var value = response.data.data[i].user[key];
 										if(value != undefined){
 											response.data.data[i].info += (value+' ');
@@ -669,9 +692,6 @@
 								_self.pagenow = _self.pagenow - 1;
 							}
 						}
-					}
-					else{
-						alert("获取失败");
 					}
 				}).catch(function(error){
 					console.log(error);
@@ -706,7 +726,7 @@
 									response.data.data[i].info = "";
 									for(var key in response.data.data[i].user){
 										if(key != 'userName' && key != 'dept' && key != 'motto')
-												continue;
+											continue;
 										var value = response.data.data[i].user[key];
 										if(value != undefined){
 											response.data.data[i].info += (value+' ');
@@ -722,9 +742,6 @@
 								_self.pagenow = _self.pagenow - 1;
 							}
 						}
-					}
-					else{
-						alert("获取失败");
 					}
 				}).catch(function(error){
 					console.log(error);

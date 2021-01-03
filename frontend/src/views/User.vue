@@ -197,12 +197,26 @@
 		methods:{
 			saveChange(){
 				this.unchange=!this.unchange;
+				var data = {
+					userName:this.userName,
+					motto:this.motto
+				}
+				this.$axios.post('https://auth.pkucs.cn/api/auth/profile',this.$qs.stringify(data),{
+					headers: {
+						'Authorization':this.$store.state.token
+					}
+				}).then(function(response){
+					console.log(response);
+				}).catch(function(error){
+					console.log(error);
+				})
 				this.$store.commit('setShowInfo',{
 					gender:this.gender,
 					dept:this.dept,
 					enroll:this.enroll,
 					motto:this.motto,
-					userName:this.userName})
+					userName:this.userName,
+					})
 			},
 			setUserName(){
 				this.$store.commit('setUserName',this.username);
@@ -212,12 +226,14 @@
 			var _self = this;
             return{
                 unchange:true,
-				avator:_self.$store.state.showInfo.avator,
+				avator:_self.$store.state.user.avator,
 				gender:_self.$store.state.showInfo.gender,
 				dept:_self.$store.state.showInfo.dept,
 				enroll:_self.$store.state.showInfo.enroll,
 				motto:_self.$store.state.showInfo.motto,
 				userName:_self.$store.state.showInfo.userName,
+				subscribe:_self.$store.state.subscribe,
+				favorite:_self.$store.state.favorite,
                 gender_items:[
                     {state:'不展示'},
                     {state:_self.$store.state.user.gender}
@@ -241,9 +257,8 @@
                     height:"26px",
                     fontSize:"14px"
                 },
-                focus:"300",
-                collects:"200",
-                reply:"100",
+                focus:this.$store.state.subscribe,
+                collects:this.$store.state.favorite,
                 no_flex:{
                     flex:"none",
                     width:"90px"

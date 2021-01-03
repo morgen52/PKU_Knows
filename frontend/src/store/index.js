@@ -33,21 +33,56 @@ export default new Vuex.Store({
 		pagenow:[1,1,1],
 		pagesum:[1,1,1],
 		questionId:0,
+		subsId:0,
 		likedAnswers:{},
-		subscribeList:[]
+		subscribeList:[],
+		favoriteList:[],
+		favoriteAnsList:[],
 	},
 	mutations: {
-		setSubscribe(state,data){
-			state.subscribe = data.num;
+		addFavorite(state){
+			if(state.favoriteList.length > 0 && state.favoriteList.indexOf(state.questionId) != -1)
+				return;
+			else
+				state.favoriteList.push(state.questionId);
 		},
-		setFavorite(state,data){
-			state.favorite = data.num;
+		deleteFavorite(state){
+			var i = 0;
+			var l = state.favoriteList.length;
+			for (i = 0;i < l; i ++){
+				if (state.favoriteList[i] == state.questionId)
+					break;
+			}
+			if(i > -1)	
+				state.favoriteList.splice(i,1);
+		},
+		addFavoriteAns(state,data){
+			if(state.favoriteAnsList.length > 0 && state.favoriteAnsList.indexOf(data.id) != -1)
+				return;
+			else
+				state.favoriteAnsList.push(data.id);
+		},
+		deleteFavoriteAns(state,data){
+			var i = 0;
+			var l = state.favoriteAnsList.length;
+			for (i = 0;i < l; i ++){
+				if (state.favoriteAnsList[i] == data.id)
+					break;
+			}
+			if(i > -1)	
+				state.favoriteAnsList.splice(i,1);
 		},
 		addSubscribe(state){
-			if(state.subscribeList.indexOf(state.questionId) != -1)
+			if(state.subscribeList.length > 0 && state.subscribeList.indexOf(state.questionId) != -1)
 				return;
 			else
 				state.subscribeList.push(state.questionId);
+		},		
+		addSubscribeWithId(state,data){
+			if(state.subscribeList.length > 0 && state.subscribeList.indexOf(data.id) != -1)
+				return;
+			else
+				state.subscribeList.push(data.id);
 		},
 		deleteSubscribe(state){
 			var i = 0;
@@ -64,6 +99,14 @@ export default new Vuex.Store({
 		},
 		setSubscribeList(state,data){
 			state.subscribeList = data.subscribeList;
+			state.subscribe = data.subscribeList.length;
+		},		
+		setFavoriteAnsList(state,data){
+			state.favoriteAnsList = data.favoriteAnsList;
+		},	
+		setFavoriteList(state,data){
+			state.favoriteList = data.favoriteList;
+			state.favorite = data.favoriteList.length;
 		},
 		setLikedAnswers(state,liked){
 			state.likedAnswers = liked;

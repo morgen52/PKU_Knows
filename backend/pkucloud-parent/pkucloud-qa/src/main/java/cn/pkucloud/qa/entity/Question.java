@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
@@ -20,7 +21,9 @@ public class Question {
     @JsonIgnore
     private String uid;
     private User user;
+    @TextIndexed
     private String title;
+    @TextIndexed
     private String txt;
     private String[] img;
     private String topic;

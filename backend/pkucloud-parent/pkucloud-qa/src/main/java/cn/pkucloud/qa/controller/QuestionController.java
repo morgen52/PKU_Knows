@@ -5,22 +5,36 @@ import cn.pkucloud.common.Result;
 import cn.pkucloud.qa.entity.Answer;
 import cn.pkucloud.qa.entity.Question;
 import cn.pkucloud.qa.service.QaService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("qa/question")
 public class QuestionController {
-    @Autowired
-    private QaService qaService;
+    private final QaService qaService;
+
+    public QuestionController(QaService qaService) {
+        this.qaService = qaService;
+    }
 
     @GetMapping
     public PageResult<Question> getQuestionByPage(@RequestHeader("iss") String issuer,
                                                   @RequestHeader("uid") String uid,
                                                   @RequestHeader("role") String role,
                                                   @RequestHeader("mod") String mod,
+                                                  @RequestParam(required = false) String topic,
+                                                  @RequestParam(required = false) String[] tag,
+                                                  @RequestParam(required = false) String regex,
                                                   @RequestParam int size,
                                                   @RequestParam int page) {
+        if (null != topic) {
+            return qaService.getQuestionByTopic(issuer, uid, role, mod, topic, size, page);
+        }
+        if (null != tag) {
+            return qaService.getQuestionByTag(issuer, uid, role, mod, tag, size, page);
+        }
+        if (null != regex) {
+            return qaService.getQuestionByRegex(issuer, uid, role, mod, regex, size, page);
+        }
         return qaService.getQuestionByPage(issuer, uid, role, mod, size, page);
     }
 

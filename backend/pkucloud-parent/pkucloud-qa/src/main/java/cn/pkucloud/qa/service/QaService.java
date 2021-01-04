@@ -60,4 +60,12 @@ public interface QaService {
     Result<?> deleteFavorite(String issuer, String uid, String role, String mod, String type, String oid);
 
     Result<?> deleteSubscription(String issuer, String uid, String role, String mod, String qid);
+
+    PageResult<Question> getQuestionByTopic(String issuer, String uid, String role, String mod, String topic, int size, int page);
+
+    PageResult<Question> getQuestionByTag(String issuer, String uid, String role, String mod, String[] tag, int size, int page);
+
+    PageResult<Question> getQuestionByRegex(String issuer, String uid, String role, String mod, String regex, int size, int page);
+
+    Result<?> putCommentLike(String issuer, String uid, String role, String mod, String id, int like);
 }

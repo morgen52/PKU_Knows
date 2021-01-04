@@ -8,7 +8,6 @@ import cn.pkucloud.qa.feign.WxmpClient;
 import cn.pkucloud.qa.repository.*;
 import cn.pkucloud.qa.service.QaService;
 import org.apache.commons.collections4.IterableUtils;
-import org.apache.commons.collections4.IteratorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,7 +20,6 @@ import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -686,6 +684,42 @@ public class QaServiceImpl implements QaService {
             return new Result<>(AUTHORIZATION_REQUIRED, "authorization required");
         }
         return new Result<>(NOT_FOUND, "not found");
+    }
+
+    @Override
+    public PageResult<Question> getQuestionByTopic(String issuer, String uid, String role, String mod, String topic, int size, int page) {
+        Sort.Order order = new Sort.Order(Sort.Direction.DESC, "_id");
+        Sort sort = Sort.by(order);
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+        Page<Question> questionPage = questionRepository.findByTopic(topic, pageRequest);
+        List<Question> questionList = questionPage.getContent();
+        return new PageResult<>(questionList);
+    }
+
+    @Override
+    public PageResult<Question> getQuestionByTag(String issuer, String uid, String role, String mod, String[] tag, int size, int page) {
+        Sort.Order order = new Sort.Order(Sort.Direction.DESC, "_id");
+        Sort sort = Sort.by(order);
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+        Page<Question> questionPage = questionRepository.findByTag(tag, pageRequest);
+        List<Question> questionList = questionPage.getContent();
+        return new PageResult<>(questionList);
+    }
+
+    @Override
+    public PageResult<Question> getQuestionByRegex(String issuer, String uid, String role, String mod, String regex, int size, int page) {
+        Sort.Order order = new Sort.Order(Sort.Direction.DESC, "_id");
+        Sort sort = Sort.by(order);
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+        System.out.println("keyword = " + regex);
+        Page<Question> questionPage = questionRepository.findByTitleRegexOrTxtRegex(regex, regex, pageRequest);
+        List<Question> questionList = questionPage.getContent();
+        return new PageResult<>(questionList);
+    }
+
+    @Override
+    public Result<?> putCommentLike(String issuer, String uid, String role, String mod, String id, int like) {
+        return null;
     }
 
     private User getUser(User user, int setting) {

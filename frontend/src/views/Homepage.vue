@@ -19,6 +19,7 @@
             v-model="searchtext"
             clearable
             label="请输入搜索内容"
+			@keyup.enter.native="searchQuestion"
         >
         </v-text-field>
         <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
@@ -79,7 +80,7 @@
                                     <v-select
                                       style="margin-top:20px; width:80px; margin-left:20px"
                                       :items="itemsx"
-									  v-model="topic"
+                                    v-model="topic"
                                       label="话题"      
                                     ></v-select>
                         <v-list-item flat text>
@@ -392,7 +393,11 @@
 			this.getQuestionByPage();//需要触发的函数
 			this.getFavorite();
 			this.getSubscription();
-			this.$forceUpdate();
+			this.tabNum = this.$store.state.tabNum;
+			console.log(this.tabNum);
+			console.log(this.$store.state.tabNum);
+			this.btrefresh();
+			console.log(this.tabNum);
 			if(this.$store.state.times == 1){
 				this.getLikedAnswer();
 				this.getSubscribeList();
@@ -408,9 +413,34 @@
 					this.pagesum = this.$store.state.pagesum[this.tabNum];
 					this.btrefresh();
 				}
+			},
+			select0(){
+				if(this.select0 == '全部'){
+					this.items2 = this.items2origin;
+					this.items3 = this.items3origin;
+					this.items4 = this.items4origin;
+				}
+				else{
+					var s = this.select0;
+					this.items2 = this.items2origin.filter(item => item.topic == s);
+					this.items3 = this.items3origin.filter(item => item.topic == s);
+					this.items4 = this.items4origin.filter(item => item.topic == s);
+				}
+				this.btrefresh();
 			}
 		},
         methods: {
+			searchQuestion(){
+				if(this.searchtext == ""){
+					this.items4 = this.items4origin;
+				}
+				else{
+					this.getQuestionByPage(this.searchtext);
+				}
+				this.tabNum = 2;
+				this.$store.commit('setTabNum',{tabNum:2});
+				this.btrefresh();
+			},
 			getFavoriteAnsId(){
 				var _self = this;
 				var url = 'https://qa.pkucs.cn/api/qa/favorite/answer/ids';
@@ -470,6 +500,8 @@
 			questionDetail(item){
 				console.log(item);
 				this.$store.state.questionId = item._id;
+				this.$store.commit('setTabNum',this.tabNum);
+				console.log(this.$store.state.tabNum);
 				this.$router.push('/qa');
 			},
 			getUserInfo(){
@@ -519,19 +551,28 @@
                 document.documentElement.scrollTop = 0;
                 this.$forceUpdate();
             },
-			getQuestionByPage(){
+			getQuestionByPage(txt = ""){
 				if(this.pagenow < 1){
 					return;
 				}
 				var _self = this;
+				var data = {
+					size:20,
+					page:this.pagenow - 1
+				};
+				if(txt != ""){
+					data = {
+						size:100,
+						page:0,
+						regex:txt,
+						tag:txt
+					};
+				}
 				this.$axios.get('https://qa.pkucs.cn/api/qa/question',{
 					headers:{
 						'Authorization':this.$store.state.token
 					},
-					params:{
-						size:20,
-						page:this.pagenow - 1
-					}
+					params:data
 				}).then(function(response){
 					console.log(response);
 					if(response.data.code == 0){
@@ -557,6 +598,8 @@
 								}							  
 							}
 							_self.items4 = response.data.data;
+							if(txt == "")	
+								_self.items4origin = response.data.data;
 						}
 						else{
 							if(_self.pagenow >= 1){
@@ -570,6 +613,8 @@
 				})
 			},
 			getNextQuestionPage(){
+				if(this.searchtext != "")
+					return;
 				var l = 0;
 				if(this.tabNum == 0)
 					l = this.items2.length;
@@ -603,6 +648,9 @@
 				}
 			},
 			getPreQuestionPage(){
+				console.log(this.searchtext);
+				if(this.searchtext != "")
+					return;
 				if(this.pagenow > 1){
 					this.pagenow = this.pagenow - 1;
 					this.$store.commit('subPageNow',{idx:this.tabNum});
@@ -646,6 +694,10 @@
 					console.log(error);
 					//alert("发送失败");
 				})
+				this.questext = "";
+				this.detailtext = "";
+				this.labeltext = "";
+				this.topic = "";
 			},
 			getFavorite(){
 				var _self = this;
@@ -685,6 +737,7 @@
 								}							  
 							}
 							_self.items3 = response.data.data;
+							_self.items3origin = response.data.data;
 						}
 						else{
 							if(_self.pagenow > 1){
@@ -735,6 +788,7 @@
 								}							  
 							}
 							_self.items2 = response.data.data;
+							_self.items2origin = response.data.data;
 						}
 						else{
 							if(_self.pagenow > 1){
@@ -767,24 +821,19 @@
 				detailtext:'',
 				topic:'',
 				labeltext:'',
-				tabNum:0,
-				items:[
-					{ title: '全部'},
-					{ title: '课程'},
-					{ title: '学术'},
-					{ title: '生活'},
-					{ title: '情感'},
-					{ title: '娱乐'},
-				],
+				tabNum:this.$store.state.tabNum,
 				items1:['最新提问','最新回答'],
 				select1: '最新提问',
 	/*            items1:[
 					{ title: '最新提问'},
 					{ title: '最新回答'},
 				],*/
-				items2:[],            
+				items2:[],
+				items2origin:[],
 				items3:[],
+				items3origin:[],
 				items4:[],
+				items4origin:[]
 			}
 		}
    }

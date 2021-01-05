@@ -145,12 +145,13 @@
         methods:{
 			signIn(){
 				this.loader = this.loading2;
+				var data = {};
+				var _self = this;
 				if(this.tab == 1){
-					var data = {
+					data = {
 						'code':this.code,
 						'phone':this.title
 					}
-					var _self = this;
 					this.$axios.post('https://auth.pkucs.cn/api/sms/token',this.$qs.stringify(data)
 					).then(function(response){
 						// console.log(response);
@@ -166,11 +167,10 @@
 					})
 				}
 				else{
-					var data = {
+					data = {
 						'password':this.password,
 						'userName':this.title_user
 					}
-					var _self = this;
 					this.$axios.post('https://auth.pkucs.cn/api/password/token',this.$qs.stringify(data)
 					).then(function(response){
 						console.log(response);

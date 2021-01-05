@@ -382,6 +382,11 @@
             <v-icon>mdi-chevron-right</v-icon>
         </v-btn>
     </v-bottom-navigation>
+	<v-footer class="uni">
+		<v-spacer></v-spacer>
+		<a href=" " target="_blank" style="color: #000000;">京ICP备2020036222号-1</a >
+		<v-spacer></v-spacer>
+	</v-footer>
   </v-app>
 </template>
 
@@ -394,10 +399,7 @@
 			this.getFavorite();
 			this.getSubscription();
 			this.tabNum = this.$store.state.tabNum;
-			console.log(this.tabNum);
-			console.log(this.$store.state.tabNum);
 			this.btrefresh();
-			console.log(this.tabNum);
 			if(this.$store.state.times == 1){
 				this.getLikedAnswer();
 				this.getSubscribeList();
@@ -838,3 +840,10 @@
 		}
    }
 </script>
+<style>
+	.uni{
+		position: fixed;
+		z-index: 999;
+		font-size: 10px;
+		}
+</style>

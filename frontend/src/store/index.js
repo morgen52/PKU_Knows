@@ -129,11 +129,14 @@ export default new Vuex.Store({
 		},
 		updateLikedAnswers(state,msg){
 			if(msg.change == 0){
-				try{
-					delete state.likedAnswers.msg.id;
-				}catch{
-					return;
+				var l = state.likedAnswers.length;
+				var i = 0;
+				for (i=0; i < l; i++){
+					if(state.likeAnswers[i] == msg.id)
+						break;
 				}
+				if(i > -1)
+					state.likeAnswers.splice(i,1);
 			}
 			else{
 				state.likedAnswers.msg.id = msg.change;

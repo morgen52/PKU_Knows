@@ -24,7 +24,7 @@
             style="margin-bottom: 10px;"
             >
                 <v-avatar size="80px">
-                    <img alt="头像" v-bind:src="avator">
+                    <img alt="请您注册微信小程序'未名云'" v-bind:src="avator">
                 </v-avatar>
                 <v-col
                 cols="9"

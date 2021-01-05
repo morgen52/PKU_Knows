@@ -32,6 +32,7 @@ export default new Vuex.Store({
 		},
 		pagenow:[1,1,1],
 		pagesum:[1,1,1],
+		tabNum:0,
 		questionId:0,
 		subsId:0,
 		likedAnswers:{},
@@ -40,6 +41,11 @@ export default new Vuex.Store({
 		favoriteAnsList:[],
 	},
 	mutations: {
+		setTabNum(state,tabNum){
+			state.tabNum = tabNum;
+			console.log("enter index.js");
+			console.log(state.tabNum);
+		},
 		addFavorite(state){
 			if(state.favoriteList.length > 0 && state.favoriteList.indexOf(state.questionId) != -1)
 				return;
@@ -175,4 +181,5 @@ export default new Vuex.Store({
 	modules: {
 	}
 })
+
 

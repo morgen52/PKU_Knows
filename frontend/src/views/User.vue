@@ -24,7 +24,7 @@
             style="margin-bottom: 10px;"
             >
                 <v-avatar size="80px">
-                    <img alt="头像" v-bind:src="image_src" >
+                    <img alt="请您注册微信小程序'未名云'" v-bind:src="avator">
                 </v-avatar>
                 <v-col
                 cols="9"
@@ -34,7 +34,7 @@
                 >
                     <v-text-field
                     single-line
-                    v-model="username"
+                    v-model="userName"
                     dense
                     v-bind:readonly="unchange"
                     v-bind:solo="unchange"
@@ -55,19 +55,14 @@
             flat
             >
                 <v-row justify="center" align="center">
-                    <v-col cols="3" sm="2" md="1" align="center" justify="center">
+                    <v-col cols="5" sm="2" md="1" align="center" justify="center">
                         <v-list-item-title>{{focus}}</v-list-item-title>
-                        <v-list-item-subtitle>关注</v-list-item-subtitle>
+                        <v-list-item-subtitle>关注问题数</v-list-item-subtitle>
                     </v-col>
                     <v-divider vertical></v-divider>
-                    <v-col cols="3" sm="2" md="1" align="center" justify="center">
+                    <v-col cols="5" sm="2" md="1" align="center" justify="center">
                         <v-list-item-title>{{collects}}</v-list-item-title>
-                        <v-list-item-subtitle>收藏</v-list-item-subtitle>
-                    </v-col>
-                    <v-divider vertical></v-divider>
-                    <v-col cols="3" sm="2" md="1" align="center" justify="center">
-                        <v-list-item-title>{{reply}}</v-list-item-title>
-                        <v-list-item-subtitle>回答</v-list-item-subtitle>
+                        <v-list-item-subtitle>收藏问题数</v-list-item-subtitle>
                     </v-col>
                 </v-row>
             </v-card>
@@ -103,7 +98,7 @@
                     <v-col cols="8" sm="6">
                         <v-select
                         v-if="!unchange"
-                        v-model="master"
+                        v-model="dept"
                         v-bind:readonly="unchange"
                         v-bind:autofocus="unchange"
                         :items="master_items"
@@ -112,7 +107,7 @@
                         ></v-select>
                         <v-text-field
                         v-if="unchange"
-                        v-model="master"
+                        v-model="dept"
                         v-bind:readonly="unchange"
                         dense
                         class="myright"
@@ -127,7 +122,7 @@
                     <v-col cols="8" sm="6">
                         <v-select
                         v-if="!unchange"
-                        v-model="grade"
+                        v-model="enroll"
                         v-bind:readonly="unchange"
                         v-bind:autofocus="unchange"
                         :items="grade_items"
@@ -136,7 +131,7 @@
                         ></v-select>
                         <v-text-field
                         v-if="unchange"
-                        v-model="grade"
+                        v-model="enroll"
                         v-bind:readonly="unchange"
                         dense
                         class="myright"
@@ -187,7 +182,7 @@
                 text
                 elevation=1
                 v-if="!unchange"
-                @click="unchange=!unchange">
+                @click="saveChange">
                     保存
                 </v-btn>
             </v-row>
@@ -199,28 +194,57 @@
     export default{
         el:"#user",
         name:'User',
+		methods:{
+			saveChange(){
+				this.unchange=!this.unchange;
+				var data = {
+					userName:this.userName,
+					motto:this.motto
+				}
+				this.$axios.post('https://auth.pkucs.cn/api/auth/profile',this.$qs.stringify(data),{
+					headers: {
+						'Authorization':this.$store.state.token
+					}
+				}).then(function(response){
+					console.log(response);
+				}).catch(function(error){
+					console.log(error);
+				})
+				this.$store.commit('setShowInfo',{
+					gender:this.gender,
+					dept:this.dept,
+					enroll:this.enroll,
+					motto:this.motto,
+					userName:this.userName,
+					})
+			},
+			setUserName(){
+				this.$store.commit('setUserName',this.username);
+			}
+		},
         data(){
+			var _self = this;
             return{
-                username:"未名被卷王",
-                image_src: require('../assets/images/portrait.jpg'),
-                master:"信息科学技术学院",
-                gender:"男",
-                grade:"2018级本科生",
-                email:"111111111@qq.com",
-                motto:"啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊",
                 unchange:true,
+				avator:_self.$store.state.user.avator,
+				gender:_self.$store.state.showInfo.gender,
+				dept:_self.$store.state.showInfo.dept,
+				enroll:_self.$store.state.showInfo.enroll,
+				motto:_self.$store.state.showInfo.motto,
+				userName:_self.$store.state.showInfo.userName,
+				subscribe:_self.$store.state.subscribe,
+				favorite:_self.$store.state.favorite,
                 gender_items:[
                     {state:'不展示'},
-                    {state:'男'},
-                    {state:'女'},
+                    {state:_self.$store.state.user.gender}
                 ],
                 master_items:[
                     {state:'不展示'},
-                    {state:'信息科学技术学院'},
+                    {state:_self.$store.state.user.dept},
                 ],
                 grade_items:[
                     {state:'不展示'},
-                    {state:'2018级本科生'},
+                    {state:_self.$store.state.user.enroll},
                 ],
                 sides:{
                     padding:"0px",
@@ -233,9 +257,8 @@
                     height:"26px",
                     fontSize:"14px"
                 },
-                focus:"300",
-                collects:"200",
-                reply:"100",
+                focus:this.$store.state.subscribe,
+                collects:this.$store.state.favorite,
                 no_flex:{
                     flex:"none",
                     width:"90px"

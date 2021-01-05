@@ -248,7 +248,7 @@
                                 <v-list-item>
                                     <v-list-item-avatar color="white">
                                       <v-img
-                                        src=item.avator
+                                        :src="item.avator"
                                       ></v-img>
                                     </v-list-item-avatar>
                                     <v-list-item-content>
@@ -350,7 +350,7 @@
                                     <v-list-item>
                                         <v-list-item-avatar color="white">
                                           <v-img
-                                            src=item.avator
+                                            :src="item.avator"
                                           ></v-img>
                                         </v-list-item-avatar>
                                         <v-list-item-content>
@@ -652,11 +652,11 @@
 								else{
 									response.data.data[i].userName = response.data.data[i].user.userName;
 								}
-								if(response.data.data[i].user.avator == undefined){
-									response.data.data[i].avator = '../assets/images/logo.png';
+								if(response.data.data[i].user.avatar == undefined){
+									response.data.data[i].avator = require('../assets/images/logo.png');
 								}
 								else{
-									response.data.data[i].avator = response.data.data[i].user.avator;
+									response.data.data[i].avator = response.data.data[i].user.avatar;
 								}
 							}						  
 						}
@@ -680,7 +680,6 @@
 						size:100
 					}
 				}).then(function(response){
-					console.log(response);
 					if(response.data.code == 0){
 						var i = 0;
 						var l = response.data.data.length;
@@ -694,11 +693,16 @@
 								response.data.data[i].liked = 2;
 							else
 								response.data.data[i].liked = 0;
-							if(response.data.data[i].user == undefined)
+							if(response.data.data[i].user == undefined){
 								response.data.data[i].info = '匿名用户';
+								response.data.data[i].avator = require('../assets/images/logo.png');
+							}
 							else{
+								response.data.data[i].avator = response.data.data[i].user.avatar;
 								response.data.data[i].info = "";
 								for(var key in response.data.data[i].user){
+									if(key != 'userName' && key != 'motto' && key != 'dept' && key != 'enroll')
+										continue;
 									var value = response.data.data[i].user[key];
 									if(value != undefined){
 										response.data.data[i].info += (value+' ');
@@ -761,8 +765,17 @@
 				})
 			},
 			dislikeAnswer(item){
-                if(item.liked == 2)
+                if(item.liked == 2){
+					this.putLike(item._id,0);
+					item.liked = 0;
+					item.dislike = item.dislike - 1;
+					this.$store.commit('updateLikedAnswers',{
+										id:item._id,
+										change:0,
+										});
+					this.$forceUpdate();
 					return;
+				}
 				else if(item.liked == 1){
 					this.putLike(item._id,0);
 					item.like = item.like - 1;
@@ -780,9 +793,18 @@
 				this.$forceUpdate();
             },
             likeAnswer(item){
-				console.log(item);
-                if(item.liked == 1)
+                if(item.liked == 1){
+					this.putLike(item._id,0);
+					item.liked = 0;
+					item.like = item.like - 1;
+					this.$store.commit('updateLikedAnswers',{
+										id:item._id,
+										change:0,
+										});
+					this.$forceUpdate();
 					return;
+				}
+
 				else if(item.liked == 2){
 					this.putLike(item._id,0);
 					item.dislike = item.dislike - 1;

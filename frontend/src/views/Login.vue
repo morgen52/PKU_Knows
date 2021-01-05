@@ -162,8 +162,7 @@
 							alert("登录失败");
 						}
 					}).catch(function(error){
-						alert(error);
-						// console.log(error);
+						console.log(error);
 					})
 				}
 				else{

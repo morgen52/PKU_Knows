@@ -248,7 +248,7 @@
                                 <v-list-item>
                                     <v-list-item-avatar color="white">
                                       <v-img
-                                        src=item.avator
+                                        :src="item.avator"
                                       ></v-img>
                                     </v-list-item-avatar>
                                     <v-list-item-content>
@@ -350,7 +350,7 @@
                                     <v-list-item>
                                         <v-list-item-avatar color="white">
                                           <v-img
-                                            src=item.avator
+                                            :src="item.avator"
                                           ></v-img>
                                         </v-list-item-avatar>
                                         <v-list-item-content>
@@ -652,11 +652,11 @@
 								else{
 									response.data.data[i].userName = response.data.data[i].user.userName;
 								}
-								if(response.data.data[i].user.avator == undefined){
-									response.data.data[i].avator = '../assets/images/logo.png';
+								if(response.data.data[i].user.avatar == undefined){
+									response.data.data[i].avator = require('../assets/images/logo.png');
 								}
 								else{
-									response.data.data[i].avator = response.data.data[i].user.avator;
+									response.data.data[i].avator = response.data.data[i].user.avatar;
 								}
 							}						  
 						}
@@ -680,7 +680,7 @@
 						size:100
 					}
 				}).then(function(response){
-					console.log(response);
+					console.log(response.data.data);
 					if(response.data.code == 0){
 						var i = 0;
 						var l = response.data.data.length;
@@ -696,10 +696,10 @@
 								response.data.data[i].liked = 0;
 							if(response.data.data[i].user == undefined){
 								response.data.data[i].info = '匿名用户';
-								response.data.data[i].avator = '../assets/images/logo.png';
+								response.data.data[i].avator = require('../assets/images/logo.png');
 							}
 							else{
-								response.data.data[i].avator = response.data.data[i].user.avator;
+								response.data.data[i].avator = response.data.data[i].user.avatar;
 								response.data.data[i].info = "";
 								for(var key in response.data.data[i].user){
 									if(key != 'userName' && key != 'motto' && key != 'dept' && key != 'enroll')

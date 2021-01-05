@@ -602,7 +602,7 @@
 								_self.items4origin = response.data.data;
 						}
 						else{
-							if(_self.pagenow >= 1){
+							if(_self.pagenow > 1){
 								_self.$store.commit('subPageNow',{idx:_self.tabNum});
 								_self.pagenow = _self.pagenow - 1;
 							}

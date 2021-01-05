@@ -766,8 +766,17 @@
 				})
 			},
 			dislikeAnswer(item){
-                if(item.liked == 2)
+                if(item.liked == 2){
+					this.putLike(item._id,0);
+					item.liked = 0;
+					item.dislike = item.dislike - 1;
+					this.$store.commit('updateLikedAnswers',{
+										id:item._id,
+										change:0,
+										});
+					this.$forceUpdate();
 					return;
+				}
 				else if(item.liked == 1){
 					this.putLike(item._id,0);
 					item.like = item.like - 1;
@@ -785,9 +794,17 @@
 				this.$forceUpdate();
             },
             likeAnswer(item){
-				console.log(item);
-                if(item.liked == 1)
+                if(item.liked == 1){
+					this.putLike(item._id,0);
+					item.liked = 0;
+					item.like = item.like - 1;
+					this.$store.commit('updateLikedAnswers',{
+										id:item._id,
+										change:0,
+										});
+					this.$forceUpdate();
 					return;
+				}
 				else if(item.liked == 2){
 					this.putLike(item._id,0);
 					item.dislike = item.dislike - 1;

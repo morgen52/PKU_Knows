@@ -7,7 +7,7 @@ export default new Vuex.Store({
 	
 	state: {
 		token:"",
-		setting:0,
+		setting:7,
 		times:1,
 		user:{
 			avator:"",

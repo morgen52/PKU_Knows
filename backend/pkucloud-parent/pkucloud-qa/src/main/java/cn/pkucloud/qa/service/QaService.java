@@ -2,17 +2,18 @@ package cn.pkucloud.qa.service;
 
 import cn.pkucloud.common.PageResult;
 import cn.pkucloud.common.Result;
-import cn.pkucloud.qa.entity.Answer;
-import cn.pkucloud.qa.entity.Comment;
-import cn.pkucloud.qa.entity.Question;
-import cn.pkucloud.qa.entity.Report;
+import cn.pkucloud.qa.entity.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface QaService {
     PageResult<Question> getQuestionByPage(String issuer, String uid, String role, String mod, int size, int page);
 
     Result<Question> getQuestionById(String issuer, String uid, String role, String mod, String id);
 
-    Result<?> postQuestion(String issuer, String uid, String role, String mod, String title, String txt, String[] img, String[] tag, int setting, boolean subscribe);
+    Result<?> postQuestion(String issuer, String uid, String role, String mod, String title, String txt, String[] img, String topic, String tag, int setting, boolean subscribe);
 
     PageResult<Answer> getAnswerByQid(String issuer, String uid, String role, String mod, String qid, int size, int page);
 
@@ -34,17 +35,37 @@ public interface QaService {
 
     Result<?> putQuestionLike(String issuer, String uid, String role, String mod, String id, int like);
 
-    PageResult<Question> getFavoriteQuestionByPage(String issuer, String uid, String role, String mod, int size, int page);
-
-    PageResult<Answer> getFavoriteAnswerByPage(String issuer, String uid, String role, String mod, int size, int page);
+    PageResult<?> getFavoriteByPage(String issuer, String uid, String role, String mod, String type, int size, int page);
 
     Result<?> postFavorite(String issuer, String uid, String role, String mod, String type, String id);
 
     Result<?> deleteFavoriteById(String issuer, String uid, String role, String mod, String id);
 
-    PageResult<Question> getSubscriptionQuestionByPage(String issuer, String uid, String role, String mod, int size, int page);
+    PageResult<SubscriptionQuestion> getSubscriptionQuestionByPage(String issuer, String uid, String role, String mod, int size, int page);
 
     Result<?> postSubscription(String issuer, String uid, String role, String mod, String qid);
 
     Result<?> deleteSubscriptionById(String issuer, String uid, String role, String mod, String id);
+
+    Result<?> putAnswerLike(String issuer, String uid, String role, String mod, String id, int like);
+
+    Result<Map<String, String>> getQuestionLike(String uid);
+
+    Result<Map<String, String>> getAnswerLike(String uid);
+
+    Result<List<String>> getFavoriteIds(String uid, String type);
+
+    Result<List<String>> getSubscriptionIds(String uid);
+
+    Result<?> deleteFavorite(String issuer, String uid, String role, String mod, String type, String oid);
+
+    Result<?> deleteSubscription(String issuer, String uid, String role, String mod, String qid);
+
+    PageResult<Question> getQuestionByTopic(String issuer, String uid, String role, String mod, String topic, int size, int page);
+
+    PageResult<Question> getQuestionByTag(String issuer, String uid, String role, String mod, String[] tag, int size, int page);
+
+    PageResult<Question> getQuestionByRegex(String issuer, String uid, String role, String mod, String regex, int size, int page);
+
+    Result<?> putCommentLike(String issuer, String uid, String role, String mod, String id, int like);
 }

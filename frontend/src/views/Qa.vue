@@ -680,7 +680,6 @@
 						size:100
 					}
 				}).then(function(response){
-					console.log(response.data.data);
 					if(response.data.code == 0){
 						var i = 0;
 						var l = response.data.data.length;
@@ -805,6 +804,7 @@
 					this.$forceUpdate();
 					return;
 				}
+
 				else if(item.liked == 2){
 					this.putLike(item._id,0);
 					item.dislike = item.dislike - 1;

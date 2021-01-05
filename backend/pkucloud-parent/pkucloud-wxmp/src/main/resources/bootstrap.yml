@@ -2,4 +2,4 @@ spring:
   application:
     name: pkucloud-wxmp
   profiles:
-    active: dev
+    active: prod

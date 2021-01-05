@@ -31,6 +31,8 @@ public class Auth {
     @JsonIgnore
     private String password;
 
+    private String motto;
+
     private String pkuId;
 
     private String phone;

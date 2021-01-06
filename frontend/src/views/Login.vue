@@ -106,6 +106,19 @@
         props:{
             source:String,
         },
+		beforeCreate() {
+			var ua = navigator.userAgent;
+			if(/mobi/i.test(ua)){
+				if(/micromessnger/i.test(ua))
+					console.log("移动端微信浏览器");
+				else{
+					return;
+				}
+			}
+			else{
+				window.location.href = "https://sso.pkucloud.cn/";
+			}
+		},
         data() {
             return {
                 tab: null,

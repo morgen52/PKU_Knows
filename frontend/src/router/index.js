@@ -71,6 +71,11 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import( '../views/Set.vue')
   },
+  {
+		path: '/sso',
+		name: 'Sso',
+		component: () => import( '../views/Sso.vue')
+  }
 ]
 const router = new VueRouter({
   routes
